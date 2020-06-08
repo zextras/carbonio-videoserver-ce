@@ -1,0 +1,21 @@
+### ~from ThirdParty/Makefile:
+# - include via ThirdParty/${package}/Makefile
+SHELL := /bin/bash
+
+SRC_ROOT ?= $(shell cd ../../..; pwd)
+THIRDPARTY_ROOT := $(shell cd ../..; pwd)
+
+include $(SRC_ROOT)/zimbra-package-stub/def/package.def
+
+include $(THIRDPARTY_ROOT)/versions.def
+include $(THIRDPARTY_ROOT)/perl-versions.def
+
+# * https://www.virtualbox.org/ticket/819
+# * https://bugzilla.zimbra.com/show_bug.cgi?id=97266
+BUILD_ROOT ?= $(THIRDPARTY_ROOT)
+BUILD_DIR := $(BUILD_ROOT)/$(patsubst $(THIRDPARTY_ROOT)/%,%,$(PKG_ROOT))/build
+
+PLATFORM_DIR = $(BUILD_DIR)/$(BUILD_PLATFORM)
+SRC_DIR = $(PLATFORM_DIR)/src
+
+PKG_MAINTAINER = Zimbra Packaging Services <packaging-devel@zimbra.com>

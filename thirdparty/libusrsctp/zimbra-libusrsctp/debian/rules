@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+export DEB_BUILD_OPTIONS=nocheck
+
+# Ensure rpath is set correctly
+export DEB_LDFLAGS_MAINT_APPEND=-Wl,-rpath,OZCL
+
+%:
+	dh $@ --parallel
+override_dh_auto_configure:
+	./bootstrap
+	./configure --prefix=OZC \
+	--disable-debug
+
+override_dh_strip:
+	dh_strip -pzimbra-libusrsctp
+	dh_strip -Nzimbra-libusrsctp -Nzimbra-libusrsctp
+
+override_dh_auto_install:
+	make DESTDIR=$$(pwd)/debian/tmp install

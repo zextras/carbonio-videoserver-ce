@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+export DEB_BUILD_OPTIONS=nocheck
+
+# Ensure rpath is set correctly
+export DEB_LDFLAGS_MAINT_APPEND=-Wl,-rpath,OZCL
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_build:
+	make -j$$(nproc)
+override_dh_auto_clean:
+
+override_dh_auto_configure:
+	PKG_CONFIG_PATH=OZCL/pkgconfig ./configure --prefix=OZC \
+	--disable-static \
+	--enable-shared \
+	--disable-debug \
+	--extra-cflags="-IOZC/include" \
+	--extra-ldflags="-LOZC/lib" \
+	--bindir="OZC/bin" \
+	--enable-gpl \
+	--enable-libass \
+	--enable-libfdk-aac \
+	--enable-libfreetype \
+	--enable-libmp3lame \
+	--enable-libopus \
+	--enable-libtheora \
+	--enable-libvpx \
+	--enable-libx264 \
+	--enable-nonfree \
+	--enable-libxcb
+
+override_dh_strip:
+	dh_strip -pzimbra-ffmpeg
+	dh_strip -Nzimbra-ffmpeg -Nzimbra-ffmpeg
+
+override_dh_auto_install:
+	make DESTDIR=$$(pwd)/debian/tmp install

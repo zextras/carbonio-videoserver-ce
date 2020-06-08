@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+export DEB_BUILD_OPTIONS=nocheck
+
+# Ensure rpath is set correctly
+export DEB_LDFLAGS_MAINT_APPEND=-Wl,-rpath,OZCL
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_build:
+	make -j$$(nproc)
+
+override_dh_auto_configure:
+	./configure --prefix=OZC \
+	--disable-install-docs \
+	--disable-install-srcs \
+	--enable-pic \
+	--enable-postproc \
+	--enable-runtime-cpu-detect \
+	--enable-shared \
+	--enable-vp8 \
+	--enable-vp9 \
+	--enable-vp9-highbitdepth \
+	--enable-vp9-temporal-denoising
+
+override_dh_strip:
+	dh_strip -pzimbra-libvpx
+	dh_strip -Nzimbra-libvpx -Nzimbra-libvpx
+
+override_dh_auto_install:
+	make DIST_DIR=$$(pwd)/debian/tmpOZC install

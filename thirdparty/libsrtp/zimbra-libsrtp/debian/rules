@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+export DEB_BUILD_OPTIONS=nocheck
+
+# Ensure rpath is set correctly
+export DEB_LDFLAGS_MAINT_APPEND=-Wl,-rpath,OZCL
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	PKG_CONFIG_PATH=OZCL/pkgconfig \
+	./configure --prefix=OZC \
+	--enable-openssl \
+
+override_dh_auto_build:
+	make all
+	make shared_library
+
+override_dh_strip:
+	dh_strip -pzimbra-libsrtp
+	dh_strip -Nzimbra-libsrtp -Nzimbra-libsrtp
+
+override_dh_auto_install:
+	make DESTDIR=$$(pwd)/debian/tmp install

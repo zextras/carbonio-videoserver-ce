@@ -1,0 +1,4 @@
+opt/zimbra/common/include/nice
+opt/zimbra/common/include/stun
+opt/zimbra/common/lib/libnice.so
+opt/zimbra/common/lib/pkgconfig/nice.pc

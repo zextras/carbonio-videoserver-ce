@@ -1,0 +1,22 @@
+Source: zimbra-libnice
+Build-Depends: debhelper (>= 9), m4, dpkg-dev (>= 1.15.7), libssl-dev
+Section: utils
+Priority: optional
+Maintainer: Zextras Packaging Services <gianluca.boiano@zextras.com>
+Uploaders: Zextras Packaging Services <gianluca.boiano@zextras.com>
+Standards-Version: 3.9.5
+Homepage: https://github.com/libnice/libnice
+
+Package: zimbra-libnice
+Priority: optional
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: An implementation of the IETF's draft ICE (for p2p UDP data streams)
+
+Package: zimbra-libnice-dev
+Section: libdevel
+Priority: optional
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}
+Description: libnice development pieces
