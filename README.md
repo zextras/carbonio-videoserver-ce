@@ -12,23 +12,23 @@ DataChannels support:      yes
 
 Recordings post-processor: yes
 
-TURN REST API client:      yes
+TURN REST API client:      no
 
 Doxygen documentation:     no
 
 Transports:
 
-    REST (HTTP/HTTPS):     yes
+    REST (HTTP/HTTPS):     no
 
     WebSockets:            yes
 
-    RabbitMQ:              yes
+    RabbitMQ:              no
 
     MQTT:                  no
 
-    Unix Sockets:          yes
+    Unix Sockets:          no
 
-    Nanomsg:               yes
+    Nanomsg:               no
 
 Plugins:
 
@@ -38,19 +38,19 @@ Plugins:
 
     Video Call:            yes
 
-    SIP Gateway:           yes
+    SIP Gateway:           no
 
-    NoSIP (RTP Bridge):    yes
+    NoSIP (RTP Bridge):    no
 
     Audio Bridge:          yes
 
     Video Room:            yes
 
-    Voice Mail:            yes
+    Voice Mail:            no
 
     Record&Play:           yes
 
-    Text Room:             yes
+    Text Room:             no
 
     Lua Interpreter:       yes
 
@@ -58,17 +58,17 @@ Plugins:
 
 Event handlers:
 
-    Sample event handler:  yes
+    Sample event handler:  no
 
     WebSocket ev. handler: yes
 
-    RabbitMQ event handler:yes
+    RabbitMQ event handler:no
 
     MQTT event handler:    no
 
-    Nanomsg event handler: yes
+    Nanomsg event handler: no
 
-    GELF event handler:    yes
+    GELF event handler:    no
 
 External loggers:
 

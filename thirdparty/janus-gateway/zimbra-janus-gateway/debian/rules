@@ -14,12 +14,19 @@ override_dh_auto_configure:
 	--prefix OZC \
 	--sysconfdir /etc \
 	--disable-docs \
-	--enable-json-logger \
-	--disable-mqtt \
+	--disable-turn-rest-api \
+	--disable-all-transports \
+	--enable-websockets \
+	--disable-plugin-sip \
+	--disable-plugin-nosip \
+	--disable-plugin-textroom \
+	--disable-plugin-voicemail \
 	--enable-plugin-duktape \
 	--enable-plugin-lua \
 	--enable-post-processing \
-	--enable-rabbitmq
+	--disable-all-handlers \
+	--enable-websockets-event-handler \
+	--enable-json-logger
 
 override_dh_strip:
 	dh_strip -pzimbra-janus-gateway
