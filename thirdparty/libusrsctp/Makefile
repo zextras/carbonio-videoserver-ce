@@ -6,7 +6,7 @@ pvers := $(LIBUSRSCTP_VERSION)
 pname := libusrsctp
 pfile := $(pname)-$(pvers).tar.gz
 psrc_file := $(SRC_DIR)/$(pfile)
-commit := 4867d7c2e5c12ffd7dbe79b2e53750d21cfa25f4
+commit := 3df8f52f44d6a24407112123aa68c6a24e8158f3
 purl := https://github.com/sctplab/usrsctp/archive/$(commit).tar.gz
 zname := zimbra-$(pname)
 zspec := $(pname).spec
@@ -40,7 +40,7 @@ build_rpm:
 	$(replace-pkginfo) $(specfile) && \
 	$(replace-pathinfo) $(specfile) && \
 	$(MKDIR) BUILD BUILDROOT RPMS SOURCES SRPMS && \
-	$(CP) $(psrc_file) SOURCES/$(zname)-$(pvers).tgz && \
+	$(CP) $(psrc_file) SOURCES/$(zname)-$(pvers).tar.gz && \
 	$(PKG_BUILD) $(specfile)
 
 build_deb: z_tgz = $(zname)_$(pvers).orig.tar.gz

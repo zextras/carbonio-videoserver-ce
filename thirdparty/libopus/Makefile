@@ -39,7 +39,7 @@ build_rpm:
 	$(replace-pkginfo) $(specfile) && \
 	$(replace-pathinfo) $(specfile) && \
 	$(MKDIR) BUILD BUILDROOT RPMS SOURCES SRPMS && \
-	$(CP) $(psrc_file) SOURCES/$(zname)-$(pvers).tgz && \
+	$(CP) $(psrc_file) SOURCES/$(zname)-$(pvers).tar.gz && \
 	$(PKG_BUILD) $(specfile)
 
 build_deb: z_tgz = $(zname)_$(pvers).orig.tar.gz

@@ -2,7 +2,7 @@
 # - include via ThirdParty/${package}/Makefile
 SHELL := /bin/bash
 
-SRC_ROOT ?= $(shell cd ../../..; pwd)
+SRC_ROOT ?= $(shell cd ../..; pwd)
 THIRDPARTY_ROOT := $(shell cd ../..; pwd)
 
 include $(SRC_ROOT)/zimbra-package-stub/def/package.def
