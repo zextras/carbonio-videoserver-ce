@@ -13,7 +13,7 @@ A portable SCTP userland stack
 %define debug_package %{nil}
 
 %prep
-%setup -n usrsctp-3df8f52f44d6a24407112123aa68c6a24e8158f3
+%setup -n usrsctp-ab18247e4105bbe00fa8ce7f4eb6c380ae88631d
 
 %build
 LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
