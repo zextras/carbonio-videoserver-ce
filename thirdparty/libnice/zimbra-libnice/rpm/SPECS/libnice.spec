@@ -5,6 +5,9 @@ Release:            ITERATIONZAPPEND
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      openssl-devel
+BuildRequires:      python3-pip
+BuildRequires:      python3-setuptools
+BuildRequires:      ninja-build
 Requires:           openssl
 AutoReqProv:        no
 URL:                https://github.com/libnice/libnice
@@ -18,14 +21,12 @@ An implementation of the IETF's draft ICE (for p2p UDP data streams)
 %setup -n libnice-%{version}
 
 %build
-LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
-CFLAGS="-O2 -g"; export CFLAGS; \
 PKG_CONFIG_PATH=OZCL/pkgconfig \
-./autogen.sh --prefix=OZC
-make
+meson --werror --warnlevel 2 -Dgtk_doc=disabled --prefix=OZC build --libdir=lib
+meson compile -C build
 
 %install
-make install DESTDIR=${RPM_BUILD_ROOT}
+DESTDIR=${RPM_BUILD_ROOT} meson install -C build/
 
 %package devel
 Summary:        libnice development pieces
@@ -44,7 +45,6 @@ OZCB
 %defattr(-,root,root)
 OZCL/*.so
 OZCL/pkgconfig
-OZCL/*.la
 OZCI
 
 %changelog

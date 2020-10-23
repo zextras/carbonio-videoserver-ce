@@ -8,11 +8,12 @@ export DEB_LDFLAGS_MAINT_APPEND=-Wl,-rpath,OZCL
 	dh $@ --parallel
 override_dh_auto_configure:
 	PKG_CONFIG_PATH=OZCL/pkgconfig \
-	./autogen.sh --prefix=OZC
+	meson --werror --warnlevel 2 -Dgtk_doc=disabled --prefix=OZC build --libdir=lib
+	meson compile -C build
 	
 override_dh_strip:
 	dh_strip -pzimbra-libnice
 	dh_strip -Nzimbra-libnice -Nzimbra-libnice
 
 override_dh_auto_install:
-	make DESTDIR=$$(pwd)/debian/tmp install
+	DESTDIR=$$(pwd)/debian/tmp meson install -C build

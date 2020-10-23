@@ -1,5 +1,5 @@
 Source: zimbra-libnice
-Build-Depends: debhelper (>= 9), m4, dpkg-dev (>= 1.15.7), libssl-dev
+Build-Depends: debhelper (>= 9), m4, dpkg-dev (>= 1.15.7), libssl-dev, ninja-build, python3-pip, python3-setuptools
 Section: utils
 Priority: optional
 Maintainer: Zextras Packaging Services <gianluca.boiano@zextras.com>
