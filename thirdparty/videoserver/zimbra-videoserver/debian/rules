@@ -31,4 +31,5 @@ override_dh_strip:
 
 override_dh_auto_install:
 	make DESTDIR=$$(pwd)/debian/tmp install configs
+	rm -rf $$(pwd)/debian/tmp/OZC/share/janus/demos/
 	install -Dm644 -t $$(pwd)/debian/tmp/lib/systemd/system/ $$(pwd)/debian/videoserver.service

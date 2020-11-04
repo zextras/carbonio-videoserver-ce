@@ -82,6 +82,8 @@ esac
 make DESTDIR=${RPM_BUILD_ROOT} install configs
 rm -rf ${RPM_BUILD_ROOT}OZCS/doc
 rm -rf ${RPM_BUILD_ROOT}OZCS/man
+rm -rf ${RPM_BUILD_ROOT}OZCS/janus/demos/
+
 mkdir -p %{buildroot}%{_unitdir}
 tee %{buildroot}%{_unitdir}/videoserver.service <<EOF
 [Unit]
