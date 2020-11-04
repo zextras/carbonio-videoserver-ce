@@ -124,6 +124,7 @@ The zimbra-videoserver-devel package contains the linking libraries and include 
 %{_unitdir}/videoserver.service
 OZCB
 OZCL/*/*/*.so.*
+OZCL/*/*/*.so
 OZCS/janus
 
 %files confs
@@ -132,7 +133,6 @@ OZCS/janus
 
 %files devel
 %defattr(-,root,root)
-OZCL/*/*/*.so
 OZCL/*/*/*.la
 OZCI
 

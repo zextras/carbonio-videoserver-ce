@@ -1,4 +1,5 @@
 lib/systemd/system/videoserver.service
 opt/zimbra/common/bin
+opt/zimbra/common/lib/*/*/*.so
 opt/zimbra/common/lib/*/*/*.so.*
 opt/zimbra/common/share/janus
