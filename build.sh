@@ -97,12 +97,12 @@ mkdir -p "artifacts/videoserver-${tag}"
 
 if [[ "${os_tag%%.*}" =~ "UBUNTU" ]] ||
 	[[ "${os_tag%%.*}" =~ "ASTRALINUX" ]]; then
-	find . -name "*.deb" \
+	find thirdparty -name "*.deb" \
 		-and -not -name "*-dbg*" \
 		-and -not -name "*-dev_*" \
 		-exec cp {} "artifacts/videoserver-${tag}" \;
 else
-	find . -name "*.rpm" \
+	find thirdparty -name "*.rpm" \
 		-and -not -name "*.src.rpm" \
 		-and -not -name "*-debuginfo-*" \
 		-and -not -name "*-debugsource-*" \
