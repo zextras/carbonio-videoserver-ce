@@ -17,21 +17,18 @@ override_dh_auto_configure:
 	--disable-turn-rest-api \
 	--disable-all-transports \
 	--enable-websockets \
-	--disable-plugin-sip \
-	--disable-plugin-nosip \
-	--disable-plugin-textroom \
-	--disable-plugin-voicemail \
-	--enable-plugin-duktape \
-	--enable-plugin-lua \
+	--disable-all-plugins \
+	--enable-plugin-audiobridge \
+	--enable-plugin-videoroom \
 	--enable-post-processing \
 	--disable-all-handlers \
 	--enable-websockets-event-handler \
-	--enable-json-logger
+	--disable-json-logger
 
 override_dh_strip:
-	dh_strip -pzimbra-janus-gateway
-	dh_strip -Nzimbra-janus-gateway -Nzimbra-janus-gateway
+	dh_strip -pzimbra-videoserver
+	dh_strip -Nzimbra-videoserver -Nzimbra-videoserver
 
 override_dh_auto_install:
 	make DESTDIR=$$(pwd)/debian/tmp install configs
-	install -Dm644 -t $$(pwd)/debian/tmp/lib/systemd/system/ $$(pwd)/debian/janus.service
+	install -Dm644 -t $$(pwd)/debian/tmp/lib/systemd/system/ $$(pwd)/debian/videoserver.service

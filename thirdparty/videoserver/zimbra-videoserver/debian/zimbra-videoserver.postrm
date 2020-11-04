@@ -9,14 +9,14 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 fi
 
 if [ "$1" = "purge" ]; then
-    if getent passwd janus >/dev/null; then
+    if getent passwd videoserver >/dev/null; then
         if which deluser >/dev/null; then
-            deluser --system janus || echo "Could not remove janus user."
+            deluser --system videoserver || echo "Could not remove videoserver user."
         fi
     fi
-    if getent group janus >/dev/null; then
+    if getent group videoserver >/dev/null; then
         if which delgroup >/dev/null; then
-            delgroup --system janus || echo "Could not remove janus group."
+            delgroup --system videoserver || echo "Could not remove videoserver group."
         fi
     fi
 fi

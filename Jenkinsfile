@@ -94,7 +94,7 @@ pipeline {
     }
     post {
         success {
-            build job: 'Bitbucket Cloud/zextras/janus-docker/master',
+            build job: 'Bitbucket Cloud/zextras/janus-installer/master',
                 parameters: [
                 string(name: 'janusParamName', value: "${BRANCH_NAME}")
             ], propagate: false

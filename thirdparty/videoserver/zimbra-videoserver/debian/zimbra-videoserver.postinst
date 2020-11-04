@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+# creating videoserver group if it isn't already there
+if ! getent group videoserver >/dev/null; then
+        addgroup --system --force-badname --quiet videoserver
+fi
+
+# creating videoserver user if it isn't already there
+if ! getent passwd videoserver >/dev/null; then
+        adduser --system --force-badname --quiet \
+            --ingroup videoserver \
+            --home /var/lib/videoserver \
+            --shell /bin/false \
+            videoserver
+        usermod -c "videoserver WebRTC group" videoserver
+fi
+
+if ! test -d /var/lib/videoserver; then
+	mkdir /var/lib/videoserver
+	chown -R videoserver:videoserver /var/lib/videoserver
+	# This directory can contain sensitive data and should not be world-readable
+	chmod 0700 /var/lib/videoserver
+fi
+#DEBHELPER#

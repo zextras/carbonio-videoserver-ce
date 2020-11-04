@@ -93,21 +93,23 @@ if [ -d artifacts ]; then
 fi
 
 tag=${os_tag##*.}-$(date +'%Y%m%d')
-mkdir -p "artifacts/janus-gateway-${tag}"
+mkdir -p "artifacts/videoserver-${tag}"
 
 if [[ "${os_tag%%.*}" =~ "UBUNTU" ]] ||
 	[[ "${os_tag%%.*}" =~ "ASTRALINUX" ]]; then
 	find . -name "*.deb" \
 		-and -not -name "*-dbg*" \
-		-exec cp {} "artifacts/janus-gateway-${tag}" \;
+		-and -not -name "*-dev_*" \
+		-exec cp {} "artifacts/videoserver-${tag}" \;
 else
 	find . -name "*.rpm" \
 		-and -not -name "*.src.rpm" \
 		-and -not -name "*-debuginfo-*" \
 		-and -not -name "*-debugsource-*" \
-		-exec cp {} "artifacts/janus-gateway-${tag}" \;
+		-and -not -name "*-devel-*" \
+		-exec cp {} "artifacts/videoserver-${tag}" \;
 fi
 
 cd artifacts || exit
-tar cfvz "janus-gateway-${tag}.tgz" \
-	"janus-gateway-${tag}"
+tar cfvz "videoserver-${tag}.tgz" \
+	"videoserver-${tag}"

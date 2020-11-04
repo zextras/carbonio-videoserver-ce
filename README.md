@@ -32,9 +32,9 @@ Transports:
 
 Plugins:
 
-    Echo Test:             yes
+    Echo Test:             no
 
-    Streaming:             yes
+    Streaming:             no
 
     Video Call:            yes
 
@@ -48,13 +48,13 @@ Plugins:
 
     Voice Mail:            no
 
-    Record&Play:           yes
+    Record&Play:           no
 
     Text Room:             no
 
-    Lua Interpreter:       yes
+    Lua Interpreter:       no
 
-    Duktape Interpreter:   yes
+    Duktape Interpreter:   no
 
 Event handlers:
 
@@ -72,6 +72,6 @@ Event handlers:
 
 External loggers:
 
-    JSON file logger:      yes
+    JSON file logger:      no
 
 JavaScript modules:        no

@@ -1,12 +1,12 @@
 [Unit]
-Description=Janus WebRTC Gateway
+Description=Zextras Videoserver
 Wants=network.target
 
 [Service]
 Type=simple
 ExecStart=/opt/zimbra/common/bin/janus
-User=janus
-Group=janus
+User=videoserver
+Group=videoserver
 Restart=on-failure
 LimitNOFILE=65536
 TasksMax=infinity
