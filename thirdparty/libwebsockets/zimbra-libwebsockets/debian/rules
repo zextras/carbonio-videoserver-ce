@@ -7,7 +7,9 @@ export DEB_LDFLAGS_MAINT_APPEND=-Wl,-rpath,OZCL
 %:
 	dh $@ --parallel
 override_dh_auto_configure:
-	cmake -D CMAKE_INSTALL_PREFIX=OZC \
+	cmake \
+	-D CMAKE_C_FLAGS="-fno-strict-aliasing" \
+	-D CMAKE_INSTALL_PREFIX=OZC \
 	-D CMAKE_BUILD_TYPE='None' \
 	-D LWS_WITH_HTTP2=ON \
 	-D LWS_IPV6=ON \

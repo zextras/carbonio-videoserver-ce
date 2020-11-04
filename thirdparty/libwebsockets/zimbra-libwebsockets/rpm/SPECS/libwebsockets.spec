@@ -26,6 +26,7 @@ C library for websocket clients and servers
 LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
 CFLAGS="-O2 -g"; export CFLAGS; \
 cmake -D CMAKE_INSTALL_PREFIX=OZC \
+-D CMAKE_C_FLAGS="-fno-strict-aliasing" \
 -D CMAKE_BUILD_TYPE='None' \
 -D LWS_WITH_HTTP2=ON \
 -D LWS_IPV6=ON \
@@ -73,10 +74,12 @@ libwebsockets development pieces
 %files
 %defattr(-,root,root)
 OZCL/*.so.*
+OZCL/libwebsockets-evlib_ev.so
+OZCL/libwebsockets-evlib_uv.so
 
 %files devel
 %defattr(-,root,root)
-OZCL/*.so
+OZCL/libwebsockets.so
 OZCL/pkgconfig
 OZCI
 
