@@ -56,7 +56,7 @@ PKG_CONFIG_PATH=OZCL/pkgconfig ./configure --prefix=OZC \
 --enable-libx264 \
 --enable-nonfree \
 --enable-libxcb
-make
+make -j$(nproc)
 
 %install
 make install DESTDIR=${RPM_BUILD_ROOT}

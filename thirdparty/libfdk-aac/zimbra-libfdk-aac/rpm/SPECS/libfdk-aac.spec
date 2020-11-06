@@ -21,7 +21,7 @@ CFLAGS="-O2 -g"; export CFLAGS; \
 ./autogen.sh
 ./configure --prefix=OZC \
 --disable-static
-make
+make -j$(nproc)
 
 %install
 make install DESTDIR=${RPM_BUILD_ROOT}

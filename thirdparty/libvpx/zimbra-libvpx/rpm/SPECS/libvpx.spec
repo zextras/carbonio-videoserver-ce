@@ -31,7 +31,7 @@ CFLAGS="-O2 -g"; export CFLAGS; \
 --enable-vp9-highbitdepth \
 --enable-vp9-temporal-denoising \
 --as=yasm
-make
+make -j$(nproc)
 
 %install
 make install DIST_DIR=${RPM_BUILD_ROOT}OZC
