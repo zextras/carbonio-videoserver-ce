@@ -1,0 +1,24 @@
+Template: videoserver/license
+Type: boolean
+Default: true
+Description: .: License Agreement :.
+ Do you want to agree with this License?
+ .
+ If you leave this field empty, the default value ('yes') will be used.
+
+Template: videoserver/public-ip
+Type: string
+Default: localhost
+Description: .: Public IP server :.
+ Please insert the Public IP server to bind with.
+ .
+ If you leave this field empty, the default value ('localhost') will be used.
+
+Template: videoserver/token
+Type: note
+Description: .: Congratulations! Every bit is in its right place :.
+ Please execute these commands:
+ .
+ zxsuite config global set teamVideoServerSecret ${API_SECRET}
+ .
+ zxsuite config global set teamVideoServerSecret ${PUBLIC_IP}

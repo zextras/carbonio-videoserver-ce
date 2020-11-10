@@ -1,26 +1,40 @@
 #!/bin/sh
-
 set -e
+. /usr/share/debconf/confmodule
 
-# creating videoserver group if it isn't already there
-if ! getent group videoserver >/dev/null; then
-        addgroup --system --force-badname --quiet videoserver
-fi
+if [ "$1" = "configure" ]; then
 
-# creating videoserver user if it isn't already there
-if ! getent passwd videoserver >/dev/null; then
-        adduser --system --force-badname --quiet \
-            --ingroup videoserver \
-            --home /var/lib/videoserver \
-            --shell /bin/false \
-            videoserver
-        usermod -c "videoserver WebRTC group" videoserver
-fi
+  # creating videoserver group if it isn't already there
+  if ! getent group videoserver >/dev/null; then
+    addgroup --system --force-badname --quiet videoserver
+  fi
 
-if ! test -d /var/lib/videoserver; then
-	mkdir /var/lib/videoserver
-	chown -R videoserver:videoserver /var/lib/videoserver
-	# This directory can contain sensitive data and should not be world-readable
-	chmod 0700 /var/lib/videoserver
-fi
-#DEBHELPER#
+  # creating videoserver user if it isn't already there
+  if ! getent passwd videoserver >/dev/null; then
+    adduser --system --force-badname --quiet \
+      --ingroup videoserver \
+      --home /var/lib/videoserver \
+      --shell /bin/false \
+      videoserver
+    usermod -c "videoserver WebRTC group" videoserver
+  fi
+
+  if ! test -d /var/lib/videoserver; then
+    mkdir /var/lib/videoserver
+    chown -R videoserver:videoserver /var/lib/videoserver
+    # This directory can contain sensitive data and should not be world-readable
+    chmod 0700 /var/lib/videoserver
+  fi
+
+  # The following only on a new install
+  # License Agreement
+  db_get videoserver/license
+  if [ "$RET" = "false" ]; then
+    exit 0
+  fi
+fi # End of configure
+
+# Stop Debconf
+db_stop
+
+exit 0

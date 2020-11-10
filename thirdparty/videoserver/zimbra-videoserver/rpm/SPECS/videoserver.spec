@@ -25,6 +25,7 @@ Requires:      libogg
 Requires:      openssl
 #Requires:      zimbra-base
 Requires:      zimbra-ffmpeg, zimbra-libnice, zimbra-libopus, zimbra-libsrtp, zimbra-libusrsctp, zimbra-libwebsockets
+Requires:      zimbra-videoserver-confs
 Requires:      zlib
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
@@ -105,7 +106,6 @@ EOF
 
 %package confs
 Summary:        videoserver Libraries
-Requires:       zimbra-videoserver
 AutoReqProv:    no
 
 %description confs
