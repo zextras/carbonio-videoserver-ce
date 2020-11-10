@@ -47,10 +47,28 @@ pipeline {
                         sh "docker cp ${WORKSPACE} ${env.CONTAINER1_ID}:/u18"
                         sh "docker exec -t ${env.CONTAINER1_ID} bash -c \"cd /u18/; ./build.sh\""
                         sh "docker cp ${env.CONTAINER1_ID}:/u18/artifacts/. ${WORKSPACE}"
+                        script {
+                            def server = Artifactory.server 'zextras-artifactory'
+                            def buildInfo = Artifactory.newBuildInfo()
+
+                            def uploadSpec = """{
+                                "files": [
+                                    {
+                                        "pattern": "videoserver*/*.deb",
+                                        "target": "debian-local/pool/",
+                                        "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
+                                    }
+                                ]
+                            }"""
+                            server.upload spec: uploadSpec, buildInfo: buildInfo
+                            server.publishBuildInfo buildInfo
+                        }
                     }
                     post {
-                        always {
+                        success {
                             archiveArtifacts artifacts: "*.tgz", fingerprint: true
+                        }
+                        always {
                             sh "docker kill ${env.CONTAINER1_ID}"
                         }
                     }
@@ -64,10 +82,28 @@ pipeline {
                         sh "docker cp ${WORKSPACE} ${env.CONTAINER2_ID}:/r7"
                         sh "docker exec -t ${env.CONTAINER2_ID} bash -c \"cd /r7/; scl enable devtoolset-9 ./build.sh\""
                         sh "docker cp ${env.CONTAINER2_ID}:/r7/artifacts/. ${WORKSPACE}"
+                        script {
+                            def server = Artifactory.server 'zextras-artifactory'
+                            def buildInfo = Artifactory.newBuildInfo()
+
+                            def uploadSpec = """{
+                                "files": [
+                                    {
+                                        "pattern": "videoserver*/(*)-(*)-(*).rpm",
+                                        "target": "rpm-local/zextras/{1}/{1}-{2}-{3}.rpm",
+                                        "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
+                                    }
+                                ]
+                            }"""
+                            server.upload spec: uploadSpec, buildInfo: buildInfo
+                            server.publishBuildInfo buildInfo
+                        }
                     }
                     post {
-                        always {
+                        success {
                             archiveArtifacts artifacts: "*.tgz", fingerprint: true
+                        }
+                        always {
                             sh "docker kill ${env.CONTAINER2_ID}"
                         }
                     }
@@ -81,14 +117,32 @@ pipeline {
                         sh "docker cp ${WORKSPACE} ${env.CONTAINER3_ID}:/r8"
                         sh "docker exec -t ${env.CONTAINER3_ID} bash -c \"cd /r8/; ./build.sh\""
                         sh "docker cp ${env.CONTAINER3_ID}:/r8/artifacts/. ${WORKSPACE}"
+                        script {
+                            def server = Artifactory.server 'zextras-artifactory'
+                            def buildInfo = Artifactory.newBuildInfo()
+
+                            def uploadSpec = """{
+                                "files": [
+                                    {
+                                        "pattern": "videoserver*/(*)-(*)-(*).rpm",
+                                        "target": "rpm-local/zextras/{1}/{1}-{2}-{3}.rpm",
+                                        "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
+                                    }
+                                ]
+                            }"""
+                            server.upload spec: uploadSpec, buildInfo: buildInfo
+                            server.publishBuildInfo buildInfo
+                        }
                     }
                     post {
-                        always {
+                        success {
                             archiveArtifacts artifacts: "*.tgz", fingerprint: true
+                        }
+                        always {
                             sh "docker kill ${env.CONTAINER3_ID}"
                         }
                     }
-                }                                                
+                }
             }
         }
     }
@@ -101,8 +155,9 @@ pipeline {
         }        
         always {
             sh 'docker rmi janus-builder-ubuntu18 --force'
-            sh 'docker rmi janus-builder-centos8 --force'
             sh 'docker rmi janus-builder-centos7 --force'
+            sh 'docker rmi janus-builder-centos8 --force'
+
             script {
                 GIT_COMMIT_EMAIL = sh(
                     script: 'git --no-pager show -s --format=\'%ae\'',

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This is the root of thi git repo (janus-packages)
+# This is the root of this git repo (janus-packages)
 packages_folder=$(pwd)
 
 # Automatically check for distro flavour
