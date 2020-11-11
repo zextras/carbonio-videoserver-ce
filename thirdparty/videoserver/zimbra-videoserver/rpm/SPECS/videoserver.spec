@@ -33,10 +33,12 @@ Patch0:             janus.jcfg.patch
 AutoReqProv:        no
 URL:                https://zextras.com
 
+%define _binary_payload w7.xzdio
+%define __python %{__python3}
+%define debug_package %{nil}
+
 %description
 Zextras Video Server
-
-%define debug_package %{nil}
 
 %prep
 %setup -n janus-gateway-multistream
@@ -49,19 +51,19 @@ CFLAGS="-O2 -g -IOZCI"; export CFLAGS; \
 PKG_CONFIG_PATH="OZCL/pkgconfig"; export PKG_CONFIG_PATH; \
 ./autogen.sh
 ./configure \
-	--prefix OZC \
-	--sysconfdir /etc \
-	--disable-docs \
-	--disable-turn-rest-api \
-	--disable-all-transports \
-	--enable-websockets \
-	--disable-all-plugins \
-	--enable-plugin-audiobridge \
-	--enable-plugin-videoroom \
-	--enable-post-processing \
-	--disable-all-handlers \
-	--enable-websockets-event-handler \
-	--disable-json-logger
+--prefix OZC \
+--sysconfdir /etc \
+--disable-docs \
+--disable-turn-rest-api \
+--disable-all-transports \
+--enable-websockets \
+--disable-all-plugins \
+--enable-plugin-audiobridge \
+--enable-plugin-videoroom \
+--enable-post-processing \
+--disable-all-handlers \
+--enable-websockets-event-handler \
+--disable-json-logger
 make
 
 %pre
@@ -69,15 +71,19 @@ getent group videoserver >/dev/null || groupadd -r videoserver
 getent passwd videoserver >/dev/null || \
 useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 
-%postun
-case "$1" in
-    0) # This is a yum remove.
-    /usr/sbin/userdel videoserver
-    ;;
-    1) # This is a yum upgrade.
-    # do nothing
-    ;;
-esac
+%post
+api_secret="$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)"
+sed -i "s/\${API_SECRET}/$api_secret/g" /etc/janus/janus.jcfg
+cat <<EOF
+.: Congratulations! Every bit is in its right place :.
+
+        Please execute these steps:
+* Set ${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
+
+* Run
+zxsuite config global set teamVideoServerSecret ${api_secret}
+zxsuite config global set teamVideoServerSecret <YOUR_IP>
+EOF
 
 %install
 make DESTDIR=${RPM_BUILD_ROOT} install configs
@@ -129,6 +135,7 @@ OZCS/janus
 
 %files confs
 %defattr(-,root,root)
+%config(noreplace) /etc/janus/janus.jcfg
 /etc
 
 %files devel
@@ -137,5 +144,5 @@ OZCL/*/*/*.la
 OZCI
 
 %changelog
-* Wed Nov 03 2020 Zextras Packaging Services <packaging@zextras.com>
+* Wed Nov 11 2020 Zextras Packaging Services <packaging@zextras.com>
 - initial packaging
