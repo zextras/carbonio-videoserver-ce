@@ -1,7 +1,7 @@
 Summary:            Zimbra's Websockets C library build
 Name:               zimbra-libwebsockets
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            MIT
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      libev-devel
@@ -17,17 +17,13 @@ URL:                https://libwebsockets.org
 %description
 C library for websocket clients and servers
 
-%define debug_package %{nil}
-
 %prep
 %setup -n libwebsockets-%{version}
 
 %build
-LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
-CFLAGS="-O2 -g"; export CFLAGS; \
 cmake -D CMAKE_INSTALL_PREFIX=OZC \
--D CMAKE_C_FLAGS="-fno-strict-aliasing" \
--D CMAKE_BUILD_TYPE='None' \
+-D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
+-D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,OZCL" \
 -D LWS_WITH_HTTP2=ON \
 -D LWS_IPV6=ON \
 -D LWS_WITH_ZIP_FOPS=ON \
@@ -45,6 +41,7 @@ cmake -D CMAKE_INSTALL_PREFIX=OZC \
 -D LWS_WITH_LWSAC=ON \
 -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
 -D LWS_WITHOUT_BUILTIN_GETIFADDRS=ON \
+-D LWS_USE_BUNDLED_ZLIB=OFF \
 -D LWS_WITHOUT_BUILTIN_SHA1=ON \
 -D LWS_WITH_STATIC=OFF \
 -D LWS_WITHOUT_CLIENT=OFF \
@@ -54,9 +51,7 @@ cmake -D CMAKE_INSTALL_PREFIX=OZC \
 -D LWS_WITHOUT_TEST_SERVER_EXTPOLL=ON \
 -D LWS_WITHOUT_TEST_PING=ON \
 -D LWS_WITHOUT_TEST_CLIENT=ON \
--Wno-dev \
--B build \
--S .
+.
 make
 
 %install

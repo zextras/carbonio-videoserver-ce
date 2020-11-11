@@ -1,7 +1,7 @@
 Summary:            Zimbra's libnice build
 Name:               zimbra-libnice
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      openssl-devel
@@ -14,8 +14,6 @@ URL:                https://github.com/libnice/libnice
 
 %description
 An implementation of the IETF's draft ICE (for p2p UDP data streams)
-
-%define debug_package %{nil}
 
 %prep
 %setup -n libnice-%{version}

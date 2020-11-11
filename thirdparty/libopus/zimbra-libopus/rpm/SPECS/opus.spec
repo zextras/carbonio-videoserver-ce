@@ -1,7 +1,7 @@
 Summary:            Zimbra's Opus codec build
 Name:               zimbra-libopus
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 AutoReqProv:        no
@@ -9,8 +9,6 @@ URL:                https://www.webmproject.org/
 
 %description
 Totally open, royalty-free, highly versatile audio codec
-
-%define debug_package %{nil}
 
 %prep
 %setup -n opus-%{version}

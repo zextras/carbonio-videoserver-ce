@@ -1,7 +1,7 @@
 Summary:            Zimbra's VP8 and VP9 codec build
 Name:               zimbra-libvpx
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      yasm
@@ -10,8 +10,6 @@ URL:                https://www.webmproject.org/
 
 %description
 VP8 and VP9 codec
-
-%define debug_package %{nil}
 
 %prep
 %setup -n libvpx-%{version}

@@ -1,7 +1,7 @@
 Summary:            Zimbra's FDK AAC codec build
 Name:               zimbra-libfdk-aac
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            CUSTOM
 Source:             %{name}-%{version}.tar.gz
 AutoReqProv:        no
@@ -9,8 +9,6 @@ URL:                https://sourceforge.net/projects/opencore-amr/
 
 %description
 Fraunhofer FDK AAC codec library
-
-%define debug_package %{nil}
 
 %prep
 %setup -n fdk-aac-%{version}

@@ -1,7 +1,7 @@
 Summary:            Zimbra's FFMPEG build
 Name:               zimbra-ffmpeg
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            GPL3
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      freetype-devel
@@ -30,8 +30,6 @@ URL:                https://ffmpeg.org/
 %description
 Complete solution to record, convert and stream audio and video
 
-%define debug_package %{nil}
-
 %prep
 %setup -n ffmpeg-%{version}
 
@@ -42,6 +40,7 @@ PKG_CONFIG_PATH=OZCL/pkgconfig ./configure --prefix=OZC \
 --disable-static \
 --enable-shared \
 --disable-debug \
+--disable-stripping \
 --extra-cflags="-IOZC/include" \
 --extra-ldflags="-LOZC/lib" \
 --bindir="OZC/bin" \

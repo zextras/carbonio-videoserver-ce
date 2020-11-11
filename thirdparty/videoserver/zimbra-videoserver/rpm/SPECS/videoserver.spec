@@ -1,7 +1,7 @@
 Summary:            Zextras Videoserver build
 Name:               zimbra-videoserver
 Version:            VERSION
-Release:            ITERATIONZAPPEND
+Release:            ITERATION%{?dist}
 License:            GPLv3
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      jansson-devel
@@ -33,9 +33,7 @@ Patch0:             janus.jcfg.patch
 AutoReqProv:        no
 URL:                https://zextras.com
 
-%define _binary_payload w7.xzdio
 %define __python %{__python3}
-%define debug_package %{nil}
 
 %description
 Zextras Video Server
@@ -78,7 +76,7 @@ cat <<EOF
 .: Congratulations! Every bit is in its right place :.
 
         Please execute these steps:
-* Set ${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
+* Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
 
 * Run
 zxsuite config global set teamVideoServerSecret ${api_secret}
