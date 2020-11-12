@@ -70,9 +70,10 @@ getent passwd videoserver >/dev/null || \
 useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 
 %post
-api_secret="$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)"
-sed -i "s/\${API_SECRET}/$api_secret/g" /etc/janus/janus.jcfg
-cat <<EOF
+if [ $1 -eq 1 ]; then
+  api_secret="$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)"
+  sed -i "s/\${API_SECRET}/$api_secret/g" /etc/janus/janus.jcfg
+  cat <<EOF
 .: Congratulations! Every bit is in its right place :.
 
         Please execute these steps:
@@ -81,7 +82,14 @@ cat <<EOF
 * Run
 zxsuite config global set teamVideoServerSecret ${api_secret}
 zxsuite config global set teamVideoServerSecret <YOUR_IP>
+
+* Fire up the videoserver:
+systemctl start videoserver.service
+
+If you want to start the service at startup please use:
+systemctl enable videoserver.service
 EOF
+fi
 
 %install
 make DESTDIR=${RPM_BUILD_ROOT} install configs
@@ -134,7 +142,10 @@ OZCS/janus
 %files confs
 %defattr(-,root,root)
 %config(noreplace) /etc/janus/janus.jcfg
-/etc
+/etc/janus/janus.jcfg.sample
+/etc/janus/janus.eventhandler.*
+/etc/janus/janus.plugin.*
+/etc/janus/janus.transport.*
 
 %files devel
 %defattr(-,root,root)

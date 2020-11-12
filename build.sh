@@ -78,7 +78,7 @@ while read -r line; do
             echo "Compilation error!"
             exit 1
           else
-            rpm -i build/"${os_tag%%.*}"/"$zimbra_name"/rpm/RPMS/x86_64/zimbra-*.rpm
+            rpm -i --noscripts build/"${os_tag%%.*}"/"$zimbra_name"/rpm/RPMS/x86_64/zimbra-*.rpm
           fi
         fi
       fi
