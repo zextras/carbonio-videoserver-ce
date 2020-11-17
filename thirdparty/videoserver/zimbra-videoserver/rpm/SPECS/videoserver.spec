@@ -71,8 +71,9 @@ useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 
 %post
 if [ $1 -eq 1 ]; then
-  api_secret="$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)"
-  sed -i "s/\${API_SECRET}/$api_secret/g" /etc/janus/janus.jcfg
+  hostname=$(hostname -f)
+  api_secret=$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)
+  sed -i "s/api_secret = \".*\"/api_secret = \"$api_secret\"/" /etc/janus/janus.jcfg 
   cat <<EOF
 .: Congratulations! Every bit is in its right place :.
 
@@ -80,8 +81,8 @@ if [ $1 -eq 1 ]; then
 * Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
 
 * Run
-zxsuite config global set teamVideoServerSecret ${api_secret}
-zxsuite config global set teamVideoServerSecret <YOUR_IP>
+zxsuite config global set attribute teamVideoServerSharedSecret value ${api_secret}
+zxsuite config global set attribute teamVideoServerHostname value ${hostname}:8188
 
 * Fire up the videoserver:
 systemctl start videoserver.service
@@ -115,6 +116,14 @@ TasksMax=infinity
 [Install]
 WantedBy=multi-user.target
 EOF
+
+%systemd_post videoserver.service
+
+%preun
+%systemd_preun videoserver.service
+
+%postun
+%systemd_postun_with_restart videoserver.service
 
 %package confs
 Summary:        videoserver Libraries

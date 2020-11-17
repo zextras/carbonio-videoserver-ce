@@ -26,15 +26,10 @@ if [ "$1" = "configure" ]; then
     chmod 0700 /var/lib/videoserver
   fi
 
-  # The following only on a new install
-  # License Agreement
-  db_get videoserver/license
-  if [ "$RET" = "false" ]; then
-    exit 0
-  fi
+  # Install and start daemon
+  deb-systemd-invoke enable videoserver
+  deb-systemd-invoke start videoserver
+  exit 0
 fi # End of configure
 
-# Stop Debconf
-db_stop
-
-exit 0
+deb-systemd-invoke start videoserver

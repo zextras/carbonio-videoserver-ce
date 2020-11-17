@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+# Stop any running videoserver process
+if [ -d /run/systemd/system ]; then
+  deb-systemd-invoke stop videoserver.service >/dev/null || true
+fi
+
+#DEBHELPER#
