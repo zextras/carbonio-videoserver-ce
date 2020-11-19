@@ -39,7 +39,7 @@ URL:                https://zextras.com
 Zextras Video Server
 
 %prep
-%setup -n janus-gateway-multistream
+%setup -n janus-gateway-multistream-pre-force-push
 #%setup -n janus-gateway-%{version}
 %patch0 -p1
 
