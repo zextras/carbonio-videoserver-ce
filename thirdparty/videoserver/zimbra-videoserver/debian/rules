@@ -7,7 +7,7 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,-rpath,OZCL -LOZCL
 export PKG_CONFIG_PATH=OZCL/pkgconfig
 
 %:
-	dh $@ --parallel
+	dh $@ --parallel --with systemd
 override_dh_auto_configure:
 	./autogen.sh
 	./configure \
@@ -32,4 +32,11 @@ override_dh_strip:
 override_dh_auto_install:
 	make DESTDIR=$$(pwd)/debian/tmp install configs
 	rm -rf $$(pwd)/debian/tmp/OZC/share/janus/demos/
-	install -Dm644 -t $$(pwd)/debian/tmp/lib/systemd/system/ $$(pwd)/debian/videoserver.service
+
+override_dh_installinit:
+	dh_systemd_enable -pzimbra-videoserver --name=videoserver videoserver.service
+	dh_installinit -pzimbra-videoserver --name=videoserver
+	dh_systemd_start -pzimbra-videoserver videoserver.service
+
+override_dh_systemd_start:
+	echo "Not running dh_systemd_start"

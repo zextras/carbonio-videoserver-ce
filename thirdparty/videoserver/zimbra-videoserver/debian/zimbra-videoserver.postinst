@@ -25,11 +25,8 @@ if [ "$1" = "configure" ]; then
     # This directory can contain sensitive data and should not be world-readable
     chmod 0700 /var/lib/videoserver
   fi
-
-  # Install and start daemon
-  deb-systemd-invoke enable videoserver
-  deb-systemd-invoke start videoserver
-  exit 0
 fi # End of configure
 
-deb-systemd-invoke start videoserver
+#DEBHELPER#
+
+exit 0

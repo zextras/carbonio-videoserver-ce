@@ -5,15 +5,17 @@
 set -e
 . /usr/share/debconf/confmodule
 
-db_input high videoserver/public-ip || true
-db_get videoserver/public-ip
-public_ip="$RET"
-api_secret=$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)
-sed -i "s/nat_1_1_mapping = \".*\"/nat_1_1_mapping = \"$public_ip\"/" /etc/janus/janus.jcfg
-sed -i "s/api_secret = \".*\"/api_secret = \"$api_secret\"/" /etc/janus/janus.jcfg
-hostname=$(hostname -f)
-db_subst videoserver/token API_SECRET "${api_secret}"
-db_subst videoserver/token HOSTNAME "${hostname}"
-db_input high videoserver/token || true
-db_get videoserver/token
-db_go
+if [ "$1" = "configure" ]; then
+  db_input high videoserver/public-ip || true
+  db_get videoserver/public-ip
+  public_ip="$RET"
+  api_secret=$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)
+  sed -i "s/nat_1_1_mapping = \".*\"/nat_1_1_mapping = \"$public_ip\"/" /etc/janus/janus.jcfg
+  sed -i "s/api_secret = \".*\"/api_secret = \"$api_secret\"/" /etc/janus/janus.jcfg
+  hostname=$(hostname -f)
+  db_subst videoserver/token API_SECRET "${api_secret}"
+  db_subst videoserver/token HOSTNAME "${hostname}"
+  db_input high videoserver/token || true
+  db_get videoserver/token
+  db_go
+fi
