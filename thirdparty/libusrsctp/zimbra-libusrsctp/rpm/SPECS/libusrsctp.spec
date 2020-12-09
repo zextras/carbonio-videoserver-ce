@@ -1,7 +1,7 @@
 Summary:            Zimbra's libusrsctp build
 Name:               zimbra-libusrsctp
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 AutoReqProv:        no

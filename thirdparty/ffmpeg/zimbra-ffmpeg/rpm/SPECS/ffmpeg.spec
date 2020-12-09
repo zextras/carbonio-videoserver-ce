@@ -1,7 +1,7 @@
 Summary:            Zimbra's FFMPEG build
 Name:               zimbra-ffmpeg
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            GPL3
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      freetype-devel

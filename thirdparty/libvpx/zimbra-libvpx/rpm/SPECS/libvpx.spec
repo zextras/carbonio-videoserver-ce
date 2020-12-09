@@ -1,7 +1,7 @@
 Summary:            Zimbra's VP8 and VP9 codec build
 Name:               zimbra-libvpx
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      yasm
@@ -55,5 +55,5 @@ OZCL/pkgconfig
 OZCI
 
 %changelog
-* Wed Aug 5 2020 Zextras Packaging Services <gianluca.boiano@zextras.com>
+* Wed Aug 5 2020 Zextras SRL <packages@zextras.com>
 - initial packaging

@@ -2,8 +2,8 @@ Source: zimbra-videoserver
 Build-Depends: debhelper (>= 9), dh-systemd (>= 1.5), m4, dpkg-dev (>= 1.15.7), libconfig-dev, libcurl4-openssl-dev, libjansson-dev, libmicrohttpd-dev, libogg-dev, libssl-dev, zimbra-ffmpeg-dev, zimbra-libnice-dev, zimbra-libopus-dev, zimbra-libsrtp-dev, zimbra-libusrsctp-dev, zimbra-libwebsockets, zlib1g-dev
 Section: comm
 Priority: optional
-Maintainer: Zextras Packaging Services <gianluca.boiano@zextras.com>
-Uploaders: Zextras Packaging Services <gianluca.boiano@zextras.com>
+Maintainer: Zextras SRL <packages@zextras.com>
+Uploaders: Zextras SRL <packages@zextras.com>
 Standards-Version: 3.9.5
 Homepage: https://janus.conf.meetecho.com
 

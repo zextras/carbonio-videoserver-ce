@@ -1,7 +1,7 @@
 Summary:            Zextras Videoserver build
 Name:               zimbra-videoserver
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            GPLv3
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      jansson-devel
@@ -162,5 +162,5 @@ OZCL/*/*/*.la
 OZCI
 
 %changelog
-* Wed Nov 11 2020 Zextras Packaging Services <packaging@zextras.com>
+* Wed Nov 11 2020 Zextras SRL <packages@zextras.com>
 - initial packaging

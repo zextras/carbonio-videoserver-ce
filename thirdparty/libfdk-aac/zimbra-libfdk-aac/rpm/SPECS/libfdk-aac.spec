@@ -1,7 +1,7 @@
 Summary:            Zimbra's FDK AAC codec build
 Name:               zimbra-libfdk-aac
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            CUSTOM
 Source:             %{name}-%{version}.tar.gz
 AutoReqProv:        no

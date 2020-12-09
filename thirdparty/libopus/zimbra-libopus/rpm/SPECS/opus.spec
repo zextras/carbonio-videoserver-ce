@@ -1,7 +1,7 @@
 Summary:            Zimbra's Opus codec build
 Name:               zimbra-libopus
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 AutoReqProv:        no
@@ -45,5 +45,5 @@ OZCI
 OZCS
 
 %changelog
-* Wed Aug 5 2020 Zextras Packaging Services <gianluca.boiano@zextras.com>
+* Wed Aug 5 2020 Zextras SRL <packages@zextras.com>
 - initial packaging

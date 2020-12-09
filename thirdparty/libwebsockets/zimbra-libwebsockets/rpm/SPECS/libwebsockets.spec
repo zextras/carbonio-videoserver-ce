@@ -1,7 +1,7 @@
 Summary:            Zimbra's Websockets C library build
 Name:               zimbra-libwebsockets
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            MIT
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      libev-devel

@@ -1,7 +1,7 @@
 Summary:            Zimbra's libnice build
 Name:               zimbra-libnice
 Version:            VERSION
-Release:            ITERATION%{?dist}
+Release:            1%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      openssl-devel
