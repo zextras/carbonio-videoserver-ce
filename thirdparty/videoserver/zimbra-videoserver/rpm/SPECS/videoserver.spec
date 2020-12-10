@@ -72,7 +72,7 @@ useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 %post
 if [ $1 -eq 1 ]; then
   hostname=$(hostname -f)
-  api_secret=$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 32 | head -n 1)
+  api_secret=$(openssl rand -base64 24)
   sed -i "s/api_secret = \".*\"/api_secret = \"$api_secret\"/" /etc/janus/janus.jcfg 
   cat <<EOF
 .: Congratulations! Every bit is in its right place :.
