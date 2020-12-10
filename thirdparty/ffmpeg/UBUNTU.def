@@ -1,0 +1,3 @@
+deps.UBUNTU16_64 := libx264-148
+deps.UBUNTU18_64 := libx264-152
+deps.UBUNTU20_64 := libx264-155

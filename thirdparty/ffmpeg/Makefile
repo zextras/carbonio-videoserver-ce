@@ -46,6 +46,8 @@ build_deb: z_tgz = $(zname)_$(pvers).orig.tar.gz
 build_deb: z_shlibs = $(subst $(zname)/,,$(wildcard $(zname)/debian/z*.shlibs))
 build_deb:
 	$(CD) $(PLATFORM_DIR)/$(zname) && \
+        $(PERL) -pi -e 's/DEPS/$(deps)/' debian/control && \
+        $(PERL) -pi -e 's/REQUIRED/$(builddeps)/' debian/control && \
 	$(replace-pkginfo) debian/changelog $(z_shlibs) && \
 	$(replace-pathinfo) debian/rules && \
 	$(CP) $(psrc_file) ../$(z_tgz) && \

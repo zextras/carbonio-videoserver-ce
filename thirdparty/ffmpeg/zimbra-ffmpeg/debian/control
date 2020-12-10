@@ -10,7 +10,7 @@ Homepage: https://ffmpeg.org/
 Package: zimbra-ffmpeg
 Priority: optional
 Architecture: any
-Depends: libass9, libc6, libfreetype6, libmp3lame0, libtheora0, libx264-152, libxcb1, zimbra-ffmpeg, zimbra-libfdk-aac, zimbra-libopus, zimbra-libvpx, zlib1g
+Depends: libass9, libc6, libfreetype6, libmp3lame0, libtheora0, DEPS, libxcb1, zimbra-ffmpeg, zimbra-libfdk-aac, zimbra-libopus, zimbra-libvpx, zlib1g
 Description: Complete solution to record, convert and stream audio and video
 
 Package: zimbra-ffmpeg-dev

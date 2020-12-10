@@ -73,41 +73,41 @@ pipeline {
 						}
 					}
 				}
-				stage('Ubuntu 20.04') {
-					steps {
-						sh 'cd janus-builder; ./build_ubuntu20'
-						script {
-							env.CONTAINER5_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu20').trim()
-						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER5_ID}:/u20"
-						sh "docker exec -t ${env.CONTAINER5_ID} bash -c \"cd /u20/; ./build.sh\""
-						sh "docker cp ${env.CONTAINER5_ID}:/u20/artifacts/. ${WORKSPACE}"
-						script {
-							def server = Artifactory.server 'zextras-artifactory'
-							def buildInfo = Artifactory.newBuildInfo()
+				// stage('Ubuntu 20.04') {
+				// 	steps {
+				// 		sh 'cd janus-builder; ./build_ubuntu20'
+				// 		script {
+				// 			env.CONTAINER5_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu20').trim()
+				// 		}
+				// 		sh "docker cp ${WORKSPACE} ${env.CONTAINER5_ID}:/u20"
+				// 		sh "docker exec -t ${env.CONTAINER5_ID} bash -c \"cd /u20/; ./build.sh\""
+				// 		sh "docker cp ${env.CONTAINER5_ID}:/u20/artifacts/. ${WORKSPACE}"
+				// 		script {
+				// 			def server = Artifactory.server 'zextras-artifactory'
+				// 			def buildInfo = Artifactory.newBuildInfo()
 
-							def uploadSpec = """{
-								"files": [
-									{
-										"pattern": "videoserver*/*.deb",
-										"target": "debian-local/pool/",
-										"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
-									}
-								]
-							}"""
-							server.upload spec: uploadSpec, buildInfo: buildInfo
-							server.publishBuildInfo buildInfo
-						}
-					}
-					post {
-						success {
-							archiveArtifacts artifacts: "*.tgz", fingerprint: true
-						}
-						always {
-							sh "docker kill ${env.CONTAINER5_ID}"
-						}
-					}
-				}                   
+				// 			def uploadSpec = """{
+				// 				"files": [
+				// 					{
+				// 						"pattern": "videoserver*/*.deb",
+				// 						"target": "debian-local/pool/",
+				// 						"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
+				// 					}
+				// 				]
+				// 			}"""
+				// 			server.upload spec: uploadSpec, buildInfo: buildInfo
+				// 			server.publishBuildInfo buildInfo
+				// 		}
+				// 	}
+				// 	post {
+				// 		success {
+				// 			archiveArtifacts artifacts: "*.tgz", fingerprint: true
+				// 		}
+				// 		always {
+				// 			sh "docker kill ${env.CONTAINER5_ID}"
+				// 		}
+				// 	}
+				// }                   
 				stage('CentOS 7') {
 					steps {
 						sh 'cd janus-builder; ./build_centos7'
@@ -190,7 +190,7 @@ pipeline {
 		}        
 		always {
 			sh 'docker rmi janus-builder-ubuntu18 --force'
-			sh 'docker rmi janus-builder-ubuntu20 --force'
+			// sh 'docker rmi janus-builder-ubuntu20 --force'
 			sh 'docker rmi janus-builder-centos7 --force'
 			sh 'docker rmi janus-builder-centos8 --force'
 
