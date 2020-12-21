@@ -1,7 +1,7 @@
 Summary:            Zimbra's libusrsctp build
 Name:               zimbra-libusrsctp
 Version:            VERSION
-Release:            1%{?dist}
+Release:            2%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 AutoReqProv:        no
@@ -11,7 +11,7 @@ URL:                https://github.com/sctplab/usrsctp
 A portable SCTP userland stack
 
 %prep
-%setup -n usrsctp-ab18247e4105bbe00fa8ce7f4eb6c380ae88631d
+%setup -n usrsctp-c65538fbe14e0141db5053bc24d7cf7d8e2ed8fc
 
 %build
 LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
