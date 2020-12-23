@@ -45,5 +45,5 @@ OZCI
 OZCS
 
 %changelog
-* Wed Aug 5 2020 Zextras SRL <packages@zextras.com>
+* Wed Dec 23 2020 Zextras SRL <packages@zextras.com>
 - initial packaging

@@ -44,5 +44,5 @@ OZCL/pkgconfig
 OZCI
 
 %changelog
-* Wed Aug 5 2020 Zimbra Packaging Services <gianluca.boiano@zextras.com>
+* Wed Dec 23 2020 Zimbra Packaging Services <gianluca.boiano@zextras.com>
 - initial packaging
