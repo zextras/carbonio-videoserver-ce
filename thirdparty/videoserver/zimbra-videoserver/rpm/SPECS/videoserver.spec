@@ -80,15 +80,10 @@ if [ $1 -eq 1 ]; then
         Please execute these steps:
 * Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
 
-* Run
-zxsuite config global set attribute teamVideoServerSharedSecret value ${api_secret}
-zxsuite config global set attribute teamVideoServerHostname value ${hostname}:8188
-
-* Fire up the videoserver:
-systemctl start videoserver.service
-
-If you want to start the service at startup please use:
-systemctl enable videoserver.service
+* Please execute these commands in a mailbox node 
+  as zimbra user to complete the setup of the video server:
+  
+zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
 EOF
 fi
 
@@ -123,6 +118,18 @@ EOF
 %systemd_preun videoserver.service
 
 %postun
+if [ $1 -eq 0 ]; then
+  hostname=$(hostname -f) 
+  cat <<EOF
+.: Final steps to uninstall the video server :.
+
+* Please execute these commands in a mailbox node 
+  as zimbra user to complete the removal of the video server:
+
+zxsuite team video-server remove ${hostname} port 8188
+EOF
+fi
+
 %systemd_postun_with_restart videoserver.service
 
 %package confs

@@ -4,13 +4,20 @@ Description: .: Public IP server :.
  .
  Please insert the Public IP server to bind with.
 
-Template: videoserver/token
+Template: videoserver/add
 Type: note
 Description: .: Congratulations! Every bit is in its right place :.
  .
  Please execute these commands in a mailbox node 
  as zimbra user to complete the setup of the video server:
  .
- zxsuite config global set attribute teamVideoServerSharedSecret value ${API_SECRET}
+ zxsuite team video-server add ${HOSTNAME} port 8188 secret ${API_SECRET}
+
+Template: videoserver/remove
+Type: note
+Description: .: Final steps to uninstall the video server :.
  .
- zxsuite config global set attribute teamVideoServerHostname value ${HOSTNAME}:8188
+ Please execute these commands in a mailbox node 
+ as zimbra user to complete the removal of the video server:
+ .
+ zxsuite team video-server remove ${HOSTNAME} port 8188 
