@@ -10,7 +10,9 @@ Homepage: https://janus.conf.meetecho.com
 Package: zimbra-videoserver
 Priority: optional
 Architecture: any
-Depends: libc6, libconfig9, libcurl4, libglib2.0-0, libjansson4, libmicrohttpd12, libogg0, libssl1.1 (>= 1.1.0), zimbra-ffmpeg, zimbra-libnice, zimbra-libopus, zimbra-libsrtp, zimbra-libusrsctp, zimbra-libwebsockets, zlib1g, zimbra-videoserver-confs
+Depends: debconf | cdebconf,
+ dialog | libterm-readline-gnu-perl,
+ libc6, libconfig9, libcurl4, libglib2.0-0, libjansson4, libmicrohttpd12, libogg0, libssl1.1 (>= 1.1.0), zimbra-ffmpeg, zimbra-libnice, zimbra-libopus, zimbra-libsrtp, zimbra-libusrsctp, zimbra-libwebsockets, zlib1g, zimbra-videoserver-confs
 Description: An open source, general purpose, WebRTC server
 
 Package: zimbra-videoserver-dev
