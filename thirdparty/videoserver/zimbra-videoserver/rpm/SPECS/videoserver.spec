@@ -75,6 +75,7 @@ if [ $1 -eq 1 ]; then
   api_secret=$(openssl rand -base64 24)
   sed -i "s#api_secret = \".*\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg 
   cat <<EOF
+
 .: Congratulations! Every bit is in its right place :.
 
         Please execute these steps:
@@ -84,6 +85,7 @@ if [ $1 -eq 1 ]; then
   as zimbra user to complete the setup of the video server:
   
 zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
+
 EOF
 fi
 
@@ -121,12 +123,14 @@ EOF
 if [ $1 -eq 0 ]; then
   hostname=$(hostname -f) 
   cat <<EOF
+
 .: Final steps to uninstall the video server :.
 
 * Please execute these commands in a mailbox node 
   as zimbra user to complete the removal of the video server:
 
 zxsuite team video-server remove ${hostname} port 8188
+
 EOF
 fi
 
