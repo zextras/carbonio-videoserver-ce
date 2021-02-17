@@ -109,6 +109,7 @@ Group=videoserver
 Restart=on-failure
 LimitNOFILE=65536
 TasksMax=infinity
+Nice=-10
 
 [Install]
 WantedBy=multi-user.target
