@@ -7,7 +7,9 @@ Source:             %{name}-%{version}.tar.gz
 BuildRequires:      openssl-devel
 BuildRequires:      python3-pip
 BuildRequires:      python3-setuptools
+%if 0%{?rhel} == 8
 BuildRequires:      ninja-build
+%endif
 Requires:           openssl
 AutoReqProv:        no
 URL:                https://github.com/libnice/libnice
