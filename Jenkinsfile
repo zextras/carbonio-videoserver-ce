@@ -55,7 +55,7 @@ pipeline {
 								"files": [
 									{
 										"pattern": "videoserver*/*.deb",
-										"target": "debian-local/pool/",
+										"target": "ubuntu-rc/pool/",
 										"props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
 									}
 								]
@@ -90,7 +90,7 @@ pipeline {
 				// 				"files": [
 				// 					{
 				// 						"pattern": "videoserver*/*.deb",
-				// 						"target": "debian-local/pool/",
+				// 						"target": "ubuntu-rc/pool/",
 				// 						"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
 				// 					}
 				// 				]
@@ -125,7 +125,7 @@ pipeline {
 								"files": [
 									{
 										"pattern": "videoserver*/(*)-(*)-(*).rpm",
-										"target": "rpm-local/zextras/{1}/{1}-{2}-{3}.rpm",
+										"target": "centos7-rc/zextras/{1}/{1}-{2}-{3}.rpm",
 										"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
 									}
 								]
@@ -160,7 +160,7 @@ pipeline {
 								"files": [
 									{
 										"pattern": "videoserver*/(*)-(*)-(*).rpm",
-										"target": "rpm-local/zextras/{1}/{1}-{2}-{3}.rpm",
+										"target": "centos8-rc/zextras/{1}/{1}-{2}-{3}.rpm",
 										"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
 									}
 								]
