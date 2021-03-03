@@ -84,7 +84,11 @@ if [ $1 -eq 1 ]; then
 * Please execute these commands in a mailbox node 
   as zimbra user to complete the setup of the video server:
   
-zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
+ -> If you are in a Zimbra NG environment:
+    zxsuite connect video-server add ${hostname} port 8188 secret ${api_secret}
+
+ -> If you are in a Zextras Suite environment:
+    zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
 
 EOF
 fi
@@ -130,7 +134,11 @@ if [ $1 -eq 0 ]; then
 * Please execute these commands in a mailbox node 
   as zimbra user to complete the removal of the video server:
 
-zxsuite team video-server remove ${hostname} port 8188
+ -> If you are in a Zimbra NG environment:
+    zxsuite connect video-server remove ${HOSTNAME} port 8188
+
+ -> If you are in a Zextras Suite environment:
+    zxsuite team video-server remove ${hostname} port 8188
 
 EOF
 fi
