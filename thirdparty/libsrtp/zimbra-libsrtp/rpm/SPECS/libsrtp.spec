@@ -1,7 +1,7 @@
 Summary:            Zimbra's Library for SRTP build
 Name:               zimbra-libsrtp
 Version:            VERSION
-Release:            2%{?dist}
+Release:            3%{?dist}
 License:            BSD
 Source:             %{name}-%{version}.tar.gz
 BuildRequires:      openssl-devel
@@ -12,7 +12,7 @@ URL:                https://github.com/cisco/libsrtp
 Library for SRTP (Secure Realtime Transport Protocol)
 
 %prep
-%setup -n libsrtp-f379f4841228ee82932b56509e73adaf6552ce6e
+%setup -n libsrtp-83404dda2884b92505fcc57609e292dcd2aca19b
 
 %build
 LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
