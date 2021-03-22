@@ -31,8 +31,8 @@ if [ "$1" = "configure" ]; then
   db_get videoserver/public-ip
   public_ip="$RET"
   api_secret=$(openssl rand -base64 24)
-  sed -i "s#nat_1_1_mapping = \".*\"#nat_1_1_mapping = \"$public_ip\"#" /etc/janus/janus.jcfg
-  sed -i "s#api_secret = \".*\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
+  sed -i "s#nat_1_1_mapping = \"\${PUBLIC_IP_ADDRESS}\"#nat_1_1_mapping = \"$public_ip\"#" /etc/janus/janus.jcfg
+  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
   hostname=$(hostname -f)
   db_subst videoserver/add API_SECRET "${api_secret}"
   db_subst videoserver/add HOSTNAME "${hostname}"
