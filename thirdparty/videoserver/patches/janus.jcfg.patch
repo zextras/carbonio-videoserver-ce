@@ -60,7 +60,7 @@ diff -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
  	#ipv6 = true
  	#min_nack_queue = 500
 -	#rtp_port_range = "20000-40000"
-+	rtp_port_range = "20000-40000"
++	rtp_port_range = "8801-8810"
  	#dtls_mtu = 1200
  	#no_media_timer = 1
  	#slowlink_threshold = 4
