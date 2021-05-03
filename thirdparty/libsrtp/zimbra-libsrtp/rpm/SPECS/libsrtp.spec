@@ -12,7 +12,7 @@ URL:                https://github.com/cisco/libsrtp
 Library for SRTP (Secure Realtime Transport Protocol)
 
 %prep
-%setup -n libsrtp-83404dda2884b92505fcc57609e292dcd2aca19b
+%setup -n libsrtp-3136ffaeda740e3aed715025e7d1f66e025da206
 
 %build
 LDFLAGS="-Wl,-rpath,OZCL"; export LDFLAGS; \
