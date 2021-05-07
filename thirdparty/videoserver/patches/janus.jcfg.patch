@@ -1,6 +1,6 @@
-diff -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
---- a/conf/janus.jcfg.sample.in	2021-02-23 12:55:08.000000000 +0100
-+++ b/conf/janus.jcfg.sample.in	2021-02-23 15:25:59.863775241 +0100
+diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
+--- a/conf/janus.jcfg.sample.in	2021-05-07 09:50:32.867333210 +0200
++++ b/conf/janus.jcfg.sample.in	2021-05-07 09:50:52.301318953 +0200
 @@ -11,7 +11,7 @@
  	loggers_folder = "@loggerdir@"			# External loggers folder
  
@@ -88,10 +88,10 @@ diff -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
  
  	# In case you want to allow Janus to start even if the configured STUN or TURN
  	# server is unreachable, you can set 'ignore_unreachable_ice_server' to true.
-diff -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/janus.plugin.audiobridge.jcfg.sample
---- a/conf/janus.plugin.audiobridge.jcfg.sample	2021-02-23 12:55:08.000000000 +0100
-+++ b/conf/janus.plugin.audiobridge.jcfg.sample	2021-02-23 15:25:59.863775241 +0100
-@@ -39,18 +39,10 @@
+diff '--color=auto' -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/janus.plugin.audiobridge.jcfg.sample
+--- a/conf/janus.plugin.audiobridge.jcfg.sample	2021-05-07 09:50:32.867333210 +0200
++++ b/conf/janus.plugin.audiobridge.jcfg.sample	2021-05-07 09:51:58.818270143 +0200
+@@ -41,12 +41,12 @@
  	#record_tmp_ext = "tmp"			# Optional temporary extension to add to filenames
  									# while recording: e.g., setting "tmp" would mean
  									# .wav --> .wav.tmp until the file is closed
@@ -102,6 +102,15 @@ diff -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/janus.plugin.audio
  	# By default, integers are used as a unique ID for both rooms and participants.
  	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
 -	#string_ids = true
++	string_ids = true
+ 
+ 	# Normally, all AudioBridge participants will join by negotiating a WebRTC
+ 	# PeerConnection: the plugin also supports adding participants that will
+@@ -62,13 +62,4 @@
+ 	# what local IP address to bind to for media. If no address is set in the
+ 	# property below, then one will be automatically guessed from the system.
+ 	#local_ip = "1.2.3.4"
+-
 -}
 -
 -room-1234: {
@@ -110,11 +119,10 @@ diff -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/janus.plugin.audio
 -	sampling_rate = 16000
 -	record = false
 -	#record_file = "/path/to/recording.wav"
-+	string_ids = true
  }
-diff -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus.plugin.videoroom.jcfg.sample
---- a/conf/janus.plugin.videoroom.jcfg.sample	2021-02-23 12:55:08.000000000 +0100
-+++ b/conf/janus.plugin.videoroom.jcfg.sample	2021-02-23 15:25:59.863775241 +0100
+diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus.plugin.videoroom.jcfg.sample
+--- a/conf/janus.plugin.videoroom.jcfg.sample	2021-05-07 09:50:32.867333210 +0200
++++ b/conf/janus.plugin.videoroom.jcfg.sample	2021-05-07 09:50:52.302318952 +0200
 @@ -48,37 +48,10 @@
  									# if this key is provided in the request
  	#lock_rtp_forward = true		# Whether the admin_key above should be
@@ -155,9 +163,9 @@ diff -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus.plugin.videoro
 -	video_svc = true
 +	string_ids = true
  }
-diff -Naur a/conf/janus.transport.websockets.jcfg.sample b/conf/janus.transport.websockets.jcfg.sample
---- a/conf/janus.transport.websockets.jcfg.sample	2021-02-23 12:55:08.000000000 +0100
-+++ b/conf/janus.transport.websockets.jcfg.sample	2021-02-23 15:25:59.863775241 +0100
+diff '--color=auto' -Naur a/conf/janus.transport.websockets.jcfg.sample b/conf/janus.transport.websockets.jcfg.sample
+--- a/conf/janus.transport.websockets.jcfg.sample	2021-05-07 09:50:32.867333210 +0200
++++ b/conf/janus.transport.websockets.jcfg.sample	2021-05-07 09:50:52.303318951 +0200
 @@ -1,11 +1,11 @@
  # WebSockets stuff: whether they should be enabled, which ports they
  # should use, and so on.

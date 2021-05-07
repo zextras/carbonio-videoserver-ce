@@ -183,4 +183,4 @@ OZCI
 
 %changelog
 * Wed Dec 23 2020 Zextras SRL <packages@zextras.com>
-- initial packaging
+- Bump to VERSION
