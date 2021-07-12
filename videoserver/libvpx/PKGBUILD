@@ -1,0 +1,50 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="zimbra-libvpx"
+pkgver="1.10.0"
+pkgrel="1"
+pkgdesc="VP8 and VP9 codec"
+pkgdesclong=(
+  "VP8 and VP9 codec"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+makedepends=(
+  "yasm"
+)
+section="libs"
+priority="important"
+sources=(
+  "https://github.com/webmproject/libvpx/archive/v${pkgver}.tar.gz"
+)
+hashsums=(
+  "85803ccbdbdd7a3b03d930187cb055f1353596969c1f92ebec2db839fa4f834a"
+)
+
+build() {
+  cd "${srcdir}/libvpx-${pkgver}"
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export CFLAGS="-O2 -g"
+  ./configure --prefix=/opt/zimbra/common \
+    --disable-install-docs \
+    --disable-install-srcs \
+    --enable-pic \
+    --enable-postproc \
+    --enable-runtime-cpu-detect \
+    --enable-shared \
+    --enable-vp8 \
+    --enable-vp9 \
+    --enable-vp9-highbitdepth \
+    --enable-vp9-temporal-denoising \
+    --as=yasm
+  make -j$(nproc)
+}
+
+package() {
+  cd "${srcdir}/libvpx-${pkgver}"
+  make DIST_DIR="${pkgdir}/opt/zimbra/common" install
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+}

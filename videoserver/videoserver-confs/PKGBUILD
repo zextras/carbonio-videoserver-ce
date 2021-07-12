@@ -1,0 +1,114 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="zimbra-videoserver-confs"
+pkgver="0.11.3"
+pkgrel="1"
+pkgdesc="An open source, general purpose, WebRTC server (configs only)"
+pkgdesclong=(
+  "An open source, general purpose, WebRTC server (configs only)"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+depends:apt=(
+  "debconf"
+  "cdebconf"
+  "dialog"
+  "libterm-readline-gnu-perl"
+  "libc6"
+  "libconfig9"
+  "libcurl4"
+  "libglib2.0-0"
+  "libjansson4"
+  "libmicrohttpd12"
+  "libogg0"
+  "libssl1.1"
+  "zimbra-base"
+  "zimbra-ffmpeg"
+  "zimbra-libnice"
+  "zimbra-libopus"
+  "zimbra-libsrtp"
+  "zimbra-libusrsctp"
+  "zimbra-libwebsockets"
+  "zimbra-videoserver-confs"
+  "zlib1g"  
+)
+depends:yum=(
+  "jansson"
+  "libconfig"
+  "libcurl"
+  "libmicrohttpd"
+  "libogg"
+  "openssl"
+  "zimbra-base"
+  "zimbra-ffmpeg"
+  "zimbra-libnice"
+  "zimbra-libopus"
+  "zimbra-libsrtp"
+  "zimbra-libusrsctp"
+  "zimbra-libwebsockets"
+  "zlib"
+)
+makedepends:apt=(
+  "gengetopt"
+  "libconfig-dev"
+  "libcurl4-openssl-dev"
+  "libjansson-dev"
+  "libmicrohttpd-dev"
+  "libogg-dev"
+  "libssl-dev"
+  "zlib1g-dev"
+)
+makedepends:yum=(
+  "gengetopt"
+  "jansson-devel"
+  "libconfig-devel"
+  "libcurl-devel"
+  "libmicrohttpd-devel"
+  "libogg-devel"
+  "openssl-devel"
+  "zlib-devel"
+)
+debconf_template="videoserver.templates"
+section="comm"
+priority="important"
+sources=(
+  "https://github.com/meetecho/janus-gateway/archive/multistream.tar.gz"
+  "janus.jcfg.patch"
+)
+hashsums=(
+  "SKIP"
+  "bb44e6a94fd15d1f93d09eea6109e2f033d0636ea761ec70729b9bda02d38f4d"
+)
+
+build() {
+  cd "${srcdir}/janus-gateway-multistream"
+  patch -Np1 -i ../janus.jcfg.patch
+  ./autogen.sh
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib -L/opt/zimbra/common/lib"
+  export CFLAGS="-O2 -I/opt/zimbra/common/include"
+  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"  
+  ./configure \
+    --prefix=/opt/zimbra/common \
+    --sysconfdir /etc \
+    --disable-docs \
+    --disable-turn-rest-api \
+    --disable-all-transports \
+    --enable-websockets \
+    --disable-all-plugins \
+    --enable-plugin-audiobridge \
+    --enable-plugin-videoroom \
+    --enable-post-processing \
+    --disable-all-handlers \
+    --enable-websockets-event-handler \
+    --disable-json-logger
+  make
+}
+
+package() {
+  cd "${srcdir}/janus-gateway-multistream"
+  make DESTDIR="${pkgdir}" install configs
+  rm -rf "${pkgdir}"/opt/
+}

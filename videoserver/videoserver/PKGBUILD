@@ -1,0 +1,242 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="zimbra-videoserver"
+pkgver="0.11.3"
+pkgrel="1"
+pkgdesc="An open source, general purpose, WebRTC server"
+pkgdesclong=(
+  "An open source, general purpose, WebRTC server"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+depends:apt=(
+  "debconf"
+  "cdebconf"
+  "dialog"
+  "libterm-readline-gnu-perl"
+  "libc6"
+  "libconfig9"
+  "libcurl4"
+  "libglib2.0-0"
+  "libjansson4"
+  "libmicrohttpd12"
+  "libogg0"
+  "libssl1.1"
+  "zimbra-base"
+  "zimbra-ffmpeg"
+  "zimbra-libnice"
+  "zimbra-libopus"
+  "zimbra-libsrtp"
+  "zimbra-libusrsctp"
+  "zimbra-libwebsockets"
+  "zimbra-videoserver-confs"
+  "zlib1g"  
+)
+depends:yum=(
+  "jansson"
+  "libconfig"
+  "libcurl"
+  "libmicrohttpd"
+  "libogg"
+  "openssl"
+  "zimbra-base"
+  "zimbra-ffmpeg"
+  "zimbra-libnice"
+  "zimbra-libopus"
+  "zimbra-libsrtp"
+  "zimbra-libusrsctp"
+  "zimbra-libwebsockets"
+  "zimbra-videoserver-confs"
+  "zlib"
+)
+makedepends:apt=(
+  "gengetopt"
+  "libconfig-dev"
+  "libcurl4-openssl-dev"
+  "libjansson-dev"
+  "libmicrohttpd-dev"
+  "libogg-dev"
+  "libssl-dev"
+  "zlib1g-dev"
+)
+makedepends:yum=(
+  "gengetopt"
+  "jansson-devel"
+  "libconfig-devel"
+  "libcurl-devel"
+  "libmicrohttpd-devel"
+  "libogg-devel"
+  "openssl-devel"
+  "zlib-devel"
+)
+debconf_template="videoserver.templates"
+section="comm"
+priority="important"
+sources=(
+  "https://github.com/meetecho/janus-gateway/archive/multistream.tar.gz"
+  "videoserver.templates"
+  "videoserver.service"
+)
+hashsums=(
+  "SKIP"
+  "5271fc2610ea51fbd226aa7e5b19207c7425f6561d3ee0e078ec0660ed335142"
+  "a06577a6fca1c459674ba6f95cff938cc837b34fb8a6a90fd0e13f05a530551a"
+)
+
+build() {
+  cd "${srcdir}/janus-gateway-multistream"
+  ./autogen.sh
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib -L/opt/zimbra/common/lib"
+  export CFLAGS="-O2 -I/opt/zimbra/common/include"
+  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"  
+  ./configure \
+    --prefix=/opt/zimbra/common \
+    --sysconfdir /etc \
+    --disable-docs \
+    --disable-turn-rest-api \
+    --disable-all-transports \
+    --enable-websockets \
+    --disable-all-plugins \
+    --enable-plugin-audiobridge \
+    --enable-plugin-videoroom \
+    --enable-post-processing \
+    --disable-all-handlers \
+    --enable-websockets-event-handler \
+    --disable-json-logger
+  make
+}
+
+package:apt() {
+  cd "${srcdir}/janus-gateway-multistream"
+  make DESTDIR="${pkgdir}" install configs
+  install -Dm755 ../videoserver.service \
+    "${pkgdir}"/lib/systemd/system/videoserver.service
+  rm -rf "${pkgdir}"/etc
+  rm -rf "${pkgdir}"/opt/zimbra/common/share/doc
+  rm -rf "${pkgdir}"/opt/zimbra/common/share/man
+  rm -rf "${pkgdir}"/opt/zimbra/common/share/janus/demos/  
+  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+}
+package:yum() {
+  cd "${srcdir}/janus-gateway-multistream"
+  make DESTDIR="${pkgdir}" install configs
+  install -Dm755 ../videoserver.service \
+    "${pkgdir}"/usr/lib/systemd/system/videoserver.service
+  rm -rf "${pkgdir}"/etc
+  rm -rf "${pkgdir}"/opt/zimbra/common/share/doc
+  rm -rf "${pkgdir}"/opt/zimbra/common/share/man
+  rm -rf "${pkgdir}"/opt/zimbra/common/share/janus/demos/  
+  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+}
+
+preinst:apt() {
+  # Automatically added by dh_installinit/11.1.6ubuntu2
+  if [ -x "/etc/init.d/videoserver" ]; then
+  	invoke-rc.d videoserver stop || exit 1
+  fi
+  # End automatically added section
+  # Automatically added by dh_systemd_start/11.1.6ubuntu2
+  if [ -d /run/systemd/system ]; then
+  	deb-systemd-invoke stop 'videoserver.service' >/dev/null || true
+  fi
+  # End automatically added section
+}
+postinst:apt() {
+  . /usr/share/debconf/confmodule
+  
+  if [ "$1" = "configure" ]; then
+  
+    # creating videoserver group if it isn't already there
+    if ! getent group videoserver >/dev/null; then
+      addgroup --system --force-badname --quiet videoserver
+    fi
+  
+    # creating videoserver user if it isn't already there
+    if ! getent passwd videoserver >/dev/null; then
+      adduser --system --force-badname --quiet \
+        --ingroup videoserver \
+        --home /var/lib/videoserver \
+        --shell /bin/false \
+        videoserver
+      usermod -c "videoserver WebRTC group" videoserver
+    fi
+  
+    if ! test -d /var/lib/videoserver; then
+      mkdir /var/lib/videoserver
+      chown -R videoserver:videoserver /var/lib/videoserver
+      # This directory can contain sensitive data and should not be world-readable
+      chmod 0700 /var/lib/videoserver
+    fi
+  
+    db_input high videoserver/public-ip || true
+    db_go
+    db_get videoserver/public-ip
+    public_ip="$RET"
+    api_secret=$(openssl rand -base64 24)
+    sed -i "s#nat_1_1_mapping = \"\${PUBLIC_IP_ADDRESS}\"#nat_1_1_mapping = \"$public_ip\"#" /etc/janus/janus.jcfg
+    sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
+    hostname=$(hostname -f)
+    db_subst videoserver/add API_SECRET "${api_secret}"
+    db_subst videoserver/add HOSTNAME "${hostname}"
+    db_input high videoserver/add || true
+    db_go
+  fi
+}
+postrm:apt() {
+  . /usr/share/debconf/confmodule
+
+  if [ "$1" = "purge" ]; then
+    if getent passwd videoserver >/dev/null; then
+      if which deluser >/dev/null; then
+        deluser --system videoserver || echo "Could not remove videoserver user."
+      fi
+    fi
+    if getent group videoserver >/dev/null; then
+      if which delgroup >/dev/null; then
+        delgroup --system videoserver || echo "Could not remove videoserver group."
+      fi
+    fi
+  
+    hostname=$(hostname -f)
+    db_subst videoserver/remove HOSTNAME "${hostname}"
+    db_input high videoserver/remove || true
+    db_get videoserver/remove
+    db_go
+  
+    db_purge
+  fi
+}
+
+preinst:centos() {
+  getent group videoserver >/dev/null || groupadd -r videoserver
+  getent passwd videoserver >/dev/null || \
+  useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
+}
+postinst:centos() {
+  if [ $1 -eq 1 ]; then
+    hostname=$(hostname -f)
+    api_secret=$(openssl rand -base64 24)
+    sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg 
+    cat <<EOF
+
+.: Congratulations! Every bit is in its right place :.
+
+        Please execute these steps:
+* Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
+
+* Please execute these commands in a mailbox node 
+  as zimbra user to complete the setup of the video server:
+  
+ -> If you are in a Zimbra NG environment:
+    zxsuite connect video-server add ${hostname} port 8188 secret ${api_secret}
+
+ -> If you are in a Zextras Suite environment:
+    zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
+EOF
+  fi
+}

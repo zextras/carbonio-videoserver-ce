@@ -1,0 +1,37 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="zimbra-base-dummy"
+pkgver="1"
+pkgrel="1"
+pkgdesc="Zextras dummy package to resolve zimbra-base dependency"
+pkgdesclong=(
+  "Zextras dummy package to resolve zimbra-base dependency"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+provides=(
+  "zimbra-base"
+  "zimbra-core"  
+  "zimbra-apache-base"
+  "zimbra-apache-components"
+  "zimbra-dnscache-base"
+  "zimbra-ldap-base"
+  "zimbra-memcached-base"
+  "zimbra-mta-base"
+  "zimbra-perl-base"
+  "zimbra-proxy-base"
+  "zimbra-snmp-base"
+  "zimbra-spell-base"
+  "zimbra-store-base"
+  "zimbra-osl"
+  "zimbra-os-requirements"
+)
+section="utils"
+priority="important"
+
+package() {
+  install -dm644 "${pkgdir}"/usr/bin/.dummy
+}

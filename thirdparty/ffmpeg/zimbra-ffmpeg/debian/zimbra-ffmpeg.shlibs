@@ -1,8 +1,0 @@
-libavcodec 58 zimbra-libavcodec (>= VERSION-1)
-libavdevice 58 zimbra-libavdevice (>= VERSION-1)
-libavfilter 7 zimbra-libavfilter (>= VERSION-1)
-libavformat 58 zimbra-libavformat (>= VERSION-1)
-libavutil 56 zimbra-libavutil (>= VERSION-1)
-libpostproc 55 zimbra-libpostproc (>= VERSION-1)
-libswresample 3 zimbra-libswresample (>= VERSION-1)
-libswscale 5 zimbra-libswscale (>= VERSION-1)

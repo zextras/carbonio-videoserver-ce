@@ -1,0 +1,51 @@
+{
+    "name": "Zextras Videoserver",
+    "Description": "The test description",
+    "build_dir": "/tmp/",
+    "output": "artifacts",
+    "Projects": [
+        {
+            "name": "base",
+            "install": true
+        },       
+        {
+            "name": "libvpx",
+            "install": true
+        },
+        {
+            "name": "libopus",
+            "install": true
+        },
+        {
+            "name": "libfdk-aac",
+            "install": true
+        },
+        {
+            "name": "ffmpeg",
+            "install": true
+        },
+        {
+            "name": "libwebsockets",
+            "install": true
+        },
+        {
+            "name": "libsrtp",
+            "install": true
+        },
+        {
+            "name": "libnice",
+            "install": true
+        },
+        {
+            "name": "libusrsctp",
+            "install": true
+        },
+        {
+            "name": "videoserver-confs",
+            "install": true
+        },
+        {
+            "name": "videoserver"
+        }
+    ]
+}

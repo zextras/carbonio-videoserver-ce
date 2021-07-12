@@ -1,0 +1,114 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="zimbra-ffmpeg"
+pkgver="4.4"
+pkgrel="1"
+pkgdesc="Complete solution to record, convert and stream audio and video"
+pkgdesclong=(
+  "Complete solution to record, convert and stream audio and video"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+depends:ubuntu-bionic=(
+  "libass9"
+  "libc6"
+  "libfreetype6"
+  "libmp3lame0"
+  "libtheora0"
+  "libx264-152"
+  "libxcb1"
+  "zimbra-libfdk-aac"
+  "zimbra-libopus"
+  "zimbra-libvpx"
+  "zlib1g"
+)
+depends:ubuntu-focal=(
+  "libass9"
+  "libc6"
+  "libfreetype6"
+  "libmp3lame0"
+  "libtheora0"  
+  "libx264-155"
+  "libxcb1"
+  "zimbra-libfdk-aac"
+  "zimbra-libopus"
+  "zimbra-libvpx"
+  "zlib1g"
+)
+makedepends:apt=(
+  "libass-dev"
+  "libmp3lame-dev"
+  "libfreetype6-dev"
+  "libtheora-dev"
+  "libx264-dev"
+  "libxcb1-dev"
+)
+depends:yum=(
+  "freetype"
+  "lame-libs"
+  "libass"
+  "libtheora"
+  "libxcb"
+  "x264-libs"
+  "zimbra-libfdk-aac"
+  "zimbra-libopus"
+  "zimbra-libvpx"
+  "zlib"
+)
+makedepends:yum=(
+  "freetype-devel"
+  "lame-devel"
+  "libass-devel"
+  "libtheora-devel"
+  "libxcb-devel"
+  "x264-devel"
+  "zlib-devel"
+)
+
+section="libs"
+priority="important"
+sources=(
+  "https://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.gz"
+)
+hashsums=(
+  "a4abede145de22eaf233baa1726e38e137f5698d9edd61b5763cd02b883f3c7c"
+)
+
+build() {
+  cd "${srcdir}/ffmpeg-${pkgver}"
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export CFLAGS="-O2"
+  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"
+
+  ./configure --prefix=/opt/zimbra/common \
+    --disable-static \
+    --enable-shared \
+    --disable-debug \
+    --disable-stripping \
+    --extra-cflags="-I/opt/zimbra/common/include" \
+    --extra-ldflags="-L/opt/zimbra/common/lib" \
+    --bindir="/opt/zimbra/common/bin" \
+    --enable-gpl \
+    --enable-libass \
+    --enable-libfdk-aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopus \
+    --enable-libtheora \
+    --enable-libvpx \
+    --enable-libx264 \
+    --enable-nonfree \
+    --enable-libxcb
+  make -j$(nproc)  
+}
+
+package() {
+  cd "${srcdir}/ffmpeg-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zimbra/common/share
+  # rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+  # rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+}

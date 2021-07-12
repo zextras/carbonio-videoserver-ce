@@ -1,0 +1,47 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="zimbra-libfdk-aac"
+pkgver="2.0.2"
+pkgrel="1"
+pkgdesc="Fraunhofer FDK AAC codec library"
+pkgdesclong=(
+  "Fraunhofer FDK AAC codec library"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+makedepends:apt=(
+  "autoconf"
+  "libtool-bin"
+)
+makedepends:yum=(
+  "autoconf"
+  "libtool"
+)
+section="libs"
+priority="important"
+sources=(
+  "https://github.com/mstorsjo/fdk-aac/archive/v${pkgver}.tar.gz"
+)
+hashsums=(
+  "7812b4f0cf66acda0d0fe4302545339517e702af7674dd04e5fe22a5ade16a90"
+)
+
+build() {
+  cd "${srcdir}/fdk-aac-${pkgver}"
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export CFLAGS="-O2"
+
+  ./autogen.sh
+  ./configure --prefix=/opt/zimbra/common \
+    --disable-static
+  make -j$(nproc)
+}
+
+package() {
+  cd "${srcdir}/fdk-aac-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+}
