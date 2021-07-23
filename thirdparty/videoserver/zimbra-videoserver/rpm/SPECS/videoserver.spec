@@ -70,10 +70,10 @@ getent passwd videoserver >/dev/null || \
 useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 
 %post
-if [ $1 -eq 1 ]; then
+if [ \( $1 -eq 1 \) -o \( "$(grep '\${PUBLIC_IP_ADDRESS}' /etc/janus/janus.jcfg)" != "" \) ]; then
   hostname=$(hostname -f)
   api_secret=$(openssl rand -base64 24)
-  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg 
+  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
   cat <<EOF
 
 .: Congratulations! Every bit is in its right place :.
@@ -81,9 +81,9 @@ if [ $1 -eq 1 ]; then
         Please execute these steps:
 * Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
 
-* Please execute these commands in a mailbox node 
+* Please execute these commands in a mailbox node
   as zimbra user to complete the setup of the video server:
-  
+
  -> If you are in a Zimbra NG environment:
     zxsuite connect video-server add ${hostname} port 8188 secret ${api_secret}
 
