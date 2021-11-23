@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-libwebsockets"
+pkgname="carbonio-libwebsockets"
 pkgver="4.2.0"
 pkgrel="1"
 pkgdesc="C library for websocket clients and servers"
@@ -46,9 +46,9 @@ hashsums=(
 
 build:apt() {
   cd "${srcdir}/libwebsockets-${pkgver}"
-  cmake -D CMAKE_INSTALL_PREFIX=/opt/zimbra/common \
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
-    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zimbra/common/lib" \
+    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -86,9 +86,9 @@ build:apt() {
 
 build:yum() {
   cd "${srcdir}/libwebsockets-${pkgver}"
-  cmake -D CMAKE_INSTALL_PREFIX=/opt/zimbra/common \
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
-    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zimbra/common/lib" \
+    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -127,11 +127,11 @@ build:yum() {
 package:apt() {
   cd "${srcdir}/libwebsockets-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zimbra/common/lib/cmake
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }
 
 package:yum() {
   cd "${srcdir}/libwebsockets-${pkgver}"
   make -C build DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zimbra/common/lib/cmake
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }

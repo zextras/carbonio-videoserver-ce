@@ -38,7 +38,6 @@ pipeline {
                     steps {
                         unstash 'project'
                         sh 'sudo pacur build ubuntu-bionic videoserver'
-                        sh 'sudo rm artifacts/zimbra-base*.deb'
                         stash includes: 'artifacts/', name: 'artifacts-ubuntu-bionic'
                     }
                     post {
@@ -63,7 +62,6 @@ sudo yum -y module install libuv:epel8-buildroot
 '''
                         sh 'sudo pacur build centos-8 videoserver'
                         stash includes: 'artifacts/', name: 'artifacts-centos-8'
-                        sh 'sudo rm artifacts/zimbra-base*.rpm'
                     }
                     post {
                         always {
@@ -76,7 +74,6 @@ sudo yum -y module install libuv:epel8-buildroot
         stage('Upload To Playground') {
             when {
                 anyOf {
-                    branch 'zextras/*'
                     expression { params.PLAYGROUND == true }
                 }
             }

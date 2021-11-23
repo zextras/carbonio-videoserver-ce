@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-libvpx"
+pkgname="carbonio-libvpx"
 pkgver="1.10.0"
 pkgrel="1"
 pkgdesc="VP8 and VP9 codec"
@@ -26,9 +26,9 @@ hashsums=(
 
 build() {
   cd "${srcdir}/libvpx-${pkgver}"
-  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
   export CFLAGS="-O2 -g"
-  ./configure --prefix=/opt/zimbra/common \
+  ./configure --prefix=/opt/zextras/common \
     --disable-install-docs \
     --disable-install-srcs \
     --enable-pic \
@@ -45,6 +45,6 @@ build() {
 
 package() {
   cd "${srcdir}/libvpx-${pkgver}"
-  make DIST_DIR="${pkgdir}/opt/zimbra/common" install
-  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+  make DIST_DIR="${pkgdir}/opt/zextras/common" install
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
 }

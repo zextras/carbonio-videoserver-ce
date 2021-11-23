@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-libnice"
+pkgname="carbonio-libnice"
 pkgver="0.1.18"
 pkgrel="1"
 pkgdesc="An implementation of the IETF's draft ICE (for p2p UDP data streams)"
@@ -39,25 +39,25 @@ hashsums=(
 
 build:apt() {
   cd "${srcdir}/libnice-${pkgver}"
-  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   pip3 install meson
   meson \
     --werror \
     --warnlevel 2 \
     -Dgtk_doc=disabled \
-    --prefix=/opt/zimbra/common build \
+    --prefix=/opt/zextras/common build \
     --libdir=lib
   meson compile -C build
 }
 
 build:yum() {
   cd "${srcdir}/libnice-${pkgver}"
-  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   meson \
     --werror \
     --warnlevel 2 \
     -Dgtk_doc=disabled \
-    --prefix=/opt/zimbra/common build \
+    --prefix=/opt/zextras/common build \
     --libdir=lib
   meson compile -C build
 }
@@ -65,6 +65,6 @@ build:yum() {
 package() {
   cd "${srcdir}/libnice-${pkgver}"
   DESTDIR="${pkgdir}" meson install -C build/
-  # rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
-  # rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }

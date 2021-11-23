@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-libusrsctp"
+pkgname="carbonio-libusrsctp"
 pkgver="0.9.5.0"
 pkgrel="1"
 pkgdesc="A portable SCTP userland stack"
@@ -23,11 +23,11 @@ hashsums=(
 
 build() {
   cd "${srcdir}/usrsctp-${pkgver}"
-  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
   export CFLAGS="-O2"
   ./bootstrap
   ./configure \
-    --prefix=/opt/zimbra/common \
+    --prefix=/opt/zextras/common \
     --disable-debug
   make
 }
@@ -35,6 +35,6 @@ build() {
 package() {
   cd "${srcdir}/usrsctp-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
-  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }

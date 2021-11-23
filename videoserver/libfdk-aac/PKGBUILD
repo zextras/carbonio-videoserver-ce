@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-libfdk-aac"
+pkgname="carbonio-libfdk-aac"
 pkgver="2.0.2"
 pkgrel="1"
 pkgdesc="Fraunhofer FDK AAC codec library"
@@ -31,11 +31,11 @@ hashsums=(
 
 build() {
   cd "${srcdir}/fdk-aac-${pkgver}"
-  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
   export CFLAGS="-O2"
 
   ./autogen.sh
-  ./configure --prefix=/opt/zimbra/common \
+  ./configure --prefix=/opt/zextras/common \
     --disable-static
   make -j$(nproc)
 }
@@ -43,5 +43,5 @@ build() {
 package() {
   cd "${srcdir}/fdk-aac-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }

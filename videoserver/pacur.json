@@ -5,10 +5,6 @@
     "output": "artifacts",
     "Projects": [
         {
-            "name": "base",
-            "install": true
-        },       
-        {
             "name": "libvpx",
             "install": true
         },

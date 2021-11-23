@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-ffmpeg"
+pkgname="carbonio-ffmpeg"
 pkgver="4.4"
 pkgrel="1"
 pkgdesc="Complete solution to record, convert and stream audio and video"
@@ -20,9 +20,9 @@ depends:ubuntu-bionic=(
   "libtheora0"
   "libx264-152"
   "libxcb1"
-  "zimbra-libfdk-aac"
-  "zimbra-libopus"
-  "zimbra-libvpx"
+  "carbonio-libfdk-aac"
+  "carbonio-libopus"
+  "carbonio-libvpx"
   "zlib1g"
 )
 depends:ubuntu-focal=(
@@ -33,9 +33,9 @@ depends:ubuntu-focal=(
   "libtheora0"  
   "libx264-155"
   "libxcb1"
-  "zimbra-libfdk-aac"
-  "zimbra-libopus"
-  "zimbra-libvpx"
+  "carbonio-libfdk-aac"
+  "carbonio-libopus"
+  "carbonio-libvpx"
   "zlib1g"
 )
 makedepends:apt=(
@@ -53,9 +53,9 @@ depends:yum=(
   "libtheora"
   "libxcb"
   "x264-libs"
-  "zimbra-libfdk-aac"
-  "zimbra-libopus"
-  "zimbra-libvpx"
+  "carbonio-libfdk-aac"
+  "carbonio-libopus"
+  "carbonio-libvpx"
   "zlib"
 )
 makedepends:yum=(
@@ -79,18 +79,18 @@ hashsums=(
 
 build() {
   cd "${srcdir}/ffmpeg-${pkgver}"
-  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
   export CFLAGS="-O2"
-  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
 
-  ./configure --prefix=/opt/zimbra/common \
+  ./configure --prefix=/opt/zextras/common \
     --disable-static \
     --enable-shared \
     --disable-debug \
     --disable-stripping \
-    --extra-cflags="-I/opt/zimbra/common/include" \
-    --extra-ldflags="-L/opt/zimbra/common/lib" \
-    --bindir="/opt/zimbra/common/bin" \
+    --extra-cflags="-I/opt/zextras/common/include" \
+    --extra-ldflags="-L/opt/zextras/common/lib" \
+    --bindir="/opt/zextras/common/bin" \
     --enable-gpl \
     --enable-libass \
     --enable-libfdk-aac \
@@ -108,7 +108,7 @@ build() {
 package() {
   cd "${srcdir}/ffmpeg-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zimbra/common/share
-  # rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
-  # rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zextras/common/share
+  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }

@@ -2,8 +2,8 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-videoserver-confs"
-pkgver="0.11.3"
+pkgname="carbonio-videoserver-confs"
+pkgver="0.11.5"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 pkgdesclong=(
@@ -25,14 +25,13 @@ depends:apt=(
   "libmicrohttpd12"
   "libogg0"
   "libssl1.1"
-  "zimbra-base"
-  "zimbra-ffmpeg"
-  "zimbra-libnice"
-  "zimbra-libopus"
-  "zimbra-libsrtp"
-  "zimbra-libusrsctp"
-  "zimbra-libwebsockets"
-  "zimbra-videoserver-confs"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-videoserver-confs"
   "zlib1g"  
 )
 depends:yum=(
@@ -42,13 +41,12 @@ depends:yum=(
   "libmicrohttpd"
   "libogg"
   "openssl"
-  "zimbra-base"
-  "zimbra-ffmpeg"
-  "zimbra-libnice"
-  "zimbra-libopus"
-  "zimbra-libsrtp"
-  "zimbra-libusrsctp"
-  "zimbra-libwebsockets"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
   "zlib"
 )
 makedepends:apt=(
@@ -80,18 +78,18 @@ sources=(
 )
 hashsums=(
   "SKIP"
-  "bb44e6a94fd15d1f93d09eea6109e2f033d0636ea761ec70729b9bda02d38f4d"
+  "31d4b5683754642f5ed3a066f568a3e433f1c4b9212debb896b8f5f47dd3326b"
 )
 
 build() {
   cd "${srcdir}/janus-gateway-multistream"
   patch -Np1 -i ../janus.jcfg.patch
   ./autogen.sh
-  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib -L/opt/zimbra/common/lib"
-  export CFLAGS="-O2 -I/opt/zimbra/common/include"
-  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"  
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
+  export CFLAGS="-O2 -I/opt/zextras/common/include"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"  
   ./configure \
-    --prefix=/opt/zimbra/common \
+    --prefix=/opt/zextras/common \
     --sysconfdir /etc \
     --disable-docs \
     --disable-turn-rest-api \

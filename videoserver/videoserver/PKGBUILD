@@ -2,8 +2,8 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="zimbra-videoserver"
-pkgver="0.11.3"
+pkgname="carbonio-videoserver"
+pkgver="0.11.5"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 pkgdesclong=(
@@ -25,14 +25,13 @@ depends:apt=(
   "libmicrohttpd12"
   "libogg0"
   "libssl1.1"
-  "zimbra-base"
-  "zimbra-ffmpeg"
-  "zimbra-libnice"
-  "zimbra-libopus"
-  "zimbra-libsrtp"
-  "zimbra-libusrsctp"
-  "zimbra-libwebsockets"
-  "zimbra-videoserver-confs"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-videoserver-confs"
   "zlib1g"  
 )
 depends:yum=(
@@ -42,14 +41,13 @@ depends:yum=(
   "libmicrohttpd"
   "libogg"
   "openssl"
-  "zimbra-base"
-  "zimbra-ffmpeg"
-  "zimbra-libnice"
-  "zimbra-libopus"
-  "zimbra-libsrtp"
-  "zimbra-libusrsctp"
-  "zimbra-libwebsockets"
-  "zimbra-videoserver-confs"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-videoserver-confs"
   "zlib"
 )
 makedepends:apt=(
@@ -76,7 +74,7 @@ debconf_template="videoserver.templates"
 section="comm"
 priority="important"
 sources=(
-  "https://github.com/meetecho/janus-gateway/archive/multistream.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/259ec96cbcaecf4bf744e7b40df7799476ab3a1e.tar.gz"
   "videoserver.templates"
   "videoserver.service"
 )
@@ -87,13 +85,13 @@ hashsums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-multistream"
+  cd "${srcdir}/janus-gateway-259ec96cbcaecf4bf744e7b40df7799476ab3a1e"
   ./autogen.sh
-  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib -L/opt/zimbra/common/lib"
-  export CFLAGS="-O2 -I/opt/zimbra/common/include"
-  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"  
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
+  export CFLAGS="-O2 -I/opt/zextras/common/include"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"  
   ./configure \
-    --prefix=/opt/zimbra/common \
+    --prefix=/opt/zextras/common \
     --sysconfdir /etc \
     --disable-docs \
     --disable-turn-rest-api \
@@ -110,28 +108,28 @@ build() {
 }
 
 package:apt() {
-  cd "${srcdir}/janus-gateway-multistream"
+  cd "${srcdir}/janus-gateway-259ec96cbcaecf4bf744e7b40df7799476ab3a1e"
   make DESTDIR="${pkgdir}" install configs
   install -Dm755 ../videoserver.service \
     "${pkgdir}"/lib/systemd/system/videoserver.service
   rm -rf "${pkgdir}"/etc
-  rm -rf "${pkgdir}"/opt/zimbra/common/share/doc
-  rm -rf "${pkgdir}"/opt/zimbra/common/share/man
-  rm -rf "${pkgdir}"/opt/zimbra/common/share/janus/demos/  
-  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
-  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zextras/common/share/doc
+  rm -rf "${pkgdir}"/opt/zextras/common/share/man
+  rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/  
+  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
 package:yum() {
-  cd "${srcdir}/janus-gateway-multistream"
+  cd "${srcdir}/janus-gateway-259ec96cbcaecf4bf744e7b40df7799476ab3a1e"
   make DESTDIR="${pkgdir}" install configs
   install -Dm755 ../videoserver.service \
     "${pkgdir}"/usr/lib/systemd/system/videoserver.service
   rm -rf "${pkgdir}"/etc
-  rm -rf "${pkgdir}"/opt/zimbra/common/share/doc
-  rm -rf "${pkgdir}"/opt/zimbra/common/share/man
-  rm -rf "${pkgdir}"/opt/zimbra/common/share/janus/demos/  
-  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
-  #rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zextras/common/share/doc
+  rm -rf "${pkgdir}"/opt/zextras/common/share/man
+  rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/  
+  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
 
 preinst:apt() {
@@ -230,13 +228,9 @@ postinst:centos() {
 * Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
 
 * Please execute these commands in a mailbox node 
-  as zimbra user to complete the setup of the video server:
-  
- -> If you are in a Zimbra NG environment:
-    zxsuite connect video-server add ${hostname} port 8188 secret ${api_secret}
+  as zextras user to complete the setup of the video server:
 
- -> If you are in a Zextras Suite environment:
-    zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
+  zxsuite team video-server add ${hostname} port 8188 secret ${api_secret}
 EOF
   fi
 }
