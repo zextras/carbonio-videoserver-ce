@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-videoserver"
-pkgver="0.11.5"
+pkgver="0.11.7"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 pkgdesclong=(
@@ -74,7 +74,7 @@ debconf_template="videoserver.templates"
 section="comm"
 priority="important"
 sources=(
-  "https://github.com/meetecho/janus-gateway/archive/259ec96cbcaecf4bf744e7b40df7799476ab3a1e.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/504d20b124c24ef73e639693b5373a6de39d53b2.tar.gz"
   "videoserver.templates"
   "videoserver.service"
 )
@@ -85,7 +85,7 @@ hashsums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-259ec96cbcaecf4bf744e7b40df7799476ab3a1e"
+  cd "${srcdir}/janus-gateway-504d20b124c24ef73e639693b5373a6de39d53b2"
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
   export CFLAGS="-O2 -I/opt/zextras/common/include"
@@ -108,7 +108,7 @@ build() {
 }
 
 package:apt() {
-  cd "${srcdir}/janus-gateway-259ec96cbcaecf4bf744e7b40df7799476ab3a1e"
+  cd "${srcdir}/janus-gateway-504d20b124c24ef73e639693b5373a6de39d53b2"
   make DESTDIR="${pkgdir}" install configs
   install -Dm755 ../videoserver.service \
     "${pkgdir}"/lib/systemd/system/videoserver.service
@@ -120,7 +120,7 @@ package:apt() {
   #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
 package:yum() {
-  cd "${srcdir}/janus-gateway-259ec96cbcaecf4bf744e7b40df7799476ab3a1e"
+  cd "${srcdir}/janus-gateway-504d20b124c24ef73e639693b5373a6de39d53b2"
   make DESTDIR="${pkgdir}" install configs
   install -Dm755 ../videoserver.service \
     "${pkgdir}"/usr/lib/systemd/system/videoserver.service
