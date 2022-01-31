@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-libwebsockets"
-pkgver="4.2.0"
+pkgver="4.2.2"
 pkgrel="1"
 pkgdesc="C library for websocket clients and servers"
 pkgdesclong=(
@@ -41,11 +41,11 @@ sources=(
   "https://github.com/warmcat/libwebsockets/archive/v${pkgver}.tar.gz"
 )
 hashsums=(
-  "e1fb5b204a030ded8dfe2a75c66ec8d1a2e6a67e82c7709fe3c4277e0ccb5fb40c18db04e73c640d07ef4516aa266ae8b102f802b2a41b80980260cb6921f369"
+  "c2ae635485b8ef8d383dee0aee29ad6272d4462e527d29d9af014ab4a2465cbd"
 )
 
 build:apt() {
-  cd "${srcdir}/libwebsockets-${pkgver}"
+  cd "${srcdir}"
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
     -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
@@ -80,12 +80,12 @@ build:apt() {
     -D LWS_UNIX_SOCK=ON \
     -Wno-dev \
     -B build \
-    -S .
-  make
+    -S "libwebsockets-${pkgver}"
+  make VERBOSE=1 -C build
 }
 
 build:yum() {
-  cd "${srcdir}/libwebsockets-${pkgver}"
+  cd "${srcdir}"
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
     -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
@@ -120,18 +120,18 @@ build:yum() {
     -D LWS_UNIX_SOCK=ON \
     -Wno-dev \
     -B build \
-    -S .
-  make -C build
+    -S "libwebsockets-${pkgver}"
+  make VERBOSE=1 -C build
 }
 
 package:apt() {
-  cd "${srcdir}/libwebsockets-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd "${srcdir}"
+  make DESTDIR="${pkgdir}" install -C build
   rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }
 
 package:yum() {
-  cd "${srcdir}/libwebsockets-${pkgver}"
-  make -C build DESTDIR="${pkgdir}" install
+  cd "${srcdir}"
+  make DESTDIR="${pkgdir}" install -C build
   rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }
