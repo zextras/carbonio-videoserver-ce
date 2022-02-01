@@ -47,4 +47,5 @@ package() {
   cd "${srcdir}/libvpx-${pkgver}"
   make DIST_DIR="${pkgdir}/opt/zextras/common" install
   rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }

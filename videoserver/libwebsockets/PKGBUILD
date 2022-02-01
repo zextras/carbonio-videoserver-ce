@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-libwebsockets"
-pkgver="4.2.2"
+pkgver="4.3.1"
 pkgrel="1"
 pkgdesc="C library for websocket clients and servers"
 pkgdesclong=(
@@ -13,24 +13,21 @@ arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 depends:apt=(
-  "libuv1"
+  "carbonio-libev"
+  "carbonio-libuv"
   "openssl"
 )
 makedepends:apt=(
   "cmake"
-  "libev-dev"
-  "libuv1-dev"
   "libssl-dev"
 )
 depends:yum=(
-  "libev"
-  "libuv"
+  "carbonio-libev"
+  "carbonio-libuv"
   "openssl"
 )
 makedepends:yum=(
   "cmake"
-  "libev-devel"
-  "libuv-devel"
   "openssl-devel"
   "zlib-devel"
 )
@@ -41,14 +38,16 @@ sources=(
   "https://github.com/warmcat/libwebsockets/archive/v${pkgver}.tar.gz"
 )
 hashsums=(
-  "c2ae635485b8ef8d383dee0aee29ad6272d4462e527d29d9af014ab4a2465cbd"
+  "8fdb1454a1b34cd9a6351beaab237a485e6853806101de7e62bd2bc250bb50af"
 )
 
-build:apt() {
+build:ubuntu-bionic() {
   cd "${srcdir}"
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
-    -D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
     -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
+    -D LIBEV_INCLUDE_DIRS="/opt/zextras/common/include" \
+    -D LIBEV_LIBRARIES="/opt/zextras/common/lib/libev.so" \
+    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -81,14 +80,61 @@ build:apt() {
     -Wno-dev \
     -B build \
     -S "libwebsockets-${pkgver}"
+
+  make VERBOSE=1
+}
+
+build:ubuntu-focal() {
+  cd "${srcdir}"
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
+    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
+    -D LIBEV_INCLUDE_DIRS="/opt/zextras/common/include" \
+    -D LIBEV_LIBRARIES="/opt/zextras/common/lib/libev.so" \
+    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
+    -D LWS_BUILD_HASH="no_hash" \
+    -D LWS_IPV6=OFF \
+    -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
+    -D LWS_WITH_ACME=ON \
+    -D LWS_WITH_DISKCACHE=ON \
+    -D LWS_WITH_EXTERNAL_POLL=OFF \
+    -D LWS_WITH_FTS=ON \
+    -D LWS_WITH_GLIB=ON \
+    -D LWS_WITH_HTTP2=ON \
+    -D LWS_WITH_HTTP_PROXY=ON \
+    -D LWS_WITH_LIBEV=ON \
+    -D LWS_WITH_LIBEVENT=OFF \
+    -D LWS_WITH_LIBUV=ON \
+    -D LWS_WITH_LWSAC=ON \
+    -D LWS_WITH_RANGES=ON \
+    -D LWS_WITH_SOCKS5=ON \
+    -D LWS_WITH_STATIC=OFF \
+    -D LWS_WITH_THREADPOOL=ON \
+    -D LWS_WITH_ZIP_FOPS=ON \
+    -D LWS_WITHOUT_BUILTIN_GETIFADDRS=ON \
+    -D LWS_WITHOUT_BUILTIN_SHA1=ON \
+    -D LWS_WITHOUT_CLIENT=OFF \
+    -D LWS_WITHOUT_SERVER=OFF \
+    -D LWS_WITHOUT_TESTAPPS=ON \
+    -D LWS_WITHOUT_TEST_CLIENT=ON \
+    -D LWS_WITHOUT_TEST_PING=ON \
+    -D LWS_WITHOUT_TEST_SERVER=OFF \
+    -D LWS_WITHOUT_TEST_SERVER_EXTPOLL=ON \
+    -D LWS_UNIX_SOCK=ON \
+    -Wno-dev \
+    -B build \
+    -S "libwebsockets-${pkgver}"
+
   make VERBOSE=1 -C build
 }
 
 build:yum() {
   cd "${srcdir}"
+  mkdir build
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
-    -D CMAKE_C_FLAGS="-fno-strict-aliasing -O2 -g" \
     -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
+    -D LIBEV_INCLUDE_DIRS="/opt/zextras/common/include" \
+    -D LIBEV_LIBRARIES="/opt/zextras/common/lib/libev.so" \
+    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -121,10 +167,17 @@ build:yum() {
     -Wno-dev \
     -B build \
     -S "libwebsockets-${pkgver}"
-  make VERBOSE=1 -C build
+
+  make
 }
 
-package:apt() {
+package:ubuntu-bionic() {
+  cd "${srcdir}"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+}
+
+package:ubuntu-focal() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install -C build
   rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake

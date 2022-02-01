@@ -36,7 +36,6 @@ hashsums=(
 build() {
   cd "${srcdir}/libsrtp-bd0f27ec0e299ad101a396dde3f7c90d48efc8fc"
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
-  export CFLAGS="-O2"
   export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
 
   ./configure \

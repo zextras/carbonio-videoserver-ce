@@ -5,6 +5,18 @@
     "output": "artifacts",
     "Projects": [
         {
+            "name": "libev",
+            "install": true
+        },
+        {
+            "name": "libuv",
+            "install": true
+        },
+        {
+            "name": "libwebsockets",
+            "install": true
+        },
+        {
             "name": "libvpx",
             "install": true
         },
@@ -18,10 +30,6 @@
         },
         {
             "name": "ffmpeg",
-            "install": true
-        },
-        {
-            "name": "libwebsockets",
             "install": true
         },
         {

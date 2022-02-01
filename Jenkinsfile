@@ -73,10 +73,8 @@ pipeline {
                         unstash 'project'
                         sh '''
 sudo yum update; \
-sudo yum install -y libuv; \
 sudo yum install -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm; \
 sudo yum install -y --nogpgcheck https://forensics.cert.org/cert-forensics-tools-release-el8.rpm; \
-sudo yum -y module install libuv:epel8-buildroot
 '''
                         sh 'sudo pacur build centos-8 videoserver'
                         stash includes: 'artifacts/', name: 'artifacts-centos-8'

@@ -1,0 +1,44 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="carbonio-libuv"
+pkgver="1.43.0"
+pkgrel="1"
+pkgdesc="Multi-platform support library with a focus on asynchronous I/O"
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://github.com/libuv/libuv"
+license=("custom")
+depends:apt=(
+  "libc6" 
+)
+depends:yum=(
+  "glibc" 
+)
+
+section="libs"
+priority="important"
+sources=(
+  "https://dist.libuv.org/dist/v${pkgver}/libuv-v${pkgver}.tar.gz"
+)
+hashsums=(
+  "90d72bb7ae18de2519d0cac70eb89c319351146b90cd3f91303a492707e693a4"
+)
+
+build() {
+  cd "libuv-v${pkgver}"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
+  ./autogen.sh
+  ./configure --prefix=/opt/zextras/common
+  make
+}
+
+package() {
+  cd "libuv-v${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
+}
