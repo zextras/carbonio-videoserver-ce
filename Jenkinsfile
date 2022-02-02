@@ -63,28 +63,28 @@ pipeline {
                         }
                     }
                 }
-                stage('Centos 8') {
-                    agent {
-                        node {
-                            label 'pacur-agent-centos-8-v1'
-                        }
-                    }
-                    steps {
-                        unstash 'project'
-                        sh '''
-sudo yum update; \
-sudo yum install -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm; \
-sudo yum install -y --nogpgcheck https://forensics.cert.org/cert-forensics-tools-release-el8.rpm; \
-'''
-                        sh 'sudo pacur build centos-8 videoserver'
-                        stash includes: 'artifacts/', name: 'artifacts-centos-8'
-                    }
-                    post {
-                        always {
-                            archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
-                        }
-                    }
-                }
+//                 stage('Centos 8') {
+//                     agent {
+//                         node {
+//                             label 'pacur-agent-centos-8-v1'
+//                         }
+//                     }
+//                     steps {
+//                         unstash 'project'
+//                         sh '''
+// sudo yum update; \
+// sudo yum install -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm; \
+// sudo yum install -y --nogpgcheck https://forensics.cert.org/cert-forensics-tools-release-el8.rpm; \
+// '''
+//                         sh 'sudo pacur build centos-8 videoserver'
+//                         stash includes: 'artifacts/', name: 'artifacts-centos-8'
+//                     }
+//                     post {
+//                         always {
+//                             archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
+//                         }
+//                     }
+//                 }
             }
         }
         stage('Upload To Playground') {
@@ -96,7 +96,7 @@ sudo yum install -y --nogpgcheck https://forensics.cert.org/cert-forensics-tools
             steps {
                 unstash 'artifacts-ubuntu-bionic'
                 unstash 'artifacts-ubuntu-focal'
-                unstash 'artifacts-centos-8'
+                // unstash 'artifacts-centos-8'
                 script {
                     def server = Artifactory.server 'zextras-artifactory'
                     def buildInfo
