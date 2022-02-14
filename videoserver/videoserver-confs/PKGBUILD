@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-videoserver-confs"
-pkgver="0.11.7"
+pkgver="0.11.8"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 pkgdesclong=(
@@ -73,7 +73,7 @@ debconf_template="videoserver.templates"
 section="comm"
 priority="important"
 sources=(
-  "https://github.com/meetecho/janus-gateway/archive/504d20b124c24ef73e639693b5373a6de39d53b2.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/4792a7391508855c8af4183a9c264e0a6a887bbb.tar.gz"
   "janus.jcfg.patch"
 )
 hashsums=(
@@ -82,7 +82,7 @@ hashsums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-504d20b124c24ef73e639693b5373a6de39d53b2"
+  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
   patch -Np1 -i ../janus.jcfg.patch
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
@@ -106,7 +106,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/janus-gateway-504d20b124c24ef73e639693b5373a6de39d53b2"
+  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
   make DESTDIR="${pkgdir}" install configs
   rm -rf "${pkgdir}"/opt/
 }
