@@ -1,0 +1,42 @@
+targets=(
+  "centos"
+)
+pkgname="carbonio-mlt"
+pkgver="7.4.0"
+pkgrel="1"
+pkgdesc="An open source multimedia framework"
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://www.mltframework.org"
+license=("BSD")
+depends:yum=(
+  "carbonio-ffmpeg"
+  "libebur128" 
+)
+makedepends:yum=(
+  "cmake"
+  "libebur128-devel" 
+)
+
+section="libs"
+priority="important"
+sources=(
+  "https://github.com/mltframework/mlt/archive/v${pkgver}/mlt-${pkgver}.tar.gz"
+)
+hashsums=(
+  "17c19843ffdbca66777aaadf39acb11829fd930eaded92f768cbcb8ae59a5f37"
+)
+
+build:yum() {
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
+  cmake -B build -S "mlt-${pkgver}" \
+    -DCMAKE_INSTALL_PREFIX=/opt/zextras/common \
+    -DMOD_OPENCV=OFF \
+    -DSWIG_PYTHON=OFF
+  cmake --build build
+}
+
+package:yum() {
+  DESTDIR="${pkgdir}" cmake --install build
+}

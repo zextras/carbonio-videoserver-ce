@@ -45,6 +45,9 @@
             "install": true
         },
         {
+            "name": "mlt"
+        },
+        {
             "name": "videoserver-confs",
             "install": true
         },
