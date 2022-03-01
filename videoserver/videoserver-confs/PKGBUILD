@@ -78,7 +78,7 @@ sources=(
 )
 hashsums=(
   "SKIP"
-  "31d4b5683754642f5ed3a066f568a3e433f1c4b9212debb896b8f5f47dd3326b"
+  "3d9d588dbc23598c5c324febb89cddf6911153cdf2920a148c5abb5b6c27ea3f"
 )
 
 build() {

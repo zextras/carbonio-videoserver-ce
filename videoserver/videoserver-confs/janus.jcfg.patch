@@ -1,6 +1,6 @@
 diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
---- a/conf/janus.jcfg.sample.in	2021-11-23 16:50:40.528747538 +0100
-+++ b/conf/janus.jcfg.sample.in	2021-11-23 16:50:44.494802335 +0100
+--- a/conf/janus.jcfg.sample.in	2022-02-21 16:02:12.059472237 +0100
++++ b/conf/janus.jcfg.sample.in	2022-02-21 16:04:31.556017525 +0100
 @@ -11,7 +11,7 @@
  	loggers_folder = "@loggerdir@"			# External loggers folder
  
@@ -55,7 +55,15 @@ diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.i
  									# event loop and related thread for all the media
  									# routing and management. If for some reason you'd
  									# rather limit the number of loop/threads, and
-@@ -212,12 +212,12 @@
+@@ -158,7 +158,6 @@
+ 		"/sbin",
+ 		"/sys",
+ 		"/usr",
+-		"/var",
+ 			# We add what are usually the folders Janus is installed to
+ 			# as well: we don't just put "/opt/janus" because that would
+ 			# include folders like "/opt/janus/share" that is where
+@@ -214,12 +213,12 @@
  	#ipv6 = true
  	#ipv6_linklocal = true
  	#min_nack_queue = 500
@@ -70,7 +78,7 @@ diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.i
  
  	# Janus can do some optimizations on the NACK queue, specifically when
  	# keyframes are involved. Namely, you can configure Janus so that any
-@@ -298,7 +298,7 @@
+@@ -300,7 +299,7 @@
  	# Multiple public IP addresses can be specified as a comma separated list
  	# if the Janus is deployed in a DMZ between two 1-1 NAT for internal and
  	# external users.
@@ -79,7 +87,7 @@ diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.i
  	#keep_private_host = true
  
  	# You can configure a TURN server in two different ways: specifying a
-@@ -367,7 +367,7 @@
+@@ -369,7 +368,7 @@
  	# Just beware that the ICE ignore list is not used if an enforce list
  	# has been configured. By default, Janus ignores all interfaces whose
  	# name starts with 'vmnet', to skip VMware interfaces:
