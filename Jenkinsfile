@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        booleanParam defaultValue: false, description: 'Whether to upload the packages in playground repositories', name: 'PLAYGROUND'
+        booleanParam defaultValue: false, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'
     }
     options {
         skipDefaultCheckout()
@@ -63,40 +63,16 @@ pipeline {
                         }
                     }
                 }
-//                 stage('Centos 8') {
-//                     agent {
-//                         node {
-//                             label 'pacur-agent-centos-8-v1'
-//                         }
-//                     }
-//                     steps {
-//                         unstash 'project'
-//                         sh '''
-// sudo yum update; \
-// sudo yum install -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm; \
-// sudo yum install -y --nogpgcheck https://forensics.cert.org/cert-forensics-tools-release-el8.rpm; \
-// '''
-//                         sh 'sudo pacur build centos-8 videoserver'
-//                         stash includes: 'artifacts/', name: 'artifacts-centos-8'
-//                     }
-//                     post {
-//                         always {
-//                             archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
-//                         }
-//                     }
-//                 }
             }
         }
-        stage('Upload To Playground') {
+        stage('Upload To Devel') {
             when {
                 anyOf {
-                    expression { params.PLAYGROUND == true }
+                    expression { params.DEVEL == true }
                 }
             }
             steps {
-                unstash 'artifacts-ubuntu-bionic'
                 unstash 'artifacts-ubuntu-focal'
-                // unstash 'artifacts-centos-8'
                 script {
                     def server = Artifactory.server 'zextras-artifactory'
                     def buildInfo
@@ -105,13 +81,8 @@ pipeline {
                     uploadSpec = '''{
                         "files": [
                             {
-                                "pattern": "artifacts/*bionic*.deb",
-                                "target": "ubuntu-playground/pool/",
-                                "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
-                            },
-                            {
-                                "pattern": "artifacts/*focal*.deb",
-                                "target": "ubuntu-playground/pool/",
+                                "pattern": "artifacts/*.deb",
+                                "target": "ubuntu-devel/pool/",
                                 "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
                             }
                         ]
