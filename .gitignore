@@ -2,3 +2,4 @@
 *.rpm
 start
 artifacts
+.idea
