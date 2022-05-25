@@ -5,6 +5,10 @@
     "output": "artifacts",
     "Projects": [
         {
+            "name": "x264",
+            "install": true
+        },        
+        {
             "name": "libev",
             "install": true
         },

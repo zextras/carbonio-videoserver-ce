@@ -6,8 +6,11 @@ pkgname="carbonio-libuv"
 pkgver="1.43.0"
 pkgrel="1"
 pkgdesc="Multi-platform support library with a focus on asynchronous I/O"
+pkgdesclong=(
+  "Multi-platform support library with a focus on asynchronous I/O"
+)
 arch="amd64"
-maintainer="Zextras <packages@zextras.com"
+maintainer="Zextras <packages@zextras.com>"
 url="https://github.com/libuv/libuv"
 license=("custom")
 depends:apt=(

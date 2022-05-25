@@ -168,7 +168,7 @@ build:yum() {
     -B build \
     -S "libwebsockets-${pkgver}"
 
-  make
+  make VERBOSE=1 -C build
 }
 
 package:ubuntu-bionic() {
