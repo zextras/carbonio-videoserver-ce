@@ -13,9 +13,6 @@ pkgdesclong=(
 )
 url="https://www.videolan.org/developers/x264.html"
 license=("GPL")
-depends=(
-  "git"
-)
 makedepends=(
   "git"
   "nasm"
