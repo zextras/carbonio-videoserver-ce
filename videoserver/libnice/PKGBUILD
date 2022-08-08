@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-libnice"
-pkgver="0.1.18"
+pkgver="0.1.19"
 pkgrel="1"
 pkgdesc="An implementation of the IETF's draft ICE (for p2p UDP data streams)"
 pkgdesclong=(

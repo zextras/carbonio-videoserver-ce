@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-libwebsockets"
-pkgver="4.3.1"
+pkgver="4.3.2"
 pkgrel="1"
 pkgdesc="C library for websocket clients and servers"
 pkgdesclong=(
