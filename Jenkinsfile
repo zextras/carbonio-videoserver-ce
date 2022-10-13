@@ -38,50 +38,15 @@ pipeline {
 		}
 		stage('Building Janus...') {
 			parallel {
-				stage('Ubuntu 18.04') {
-					steps {
-						sh 'cd janus-builder; ./build_ubuntu18'
-						script {
-							env.CONTAINER1_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu18').trim()
-						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER1_ID}:/u18"
-						sh "docker exec -t ${env.CONTAINER1_ID} bash -c \"cd /u18/; ./build.sh\""
-						sh "docker cp ${env.CONTAINER1_ID}:/u18/artifacts/. ${WORKSPACE}"
-						script {
-							def server = Artifactory.server 'zextras-artifactory'
-							def buildInfo = Artifactory.newBuildInfo()
-
-							def uploadSpec = """{
-								"files": [
-									{
-										"pattern": "videoserver*/*.deb",
-										"target": "ubuntu-rc/pool/",
-										"props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
-									}
-								]
-							}"""
-							server.upload spec: uploadSpec, buildInfo: buildInfo
-							server.publishBuildInfo buildInfo
-						}
-					}
-					post {
-						success {
-							archiveArtifacts artifacts: "*.tgz", fingerprint: true
-						}
-						always {
-							sh "docker kill ${env.CONTAINER1_ID}"
-						}
-					}
-				}
-				// stage('Ubuntu 20.04') {
+				// stage('Ubuntu 18.04') {
 				// 	steps {
-				// 		sh 'cd janus-builder; ./build_ubuntu20'
+				// 		sh 'cd janus-builder; ./build_ubuntu18'
 				// 		script {
-				// 			env.CONTAINER5_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu20').trim()
+				// 			env.CONTAINER1_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu18').trim()
 				// 		}
-				// 		sh "docker cp ${WORKSPACE} ${env.CONTAINER5_ID}:/u20"
-				// 		sh "docker exec -t ${env.CONTAINER5_ID} bash -c \"cd /u20/; ./build.sh\""
-				// 		sh "docker cp ${env.CONTAINER5_ID}:/u20/artifacts/. ${WORKSPACE}"
+				// 		sh "docker cp ${WORKSPACE} ${env.CONTAINER1_ID}:/u18"
+				// 		sh "docker exec -t ${env.CONTAINER1_ID} bash -c \"cd /u18/; ./build.sh\""
+				// 		sh "docker cp ${env.CONTAINER1_ID}:/u18/artifacts/. ${WORKSPACE}"
 				// 		script {
 				// 			def server = Artifactory.server 'zextras-artifactory'
 				// 			def buildInfo = Artifactory.newBuildInfo()
@@ -91,7 +56,7 @@ pipeline {
 				// 					{
 				// 						"pattern": "videoserver*/*.deb",
 				// 						"target": "ubuntu-rc/pool/",
-				// 						"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
+				// 						"props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
 				// 					}
 				// 				]
 				// 			}"""
@@ -104,19 +69,19 @@ pipeline {
 				// 			archiveArtifacts artifacts: "*.tgz", fingerprint: true
 				// 		}
 				// 		always {
-				// 			sh "docker kill ${env.CONTAINER5_ID}"
+				// 			sh "docker kill ${env.CONTAINER1_ID}"
 				// 		}
 				// 	}
-				// }                   
-				stage('CentOS 7') {
+				// }
+				stage('Ubuntu 20.04') {
 					steps {
-						sh 'cd janus-builder; ./build_centos7'
+						sh 'cd janus-builder; ./build_ubuntu20'
 						script {
-							env.CONTAINER2_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-centos7').trim()
+							env.CONTAINER5_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu20').trim()
 						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER2_ID}:/r7"
-						sh "docker exec -t ${env.CONTAINER2_ID} bash -c \"cd /r7/; scl enable devtoolset-9 ./build.sh\""
-						sh "docker cp ${env.CONTAINER2_ID}:/r7/artifacts/. ${WORKSPACE}"
+						sh "docker cp ${WORKSPACE} ${env.CONTAINER5_ID}:/u20"
+						sh "docker exec -t ${env.CONTAINER5_ID} bash -c \"cd /u20/; ./build.sh\""
+						sh "docker cp ${env.CONTAINER5_ID}:/u20/artifacts/. ${WORKSPACE}"
 						script {
 							def server = Artifactory.server 'zextras-artifactory'
 							def buildInfo = Artifactory.newBuildInfo()
@@ -124,9 +89,9 @@ pipeline {
 							def uploadSpec = """{
 								"files": [
 									{
-										"pattern": "videoserver*/(*)-(*)-(*).rpm",
-										"target": "centos7-rc/zextras/{1}/{1}-{2}-{3}.rpm",
-										"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
+										"pattern": "videoserver*/*.deb",
+										"target": "ubuntu-rc/pool/",
+										"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
 									}
 								]
 							}"""
@@ -139,45 +104,80 @@ pipeline {
 							archiveArtifacts artifacts: "*.tgz", fingerprint: true
 						}
 						always {
-							sh "docker kill ${env.CONTAINER2_ID}"
+							sh "docker kill ${env.CONTAINER5_ID}"
 						}
 					}
-				}
-				stage('CentOS 8') {
-					steps {
-						sh 'cd janus-builder; ./build_centos8'
-						script {
-							env.CONTAINER3_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-centos8').trim()
-						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER3_ID}:/r8"
-						sh "docker exec -t ${env.CONTAINER3_ID} bash -c \"cd /r8/; ./build.sh\""
-						sh "docker cp ${env.CONTAINER3_ID}:/r8/artifacts/. ${WORKSPACE}"
-						script {
-							def server = Artifactory.server 'zextras-artifactory'
-							def buildInfo = Artifactory.newBuildInfo()
+				}                   
+				// stage('CentOS 7') {
+				// 	steps {
+				// 		sh 'cd janus-builder; ./build_centos7'
+				// 		script {
+				// 			env.CONTAINER2_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-centos7').trim()
+				// 		}
+				// 		sh "docker cp ${WORKSPACE} ${env.CONTAINER2_ID}:/r7"
+				// 		sh "docker exec -t ${env.CONTAINER2_ID} bash -c \"cd /r7/; scl enable devtoolset-9 ./build.sh\""
+				// 		sh "docker cp ${env.CONTAINER2_ID}:/r7/artifacts/. ${WORKSPACE}"
+				// 		script {
+				// 			def server = Artifactory.server 'zextras-artifactory'
+				// 			def buildInfo = Artifactory.newBuildInfo()
 
-							def uploadSpec = """{
-								"files": [
-									{
-										"pattern": "videoserver*/(*)-(*)-(*).rpm",
-										"target": "centos8-rc/zextras/{1}/{1}-{2}-{3}.rpm",
-										"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
-									}
-								]
-							}"""
-							server.upload spec: uploadSpec, buildInfo: buildInfo
-							server.publishBuildInfo buildInfo
-						}
-					}
-					post {
-						success {
-							archiveArtifacts artifacts: "*.tgz", fingerprint: true
-						}
-						always {
-							sh "docker kill ${env.CONTAINER3_ID}"
-						}
-					}
-				}
+				// 			def uploadSpec = """{
+				// 				"files": [
+				// 					{
+				// 						"pattern": "videoserver*/(*)-(*)-(*).rpm",
+				// 						"target": "centos7-rc/zextras/{1}/{1}-{2}-{3}.rpm",
+				// 						"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
+				// 					}
+				// 				]
+				// 			}"""
+				// 			server.upload spec: uploadSpec, buildInfo: buildInfo
+				// 			server.publishBuildInfo buildInfo
+				// 		}
+				// 	}
+				// 	post {
+				// 		success {
+				// 			archiveArtifacts artifacts: "*.tgz", fingerprint: true
+				// 		}
+				// 		always {
+				// 			sh "docker kill ${env.CONTAINER2_ID}"
+				// 		}
+				// 	}
+				// }
+				// stage('CentOS 8') {
+				// 	steps {
+				// 		sh 'cd janus-builder; ./build_centos8'
+				// 		script {
+				// 			env.CONTAINER3_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-centos8').trim()
+				// 		}
+				// 		sh "docker cp ${WORKSPACE} ${env.CONTAINER3_ID}:/r8"
+				// 		sh "docker exec -t ${env.CONTAINER3_ID} bash -c \"cd /r8/; ./build.sh\""
+				// 		sh "docker cp ${env.CONTAINER3_ID}:/r8/artifacts/. ${WORKSPACE}"
+				// 		script {
+				// 			def server = Artifactory.server 'zextras-artifactory'
+				// 			def buildInfo = Artifactory.newBuildInfo()
+
+				// 			def uploadSpec = """{
+				// 				"files": [
+				// 					{
+				// 						"pattern": "videoserver*/(*)-(*)-(*).rpm",
+				// 						"target": "centos8-rc/zextras/{1}/{1}-{2}-{3}.rpm",
+				// 						"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
+				// 					}
+				// 				]
+				// 			}"""
+				// 			server.upload spec: uploadSpec, buildInfo: buildInfo
+				// 			server.publishBuildInfo buildInfo
+				// 		}
+				// 	}
+				// 	post {
+				// 		success {
+				// 			archiveArtifacts artifacts: "*.tgz", fingerprint: true
+				// 		}
+				// 		always {
+				// 			sh "docker kill ${env.CONTAINER3_ID}"
+				// 		}
+				// 	}
+				// }
 			}
 		}
 	}
@@ -189,10 +189,10 @@ pipeline {
 			], propagate: false
 		}        
 		always {
-			sh 'docker rmi janus-builder-ubuntu18 --force'
-			// sh 'docker rmi janus-builder-ubuntu20 --force'
-			sh 'docker rmi janus-builder-centos7 --force'
-			sh 'docker rmi janus-builder-centos8 --force'
+			// sh 'docker rmi janus-builder-ubuntu18 --force'
+			sh 'docker rmi janus-builder-ubuntu20 --force'
+			// sh 'docker rmi janus-builder-centos7 --force'
+			// sh 'docker rmi janus-builder-centos8 --force'
 
 			script {
 				GIT_COMMIT_EMAIL = sh(
