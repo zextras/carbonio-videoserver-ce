@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="carbonio-libwebsockets"
+pkgname="zimbra-libwebsockets"
 pkgver="4.3.1"
 pkgrel="1"
 pkgdesc="C library for websocket clients and servers"
@@ -13,8 +13,8 @@ arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 depends:apt=(
-  "carbonio-libev"
-  "carbonio-libuv"
+  "zimbra-libev"
+  "zimbra-libuv"
   "openssl"
 )
 makedepends:apt=(
@@ -22,8 +22,8 @@ makedepends:apt=(
   "libssl-dev"
 )
 depends:yum=(
-  "carbonio-libev"
-  "carbonio-libuv"
+  "zimbra-libev"
+  "zimbra-libuv"
   "openssl"
 )
 makedepends:yum=(
@@ -43,11 +43,11 @@ hashsums=(
 
 build:ubuntu-bionic() {
   cd "${srcdir}"
-  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
-    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
-    -D LIBEV_INCLUDE_DIRS="/opt/zextras/common/include" \
-    -D LIBEV_LIBRARIES="/opt/zextras/common/lib/libev.so" \
-    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zimbra/common \
+    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zimbra/common/lib" \
+    -D LIBEV_INCLUDE_DIRS="/opt/zimbra/common/include" \
+    -D LIBEV_LIBRARIES="/opt/zimbra/common/lib/libev.so" \
+    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zimbra/common/include" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -86,11 +86,11 @@ build:ubuntu-bionic() {
 
 build:ubuntu-focal() {
   cd "${srcdir}"
-  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
-    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
-    -D LIBEV_INCLUDE_DIRS="/opt/zextras/common/include" \
-    -D LIBEV_LIBRARIES="/opt/zextras/common/lib/libev.so" \
-    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zimbra/common \
+    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zimbra/common/lib" \
+    -D LIBEV_INCLUDE_DIRS="/opt/zimbra/common/include" \
+    -D LIBEV_LIBRARIES="/opt/zimbra/common/lib/libev.so" \
+    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zimbra/common/include" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -130,11 +130,11 @@ build:ubuntu-focal() {
 build:yum() {
   cd "${srcdir}"
   mkdir build
-  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
-    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
-    -D LIBEV_INCLUDE_DIRS="/opt/zextras/common/include" \
-    -D LIBEV_LIBRARIES="/opt/zextras/common/lib/libev.so" \
-    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zimbra/common \
+    -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zimbra/common/lib" \
+    -D LIBEV_INCLUDE_DIRS="/opt/zimbra/common/include" \
+    -D LIBEV_LIBRARIES="/opt/zimbra/common/lib/libev.so" \
+    -D LWS_LIBUV_INCLUDE_DIRS="/opt/zimbra/common/include" \
     -D LWS_BUILD_HASH="no_hash" \
     -D LWS_IPV6=OFF \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
@@ -174,17 +174,17 @@ build:yum() {
 package:ubuntu-bionic() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/cmake
 }
 
 package:ubuntu-focal() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install -C build
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/cmake
 }
 
 package:yum() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install -C build
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/cmake
 }

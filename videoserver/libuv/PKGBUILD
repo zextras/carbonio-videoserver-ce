@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="carbonio-libuv"
+pkgname="zimbra-libuv"
 pkgver="1.43.0"
 pkgrel="1"
 pkgdesc="Multi-platform support library with a focus on asynchronous I/O"
@@ -31,10 +31,10 @@ hashsums=(
 
 build() {
   cd "libuv-v${pkgver}"
-  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
-  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"
   ./autogen.sh
-  ./configure --prefix=/opt/zextras/common
+  ./configure --prefix=/opt/zimbra/common
   make
 }
 
@@ -42,6 +42,6 @@ package() {
   cd "libuv-v${pkgver}"
 
   make DESTDIR="${pkgdir}" install
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
 }

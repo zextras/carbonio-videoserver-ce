@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="carbonio-videoserver-confs"
+pkgname="zimbra-videoserver-confs"
 pkgver="0.11.8"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
@@ -25,13 +25,13 @@ depends:apt=(
   "libmicrohttpd12"
   "libogg0"
   "libssl1.1"
-  "carbonio-ffmpeg"
-  "carbonio-libnice"
-  "carbonio-libopus"
-  "carbonio-libsrtp"
-  "carbonio-libusrsctp"
-  "carbonio-libwebsockets"
-  "carbonio-videoserver-confs"
+  "zimbra-ffmpeg"
+  "zimbra-libnice"
+  "zimbra-libopus"
+  "zimbra-libsrtp"
+  "zimbra-libusrsctp"
+  "zimbra-libwebsockets"
+  "zimbra-videoserver-confs"
   "zlib1g"  
 )
 depends:yum=(
@@ -41,12 +41,12 @@ depends:yum=(
   "libmicrohttpd"
   "libogg"
   "openssl"
-  "carbonio-ffmpeg"
-  "carbonio-libnice"
-  "carbonio-libopus"
-  "carbonio-libsrtp"
-  "carbonio-libusrsctp"
-  "carbonio-libwebsockets"
+  "zimbra-ffmpeg"
+  "zimbra-libnice"
+  "zimbra-libopus"
+  "zimbra-libsrtp"
+  "zimbra-libusrsctp"
+  "zimbra-libwebsockets"
   "zlib"
 )
 makedepends:apt=(
@@ -85,11 +85,11 @@ build() {
   cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
   patch -Np1 -i ../janus.jcfg.patch
   ./autogen.sh
-  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
-  export CFLAGS="-O2 -I/opt/zextras/common/include"
-  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"  
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib -L/opt/zimbra/common/lib"
+  export CFLAGS="-O2 -I/opt/zimbra/common/include"
+  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"  
   ./configure \
-    --prefix=/opt/zextras/common \
+    --prefix=/opt/zimbra/common \
     --sysconfdir /etc \
     --disable-docs \
     --disable-turn-rest-api \

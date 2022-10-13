@@ -4,7 +4,7 @@ Wants=network.target
 
 [Service]
 Type=simple
-ExecStart=/opt/zextras/common/bin/janus
+ExecStart=/opt/zimbra/common/bin/janus
 User=videoserver
 Group=videoserver
 Restart=on-failure

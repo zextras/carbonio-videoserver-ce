@@ -29,23 +29,6 @@ pipeline {
 		}
 		stage('Packaging') {
 			parallel {
-				stage('Ubuntu 18') {
-					agent {
-						node {
-							label 'pacur-agent-ubuntu-18.04-v1'
-						}
-					}
-					steps {
-						unstash 'project'
-						sh 'sudo pacur build ubuntu-bionic videoserver'
-						stash includes: 'artifacts/', name: 'artifacts-ubuntu-bionic'
-					}
-					post {
-						always {
-							archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
-						}
-					}
-				}
 				stage('Ubuntu 20') {
 					agent {
 						node {
@@ -63,23 +46,6 @@ pipeline {
 						}
 					}
 				}
-				stage('Rocky 8') {
-					agent {
-						node {
-							label 'pacur-agent-rocky-8-v1'
-						}
-					}
-					steps {
-						unstash 'project'
-						sh 'sudo pacur build rocky-8 videoserver'
-						stash includes: 'artifacts/', name: 'artifacts-rocky-8'
-					}
-					post {
-						always {
-							archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
-						}
-					}
-				}
 			}
 		}
 		stage('Upload To Devel') {
@@ -90,8 +56,6 @@ pipeline {
 			}
 			steps {
 				unstash 'artifacts-ubuntu-focal'
-				// unstash 'artifacts-ubuntu-bionic'
-				unstash 'artifacts-rocky-8'
 				script {
 					def server = Artifactory.server 'zextras-artifactory'
 					def buildInfo
@@ -105,67 +69,67 @@ pipeline {
 								"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
 							},
 						   {
-								"pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
+								"pattern": "artifacts/(zimbra-ffmpeg)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libev)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libev)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libfdk-aac)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libnice)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libnice)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libopus)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libopus)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libsrtp)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libusrsctp)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libuv)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libuv)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libvpx)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libwebsockets)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
+								"pattern": "artifacts/(zimbra-videoserver)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
+								"pattern": "artifacts/(zimbra-videoserver-confs)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-x264)-(*).rpm",
+								"pattern": "artifacts/(zimbra-x264)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							}
@@ -228,67 +192,67 @@ pipeline {
 					uploadSpec = '''{
 						"files": [
 							{
-								"pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
+								"pattern": "artifacts/(zimbra-ffmpeg)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libev)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libev)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libfdk-aac)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libnice)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libnice)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libopus)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libopus)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libsrtp)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libusrsctp)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libuv)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libuv)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libvpx)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
+								"pattern": "artifacts/(zimbra-libwebsockets)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
+								"pattern": "artifacts/(zimbra-videoserver)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
+								"pattern": "artifacts/(zimbra-videoserver-confs)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
-								"pattern": "artifacts/(carbonio-x264)-(*).rpm",
+								"pattern": "artifacts/(zimbra-x264)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							}

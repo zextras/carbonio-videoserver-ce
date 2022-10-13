@@ -9,7 +9,7 @@ Type: note
 Description: .: Congratulations! Every bit is in its right place :.
  .
  Please execute these commands in a mailbox node 
- as zextras user to complete the setup of the video server:
+ as zimbra user to complete the setup of the video server:
  .
  -> If you are in a Zextras Suite environment:
     zxsuite chats video-server add ${HOSTNAME} port 8188 secret ${API_SECRET}
@@ -19,7 +19,7 @@ Type: note
 Description: .: Final steps to uninstall the video server :.
  .
  Please execute these commands in a mailbox node 
- as zextras user to complete the removal of the video server:
+ as zimbra user to complete the removal of the video server:
  .
  -> If you are in a Zextras Suite environment:
     zxsuite chats video-server remove ${HOSTNAME} port 8188

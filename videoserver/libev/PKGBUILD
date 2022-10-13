@@ -2,7 +2,7 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="carbonio-libev"
+pkgname="zimbra-libev"
 pkgver="4.33"
 pkgrel="1"
 pkgdesc="A full-featured and high-performance event loop"
@@ -31,9 +31,9 @@ hashsums=(
 
 build() {
   cd "libev-${pkgver}"
-  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
-  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
-  ./configure --prefix=/opt/zextras/common
+  export LDFLAGS="-Wl,-rpath,/opt/zimbra/common/lib"
+  export PKG_CONFIG_PATH="/opt/zimbra/common/lib/pkgconfig"
+  ./configure --prefix=/opt/zimbra/common
   make
 }
 
@@ -41,8 +41,8 @@ package() {
   cd "libev-${pkgver}"
   make DESTDIR="${pkgdir}" install
   # fix conflict with libevent
-  rm "${pkgdir}/opt/zextras/common/include/event.h"
+  rm "${pkgdir}/opt/zimbra/common/include/event.h"
 
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
-  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.a
+  rm -rf "${pkgdir}"/opt/zimbra/common/lib/*.la
 }
