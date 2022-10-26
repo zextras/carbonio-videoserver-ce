@@ -29,23 +29,6 @@ pipeline {
 		}
 		stage('Packaging') {
 			parallel {
-				stage('Ubuntu 18') {
-					agent {
-						node {
-							label 'pacur-agent-ubuntu-18.04-v1'
-						}
-					}
-					steps {
-						unstash 'project'
-						sh 'sudo pacur build ubuntu-bionic videoserver'
-						stash includes: 'artifacts/', name: 'artifacts-ubuntu-bionic'
-					}
-					post {
-						always {
-							archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
-						}
-					}
-				}
 				stage('Ubuntu 20') {
 					agent {
 						node {
