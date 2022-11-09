@@ -73,7 +73,7 @@ debconf_template="videoserver.templates"
 section="comm"
 priority="important"
 sources=(
-  "https://github.com/meetecho/janus-gateway/archive/0b5ea050d7bc5330de657e8939580f86348f4e68.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
   "janus.jcfg.patch"
 )
 hashsums=(
@@ -82,7 +82,7 @@ hashsums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-0b5ea050d7bc5330de657e8939580f86348f4e68"
+  cd "${srcdir}/janus-gateway-${pkgver}”
   patch -Np1 -i ../janus.jcfg.patch
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
@@ -106,7 +106,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/janus-gateway-0b5ea050d7bc5330de657e8939580f86348f4e68"
+  cd "${srcdir}/janus-gateway-${pkgver}”
   make DESTDIR="${pkgdir}" install configs
   rm -rf "${pkgdir}"/opt/
 }
