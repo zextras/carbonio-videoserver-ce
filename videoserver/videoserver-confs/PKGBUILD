@@ -32,7 +32,7 @@ depends:apt=(
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
   "carbonio-videoserver-confs"
-  "zlib1g"  
+  "zlib1g"
 )
 depends:yum=(
   "jansson"
@@ -82,7 +82,7 @@ hashsums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-${pkgver}”
+  cd "${srcdir}/janus-gateway-${pkgver}"
   patch -Np1 -i ../janus.jcfg.patch
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
@@ -106,7 +106,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/janus-gateway-${pkgver}”
+  cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
   rm -rf "${pkgdir}"/opt/
 }

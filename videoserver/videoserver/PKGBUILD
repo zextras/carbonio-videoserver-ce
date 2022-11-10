@@ -85,7 +85,7 @@ hashsums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-${pkgver}”
+  cd "${srcdir}/janus-gateway-${pkgver}"
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
   export CFLAGS="-O2 -I/opt/zextras/common/include"
@@ -108,7 +108,7 @@ build() {
 }
 
 package:apt() {
-  cd "${srcdir}/janus-gateway-${pkgver}”
+  cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
   install -Dm755 ../videoserver.service \
     "${pkgdir}"/lib/systemd/system/videoserver.service
@@ -120,7 +120,7 @@ package:apt() {
   #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
 package:yum() {
-  cd "${srcdir}/janus-gateway-${pkgver}”
+  cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
   install -Dm755 ../videoserver.service \
     "${pkgdir}"/usr/lib/systemd/system/videoserver.service
