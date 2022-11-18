@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-videoserver"
-pkgver="1.0.4"
+pkgver="1.1.0"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 pkgdesclong=(
@@ -32,7 +32,11 @@ depends:apt=(
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
   "carbonio-videoserver-confs"
-  "zlib1g"  
+  "zlib1g"
+  "carbonio-openjdk"
+  "service-discover"
+  "pending-setups"
+  "jq"
 )
 depends:yum=(
   "jansson"
@@ -49,6 +53,10 @@ depends:yum=(
   "carbonio-libwebsockets"
   "carbonio-videoserver-confs"
   "zlib"
+  "carbonio-openjdk"
+  "service-discover"
+  "pending-setups"
+  "jq"
 )
 makedepends:apt=(
   "gengetopt"
@@ -70,22 +78,36 @@ makedepends:yum=(
   "openssl-devel"
   "zlib-devel"
 )
-debconf_template="videoserver.templates"
+debconf_template="carbonio-videoserver.templates"
 section="comm"
 priority="important"
 sources=(
-  "https://github.com/meetecho/janus-gateway/archive/4792a7391508855c8af4183a9c264e0a6a887bbb.tar.gz"
-  "videoserver.templates"
-  "videoserver.service"
+  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
+  "carbonio-videoserver.templates"
+  "carbonio-videoserver.service"
+  "carbonio-videoserver"
+  "carbonio-videoserver.hcl"
+  "carbonio-videoserver-sidecar.service"
+  "carbonio-videoserver-setup.sh"
+  "intentions.json"
+  "policies.json"
+  "service-protocol.json"
 )
 hashsums=(
-  "SKIP"
-  "5271fc2610ea51fbd226aa7e5b19207c7425f6561d3ee0e078ec0660ed335142"
-  "a06577a6fca1c459674ba6f95cff938cc837b34fb8a6a90fd0e13f05a530551a"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
+  "skip"
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
+  cd "${srcdir}/janus-gateway-${pkgver}"
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
   export CFLAGS="-O2 -I/opt/zextras/common/include"
@@ -108,10 +130,24 @@ build() {
 }
 
 package:apt() {
-  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
+  cd "${srcdir}/janus-gateway-{$pkgver}"
   make DESTDIR="${pkgdir}" install configs
-  install -Dm755 ../videoserver.service \
-    "${pkgdir}"/lib/systemd/system/videoserver.service
+  install -Dm 755 carbonio-videoserver-recorder \
+      "${pkgdir}/usr/bin/carbonio-videoserver"
+    install -Dm 755 ../carbonio-videoserver.service \
+      "${pkgdir}"/usr/lib/systemd/system/carbonio-videoserver.service
+    install -Dm 644 carbonio-videoserver-sidecar.service \
+      "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
+    install -Dm 644 carbonio-videoserver.hcl \
+      "${pkgdir}/etc/zextras/service-discover/carbonio-videoserver.hcl"
+    install -Dm 644 carbonio-videoserver-setup.sh \
+      "${pkgdir}/etc/zextras/pending-setups.d/carbonio-videoserver.sh"
+    install -Dm 644 intentions.json \
+      "${pkgdir}/etc/carbonio/videoserver-recorder/service-discover/intentions.json"
+    install -Dm 644 policies.json \
+      "${pkgdir}/etc/carbonio/videoserver-recorder/service-discover/policies.json"
+    install -Dm 644 service-protocol.json \
+      "${pkgdir}/etc/carbonio/videoserver-recorder/service-discover/service-protocol.json"
   rm -rf "${pkgdir}"/etc
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
   rm -rf "${pkgdir}"/opt/zextras/common/share/man
@@ -120,10 +156,24 @@ package:apt() {
   #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
 package:yum() {
-  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
+  cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
-  install -Dm755 ../videoserver.service \
-    "${pkgdir}"/usr/lib/systemd/system/videoserver.service
+  install -Dm 755 carbonio-videoserver-recorder \
+    "${pkgdir}/usr/bin/carbonio-videoserver"
+  install -Dm 755 ../carbonio-videoserver.service \
+    "${pkgdir}"/usr/lib/systemd/system/carbonio-videoserver.service
+  install -Dm 644 carbonio-videoserver-sidecar.service \
+    "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
+  install -Dm 644 carbonio-videoserver.hcl \
+    "${pkgdir}/etc/zextras/service-discover/carbonio-videoserver.hcl"
+  install -Dm 644 carbonio-videoserver-setup.sh \
+    "${pkgdir}/etc/zextras/pending-setups.d/carbonio-videoserver.sh"
+  install -Dm 644 intentions.json \
+    "${pkgdir}/etc/carbonio/videoserver-recorder/service-discover/intentions.json"
+  install -Dm 644 policies.json \
+    "${pkgdir}/etc/carbonio/videoserver-recorder/service-discover/policies.json"
+  install -Dm 644 service-protocol.json \
+    "${pkgdir}/etc/carbonio/videoserver-recorder/service-discover/service-protocol.json"
   rm -rf "${pkgdir}"/etc
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
   rm -rf "${pkgdir}"/opt/zextras/common/share/man
@@ -135,12 +185,12 @@ package:yum() {
 preinst:apt() {
   # Automatically added by dh_installinit/11.1.6ubuntu2
   if [ -x "/etc/init.d/videoserver" ]; then
-  	invoke-rc.d videoserver stop || exit 1
+  	invoke-rc.d carbonio-videoserver stop || exit 1
   fi
   # End automatically added section
   # Automatically added by dh_systemd_start/11.1.6ubuntu2
   if [ -d /run/systemd/system ]; then
-  	deb-systemd-invoke stop 'videoserver.service' >/dev/null || true
+  	deb-systemd-invoke stop 'carbonio-videoserver.service' >/dev/null || true
   fi
   # End automatically added section
 }
@@ -183,7 +233,18 @@ postinst:apt() {
     db_subst videoserver/add HOSTNAME "${hostname}"
     db_input high videoserver/add || true
     db_go
+
+    if [ -d /run/systemd/system ]; then
+      systemctl daemon-reload >/dev/null 2>&1 || :
+      systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
+      systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
+    fi
   fi
+
+  echo "======================================================"
+  echo "Carbonio videoserver installed successfully!"
+  echo "You must run pending-setups to configure it correctly."
+  echo "======================================================"
 }
 postrm:apt() {
   . /usr/share/debconf/confmodule
@@ -207,6 +268,11 @@ postrm:apt() {
     db_go
   
     db_purge
+
+    rm -f /etc/carbonio/videoserver/service-discover/token
+    if [ -d /run/systemd/system ]; then
+      systemctl daemon-reload >/dev/null 2>&1 || :
+    fi
   fi
 }
 
@@ -214,6 +280,12 @@ preinst:yum() {
   getent group videoserver >/dev/null || groupadd -r videoserver
   getent passwd videoserver >/dev/null || \
   useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
+  fi
 }
 postinst:yum() {
   if [ $1 -eq 1 ]; then
@@ -233,4 +305,15 @@ postinst:yum() {
   zxsuite chats video-server add ${hostname} port 8188 secret ${api_secret}
 EOF
   fi
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
+  fi
+
+  echo "======================================================"
+  echo "Carbonio videoserver installed successfully!"
+  echo "You must run pending-setups to configure it correctly."
+  echo "======================================================"
 }
