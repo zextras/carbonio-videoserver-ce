@@ -130,7 +130,7 @@ build() {
 }
 
 package:apt() {
-  cd "${srcdir}/janus-gateway-{$pkgver}"
+  cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
   install -Dm 755 ../carbonio-videoserver \
     "${pkgdir}/usr/bin/carbonio-videoserver"
