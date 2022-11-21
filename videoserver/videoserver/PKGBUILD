@@ -135,7 +135,7 @@ package:apt() {
   install -Dm 755 ../carbonio-videoserver \
     "${pkgdir}/usr/bin/carbonio-videoserver"
   install -Dm 755 ../carbonio-videoserver.service \
-    "${pkgdir}"/usr/lib/systemd/system/carbonio-videoserver.service
+    "${pkgdir}/usr/lib/systemd/system/carbonio-videoserver.service"
   install -Dm 644 ../carbonio-videoserver-sidecar.service \
     "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
   install -Dm 644 ../carbonio-videoserver.hcl \
@@ -161,7 +161,7 @@ package:yum() {
   install -Dm 755 ../carbonio-videoserver \
     "${pkgdir}/usr/bin/carbonio-videoserver"
   install -Dm 755 ../carbonio-videoserver.service \
-    "${pkgdir}"/usr/lib/systemd/system/carbonio-videoserver.service
+    "${pkgdir}/usr/lib/systemd/system/carbonio-videoserver.service"
   install -Dm 644 ../carbonio-videoserver-sidecar.service \
     "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
   install -Dm 644 ../carbonio-videoserver.hcl \
