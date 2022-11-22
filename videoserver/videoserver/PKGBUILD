@@ -150,7 +150,7 @@ package:apt() {
     "${pkgdir}/etc/carbonio/videoserver/service-discover/policies.json"
   install -Dm 644 service-protocol.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/service-protocol.json"
-  rm -rf "${pkgdir}"/etc
+  rm -rf "${pkgdir}"/etc/janus
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
   rm -rf "${pkgdir}"/opt/zextras/common/share/man
   rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/  
@@ -178,7 +178,7 @@ package:yum() {
     "${pkgdir}/etc/carbonio/videoserver/service-discover/policies.json"
   install -Dm 644 service-protocol.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/service-protocol.json"
-  rm -rf "${pkgdir}"/etc
+  rm -rf "${pkgdir}"/etc/janus
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
   rm -rf "${pkgdir}"/opt/zextras/common/share/man
   rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/  
