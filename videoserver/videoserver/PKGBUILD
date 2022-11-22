@@ -132,21 +132,23 @@ build() {
 package:apt() {
   cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
-  install -Dm 755 ../carbonio-videoserver \
+
+  cd "${srcdir}"
+  install -Dm 755 carbonio-videoserver \
     "${pkgdir}/usr/bin/carbonio-videoserver"
-  install -Dm 755 ../carbonio-videoserver.service \
+  install -Dm 755 carbonio-videoserver.service \
     "${pkgdir}/usr/lib/systemd/system/carbonio-videoserver.service"
-  install -Dm 644 ../carbonio-videoserver-sidecar.service \
+  install -Dm 644 carbonio-videoserver-sidecar.service \
     "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
-  install -Dm 644 ../carbonio-videoserver.hcl \
+  install -Dm 644 carbonio-videoserver.hcl \
     "${pkgdir}/etc/zextras/service-discover/carbonio-videoserver.hcl"
-  install -Dm 644 ../carbonio-videoserver-setup.sh \
+  install -Dm 644 carbonio-videoserver-setup.sh \
     "${pkgdir}/etc/zextras/pending-setups.d/carbonio-videoserver.sh"
-  install -Dm 644 ../intentions.json \
+  install -Dm 644 intentions.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/intentions.json"
-  install -Dm 644 ../policies.json \
+  install -Dm 644 policies.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/policies.json"
-  install -Dm 644 ../service-protocol.json \
+  install -Dm 644 service-protocol.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/service-protocol.json"
   rm -rf "${pkgdir}"/etc
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
@@ -158,21 +160,23 @@ package:apt() {
 package:yum() {
   cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
-  install -Dm 755 ../carbonio-videoserver \
+
+  cd "${srcdir}"
+  install -Dm 755 carbonio-videoserver \
     "${pkgdir}/usr/bin/carbonio-videoserver"
-  install -Dm 755 ../carbonio-videoserver.service \
+  install -Dm 755 carbonio-videoserver.service \
     "${pkgdir}/usr/lib/systemd/system/carbonio-videoserver.service"
-  install -Dm 644 ../carbonio-videoserver-sidecar.service \
+  install -Dm 644 carbonio-videoserver-sidecar.service \
     "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
-  install -Dm 644 ../carbonio-videoserver.hcl \
+  install -Dm 644 carbonio-videoserver.hcl \
     "${pkgdir}/etc/zextras/service-discover/carbonio-videoserver.hcl"
-  install -Dm 644 ../carbonio-videoserver-setup.sh \
+  install -Dm 644 carbonio-videoserver-setup.sh \
     "${pkgdir}/etc/zextras/pending-setups.d/carbonio-videoserver.sh"
-  install -Dm 644 ../intentions.json \
+  install -Dm 644 intentions.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/intentions.json"
-  install -Dm 644 ../policies.json \
+  install -Dm 644 policies.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/policies.json"
-  install -Dm 644 ../service-protocol.json \
+  install -Dm 644 service-protocol.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/service-protocol.json"
   rm -rf "${pkgdir}"/etc
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
