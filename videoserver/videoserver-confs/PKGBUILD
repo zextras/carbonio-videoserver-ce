@@ -95,12 +95,14 @@ build() {
     --disable-turn-rest-api \
     --disable-all-transports \
     --enable-websockets \
+    --enable-rabbitmq \
     --disable-all-plugins \
     --enable-plugin-audiobridge \
     --enable-plugin-videoroom \
     --enable-post-processing \
     --disable-all-handlers \
     --enable-websockets-event-handler \
+    --enable-rabbitmq-event-handler \
     --disable-json-logger
   make
 }

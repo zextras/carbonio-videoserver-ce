@@ -76,6 +76,24 @@ consul reload
 # Limit token visibility as much as possible
 export -n CONSUL_HTTP_TOKEN
 
+get_consul_kv() {
+  KEY=$1
+  CONSUL_VALUE=$(consul kv get -token-file="$CONSUL_TOKEN_PATH" "$KEY" || echo "")
+  EXIT_CODE=$?
+  if [[ "$EXIT_CODE" != "0" ]]; then
+    CONSUL_VALUE=""
+  fi
+}
+get_consul_kv "carbonio-message-broker/username"; USERNAME=$CONSUL_VALUE
+get_consul_kv "carbonio-message-broker/password"; PASSWORD=$CONSUL_VALUE
+
+if [[ "$USERNAME" != "" && "$PASSWORD" != "" ]]; then
+  sed -i "s/$RABBITMQ_USERNAME/$USERNAME/" /etc/janus/janus.transport.rabbitmq.jcfg
+  sed -i "s/$RABBITMQ_PASSWORD/$PASSWORD/" /etc/janus/janus.transport.rabbitmq.jcfg
+  FROM_JANUS_QUEUE=$(openssl rand -hex 16 | tr -d '\n')
+  sed -i "s/$FROM_JANUS_QUEUE/$PASSWORD/" /etc/janus/janus.transport.rabbitmq.jcfg
+fi
+
 systemctl restart carbonio-videoserver.service
 systemctl restart carbonio-videoserver-sidecar.service
 trap - EXIT
