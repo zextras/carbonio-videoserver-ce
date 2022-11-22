@@ -1,9 +1,4 @@
 services {
-  check {
-    tcp      = "127.78.0.16:10000"
-    timeout  = "1s"
-    interval = "5s"
-  }
   connect {
     sidecar_service {
       proxy {
