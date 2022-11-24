@@ -46,7 +46,7 @@ build:ubuntu-bionic() {
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D BUILD_EXAMPLES=OFF \
     -D BUILD_SHARED_LIBS=ON \
-    -D BUILD_STATIC_LIBS=OFF \
+    -D BUILD_STATIC_LIBS=ON \
     -D BUILD_TESTING=OFF \
     -D BUILD_TOOLS=OFF \
     -D BUILD_TOOLS_DOCS=OFF \
@@ -65,7 +65,7 @@ build:ubuntu-focal() {
     cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
       -D BUILD_EXAMPLES=OFF \
       -D BUILD_SHARED_LIBS=ON \
-      -D BUILD_STATIC_LIBS=OFF \
+      -D BUILD_STATIC_LIBS=ON \
       -D BUILD_TESTING=OFF \
       -D BUILD_TOOLS=OFF \
       -D BUILD_TOOLS_DOCS=OFF \
