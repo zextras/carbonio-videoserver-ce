@@ -21,6 +21,10 @@
             "install": true
         },
         {
+            "name": "rabbitmq-c",
+            "install": true
+        },
+        {
             "name": "libvpx",
             "install": true
         },

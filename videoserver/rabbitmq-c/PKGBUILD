@@ -1,0 +1,119 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="carbonio-rabbitmq-c"
+pkgver="0.11.0"
+pkgrel="1"
+pkgdesc="C library for rabbitmq"
+pkgdesclong=(
+  "C library for rabbitmq"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+depends:apt=(
+  "carbonio-libev"
+  "carbonio-libuv"
+  "openssl"
+)
+makedepends:apt=(
+  "cmake"
+  "libssl-dev"
+)
+depends:yum=(
+  "carbonio-libev"
+  "carbonio-libuv"
+  "openssl"
+)
+makedepends:yum=(
+  "cmake"
+  "openssl-devel"
+  "zlib-devel"
+)
+
+section="libs"
+priority="important"
+sources=(
+  "https://github.com/alanxz/rabbitmq-c/archive/v${pkgver}.tar.gz"
+)
+hashsums=(
+  "skip"
+)
+
+build:ubuntu-bionic() {
+  cd "${srcdir}"
+  cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
+    -D BUILD_EXAMPLES=OFF \
+    -D BUILD_SHARED_LIBS=ON \
+    -D BUILD_STATIC_LIBS=OFF \
+    -D BUILD_TESTING=OFF \
+    -D BUILD_TOOLS=ON \
+    -D BUILD_TOOLS_DOCS=OFF \
+    -D ENABLE_SSL_SUPPORT=ON \
+    -D BUILD_API_DOCS=OFF \
+    -D RUN_SYSTEM_TESTS=OFF \
+    -Wno-dev \
+    -B build \
+    -S "rabbitmq-c-${pkgver}"
+
+  make VERBOSE=1
+}
+
+build:ubuntu-focal() {
+  cd "${srcdir}"
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
+      -D BUILD_EXAMPLES=OFF \
+      -D BUILD_SHARED_LIBS=ON \
+      -D BUILD_STATIC_LIBS=OFF \
+      -D BUILD_TESTING=OFF \
+      -D BUILD_TOOLS=ON \
+      -D BUILD_TOOLS_DOCS=OFF \
+      -D ENABLE_SSL_SUPPORT=ON \
+      -D BUILD_API_DOCS=OFF \
+      -D RUN_SYSTEM_TESTS=OFF \
+      -Wno-dev \
+      -B build \
+      -S "rabbitmq-c-${pkgver}"
+
+  make VERBOSE=1 -C build
+}
+
+build:yum() {
+  cd "${srcdir}"
+  mkdir build
+  cd "${srcdir}"
+    cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
+      -D BUILD_EXAMPLES=OFF \
+      -D BUILD_SHARED_LIBS=ON \
+      -D BUILD_STATIC_LIBS=OFF \
+      -D BUILD_TESTING=OFF \
+      -D BUILD_TOOLS=ON \
+      -D BUILD_TOOLS_DOCS=OFF \
+      -D ENABLE_SSL_SUPPORT=ON \
+      -D BUILD_API_DOCS=OFF \
+      -D RUN_SYSTEM_TESTS=OFF \
+      -Wno-dev \
+      -B build \
+      -S "rabbitmq-c-${pkgver}"
+
+  make VERBOSE=1 -C build
+}
+
+package:ubuntu-bionic() {
+  cd "${srcdir}"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+}
+
+package:ubuntu-focal() {
+  cd "${srcdir}"
+  make DESTDIR="${pkgdir}" install -C build
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+}
+
+package:yum() {
+  cd "${srcdir}"
+  make DESTDIR="${pkgdir}" install -C build
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
+}
