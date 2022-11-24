@@ -48,7 +48,7 @@ build:ubuntu-bionic() {
     -D BUILD_SHARED_LIBS=ON \
     -D BUILD_STATIC_LIBS=OFF \
     -D BUILD_TESTING=OFF \
-    -D BUILD_TOOLS=ON \
+    -D BUILD_TOOLS=OFF \
     -D BUILD_TOOLS_DOCS=OFF \
     -D ENABLE_SSL_SUPPORT=ON \
     -D BUILD_API_DOCS=OFF \
@@ -67,7 +67,7 @@ build:ubuntu-focal() {
       -D BUILD_SHARED_LIBS=ON \
       -D BUILD_STATIC_LIBS=OFF \
       -D BUILD_TESTING=OFF \
-      -D BUILD_TOOLS=ON \
+      -D BUILD_TOOLS=OFF \
       -D BUILD_TOOLS_DOCS=OFF \
       -D ENABLE_SSL_SUPPORT=ON \
       -D BUILD_API_DOCS=OFF \
