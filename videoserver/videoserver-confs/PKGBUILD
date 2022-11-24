@@ -77,8 +77,8 @@ sources=(
   "janus.jcfg.patch"
 )
 hashsums=(
-  "SKIP"
-  "3d9d588dbc23598c5c324febb89cddf6911153cdf2920a148c5abb5b6c27ea3f"
+  "skip"
+  "skip"
 )
 
 build() {
