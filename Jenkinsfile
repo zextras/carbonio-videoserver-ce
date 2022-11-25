@@ -138,6 +138,11 @@ pipeline {
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
 							{
+              	"pattern": "artifacts/(carbonio-rabbitmq-c)-(*).rpm",
+              	"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+              	"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+							{
 								"pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
@@ -260,6 +265,11 @@ pipeline {
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
+							{
+              	"pattern": "artifacts/(carbonio-rabbitmq-c)-(*).rpm",
+              	"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+              	"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
 							{
 								"pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
