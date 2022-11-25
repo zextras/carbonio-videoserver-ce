@@ -103,14 +103,17 @@ build:yum() {
 package:ubuntu-bionic() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }
 
 package:ubuntu-focal() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install -C build
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }
 
 package:yum() {
   cd "${srcdir}"
   make DESTDIR="${pkgdir}" install -C build
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/cmake
 }
