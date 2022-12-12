@@ -96,6 +96,7 @@ build() {
     --disable-docs \
     --disable-turn-rest-api \
     --disable-all-transports \
+    --enable-rest \
     --enable-websockets \
     --enable-rabbitmq \
     --disable-all-plugins \
