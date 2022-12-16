@@ -34,10 +34,8 @@ depends:apt=(
   "carbonio-rabbitmq-c"
   "carbonio-videoserver-confs"
   "zlib1g"
-  "carbonio-openjdk"
   "service-discover"
   "pending-setups"
-  "jq"
 )
 depends:yum=(
   "jansson"
@@ -55,10 +53,8 @@ depends:yum=(
   "carbonio-rabbitmq-c"
   "carbonio-videoserver-confs"
   "zlib"
-  "carbonio-openjdk"
   "service-discover"
   "pending-setups"
-  "jq"
 )
 makedepends:apt=(
   "gengetopt"
