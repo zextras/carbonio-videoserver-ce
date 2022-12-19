@@ -37,6 +37,9 @@ hashsums=(
 )
 
 build:ubuntu-focal() {
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
+  export CFLAGS="-I/opt/zextras/common/include"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   cd "${srcdir}"
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D BUILD_EXAMPLES=OFF \
@@ -56,6 +59,9 @@ build:ubuntu-focal() {
 }
 
 build:yum() {
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
+  export CFLAGS="-I/opt/zextras/common/include"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   cd "${srcdir}"
   mkdir build
   cmake -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
