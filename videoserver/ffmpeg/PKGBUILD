@@ -12,20 +12,8 @@ pkgdesclong=(
 arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
-depends:ubuntu-bionic=(
-  "carbonio-libfdk-aac"
-  "carbonio-libopus"
-  "carbonio-libvpx"
-  "carbonio-x264"
-  "libass9"
-  "libc6"
-  "libfreetype6"
-  "libmp3lame0"
-  "libtheora0"
-  "libxcb1"
-  "zlib1g"
-)
-depends:ubuntu-focal=(
+
+depends:apt=(
   "carbonio-libfdk-aac"
   "carbonio-libopus"
   "carbonio-libvpx"

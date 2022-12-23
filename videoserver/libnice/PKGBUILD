@@ -13,15 +13,15 @@ arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 depends:apt=(
-  "openssl"
+  "carbonio-openssl"
 )
 makedepends:apt=(
-  "libssl-dev"
+  "carbonio-openssl"
   "ninja-build"
   "python3-pip"
 )
 depends:yum=(
-  "openssl"
+  "carbonio-openssl"
 )
 makedepends:yum=(
   "meson"

@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-videoserver-confs"
-pkgver="1.0.4"
+pkgver="1.1.0"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 pkgdesclong=(
@@ -13,76 +13,78 @@ arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 depends:apt=(
-  "debconf"
+  "carbonio-curl"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-librabbitmq-c"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-openssl"
+  "carbonio-videoserver-confs"
   "cdebconf"
+  "debconf"
   "dialog"
-  "libterm-readline-gnu-perl"
   "libc6"
   "libconfig9"
-  "libcurl4"
   "libglib2.0-0"
   "libjansson4"
   "libmicrohttpd12"
   "libogg0"
-  "libssl1.1"
-  "carbonio-ffmpeg"
-  "carbonio-libnice"
-  "carbonio-libopus"
-  "carbonio-libsrtp"
-  "carbonio-libusrsctp"
-  "carbonio-libwebsockets"
-  "carbonio-videoserver-confs"
-  "zlib1g"  
+  "libterm-readline-gnu-perl"
+  "zlib1g"
 )
 depends:yum=(
-  "jansson"
-  "libconfig"
-  "libcurl"
-  "libmicrohttpd"
-  "libogg"
-  "openssl"
+  "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
   "carbonio-libopus"
+  "carbonio-librabbitmq-c"
   "carbonio-libsrtp"
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
+  "carbonio-openssl"
+  "jansson"
+  "libconfig"
+  "libmicrohttpd"
+  "libogg"
   "zlib"
 )
 makedepends:apt=(
+  "carbonio-curl"
+  "carbonio-openssl"
   "gengetopt"
   "libconfig-dev"
-  "libcurl4-openssl-dev"
   "libjansson-dev"
   "libmicrohttpd-dev"
   "libogg-dev"
-  "libssl-dev"
   "zlib1g-dev"
 )
 makedepends:yum=(
+  "carbonio-curl"
+  "carbonio-openssl"
   "gengetopt"
   "jansson-devel"
   "libconfig-devel"
-  "libcurl-devel"
   "libmicrohttpd-devel"
   "libogg-devel"
-  "openssl-devel"
   "zlib-devel"
 )
-debconf_template="videoserver.templates"
+debconf_template="carbonio-videoserver.templates"
 section="comm"
 priority="important"
 sources=(
-  "https://github.com/meetecho/janus-gateway/archive/4792a7391508855c8af4183a9c264e0a6a887bbb.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
   "janus.jcfg.patch"
 )
 hashsums=(
-  "SKIP"
-  "3d9d588dbc23598c5c324febb89cddf6911153cdf2920a148c5abb5b6c27ea3f"
+  "skip"
+  "skip"
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
+  cd "${srcdir}/janus-gateway-${pkgver}"
   patch -Np1 -i ../janus.jcfg.patch
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
@@ -94,19 +96,22 @@ build() {
     --disable-docs \
     --disable-turn-rest-api \
     --disable-all-transports \
+    --enable-rest \
     --enable-websockets \
+    --enable-rabbitmq \
     --disable-all-plugins \
     --enable-plugin-audiobridge \
     --enable-plugin-videoroom \
     --enable-post-processing \
     --disable-all-handlers \
     --enable-websockets-event-handler \
+    --enable-rabbitmq-event-handler \
     --disable-json-logger
   make
 }
 
 package() {
-  cd "${srcdir}/janus-gateway-4792a7391508855c8af4183a9c264e0a6a887bbb"
+  cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
   rm -rf "${pkgdir}"/opt/
 }

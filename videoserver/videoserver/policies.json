@@ -1,0 +1,26 @@
+{
+  "key_prefix": [
+    {
+      "carbonio-videoserver/": {
+        "policy": "read"
+      }
+    }
+  ],
+  "node_prefix": [
+    {
+      "": {
+        "policy": "read"
+      }
+    }
+  ],
+  "service": [
+    {
+      "carbonio-videoserver": {
+        "policy": "write"
+      },
+      "carbonio-videoserver-sidecar-proxy": {
+        "policy": "write"
+      }
+    }
+  ]
+}

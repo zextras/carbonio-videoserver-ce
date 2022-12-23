@@ -1,6 +1,6 @@
 pipeline {
 	parameters {
-		booleanParam defaultValue: false, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'
+		booleanParam defaultValue: true, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'
 	}
 	options {
 		skipDefaultCheckout()
@@ -29,23 +29,6 @@ pipeline {
 		}
 		stage('Packaging') {
 			parallel {
-				stage('Ubuntu 18') {
-					agent {
-						node {
-							label 'pacur-agent-ubuntu-18.04-v1'
-						}
-					}
-					steps {
-						unstash 'project'
-						sh 'sudo pacur build ubuntu-bionic videoserver'
-						stash includes: 'artifacts/', name: 'artifacts-ubuntu-bionic'
-					}
-					post {
-						always {
-							archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
-						}
-					}
-				}
 				stage('Ubuntu 20') {
 					agent {
 						node {
@@ -54,6 +37,19 @@ pipeline {
 					}
 					steps {
 						unstash 'project'
+						withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+						    passwordVariable: 'SECRET',
+						    usernameVariable: 'USERNAME')]) {
+						        sh 'echo "machine zextras.jfrog.io" >> auth.conf'
+						        sh 'echo "login $USERNAME" >> auth.conf'
+						        sh 'echo "password $SECRET" >> auth.conf'
+						        sh 'sudo mv auth.conf /etc/apt'
+						}
+						sh '''
+						sudo echo "deb https://zextras.jfrog.io/artifactory/ubuntu-playground focal main" > zextras.list
+						sudo mv zextras.list /etc/apt/sources.list.d/
+						sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 52FD40243E584A21
+						'''
 						sh 'sudo pacur build ubuntu-focal videoserver'
 						stash includes: 'artifacts/', name: 'artifacts-ubuntu-focal'
 					}
@@ -71,6 +67,16 @@ pipeline {
 					}
 					steps {
 						unstash 'project'
+						withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+						    passwordVariable: 'SECRET',
+						    usernameVariable: 'USERNAME')]) {
+						        sh 'echo "[Zextras]" > zextras.repo'
+						        sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-playground/" >> zextras.repo'
+						        sh 'echo "enabled=1" >> zextras.repo'
+						        sh 'echo "gpgcheck=0" >> zextras.repo'
+						        sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-playground/repomd.xml.key" >> zextras.repo'
+						        sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
+						}
 						sh 'sudo pacur build rocky-8 videoserver'
 						stash includes: 'artifacts/', name: 'artifacts-rocky-8'
 					}
@@ -90,7 +96,6 @@ pipeline {
 			}
 			steps {
 				unstash 'artifacts-ubuntu-focal'
-				// unstash 'artifacts-ubuntu-bionic'
 				unstash 'artifacts-rocky-8'
 				script {
 					def server = Artifactory.server 'zextras-artifactory'
@@ -104,7 +109,7 @@ pipeline {
 								"target": "ubuntu-devel/pool/",
 								"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
 							},
-						   {
+							{
 								"pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
@@ -126,6 +131,11 @@ pipeline {
 							},
 							{
 								"pattern": "artifacts/(carbonio-libopus)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
 								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
@@ -180,7 +190,6 @@ pipeline {
 				buildingTag()
 			}
 			steps {
-				unstash 'artifacts-ubuntu-bionic'
 				unstash 'artifacts-ubuntu-focal'
 				unstash 'artifacts-rocky-8'
 
@@ -195,11 +204,6 @@ pipeline {
 					buildInfo.name += '-ubuntu'
 					uploadSpec = '''{
 						"files": [
-							{
-								"pattern": "artifacts/*bionic*.deb",
-								"target": "ubuntu-rc/pool/",
-								"props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
-							},
 							{
 								"pattern": "artifacts/*focal*.deb",
 								"target": "ubuntu-rc/pool/",
@@ -249,6 +253,11 @@ pipeline {
 							},
 							{
 								"pattern": "artifacts/(carbonio-libopus)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
 								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
 								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
 							},
