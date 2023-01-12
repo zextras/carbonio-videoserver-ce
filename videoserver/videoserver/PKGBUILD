@@ -230,7 +230,7 @@ postinst:yum() {
 * Please execute these commands in a mailbox node 
   as zextras user to complete the setup of the video server:
 
-  zxsuite chats video-server add ${hostname} port 8188 secret ${api_secret}
+  carbonio chats video-server add ${hostname} port 8188 secret ${api_secret}
 EOF
   fi
 }
