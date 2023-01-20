@@ -12,17 +12,11 @@ pkgdesclong=(
 arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
-depends:apt=(
-  "libssl"
+depends=(
+  "carbonio-openssl"
 )
-makedepends:apt=(
-  "libssl-dev"
-)
-depends:apt=(
-  "openssl"
-)
-makedepends:yum=(
-  "openssl-devel"
+makedepends=(
+  "carbonio-openssl"
 )
 section="libs"
 priority="important"

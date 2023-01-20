@@ -13,61 +13,65 @@ arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 depends:apt=(
-  "debconf"
+  "carbonio-curl"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-openssl"
+  "carbonio-videoserver-confs"
   "cdebconf"
+  "debconf"
   "dialog"
-  "libterm-readline-gnu-perl"
   "libc6"
   "libconfig9"
-  "libcurl4"
   "libglib2.0-0"
   "libjansson4"
   "libmicrohttpd12"
   "libogg0"
-  "libssl1.1"
-  "carbonio-ffmpeg"
-  "carbonio-libnice"
-  "carbonio-libopus"
-  "carbonio-libsrtp"
-  "carbonio-libusrsctp"
-  "carbonio-libwebsockets"
-  "carbonio-videoserver-confs"
-  "zlib1g"  
+  "libterm-readline-gnu-perl"
+  "pending-setups"
+  "service-discover"
+  "zlib1g"
 )
 depends:yum=(
-  "jansson"
-  "libconfig"
-  "libcurl"
-  "libmicrohttpd"
-  "libogg"
-  "openssl"
+  "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
   "carbonio-libopus"
   "carbonio-libsrtp"
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
+  "carbonio-openssl"
   "carbonio-videoserver-confs"
+  "jansson"
+  "libconfig"
+  "libmicrohttpd"
+  "libogg"
+  "pending-setups"
+  "service-discover"
   "zlib"
 )
 makedepends:apt=(
+  "carbonio-curl"
+  "carbonio-openssl"
   "gengetopt"
   "libconfig-dev"
-  "libcurl4-openssl-dev"
   "libjansson-dev"
   "libmicrohttpd-dev"
   "libogg-dev"
-  "libssl-dev"
   "zlib1g-dev"
 )
 makedepends:yum=(
+  "carbonio-curl"
+  "carbonio-openssl"
   "gengetopt"
   "jansson-devel"
   "libconfig-devel"
-  "libcurl-devel"
   "libmicrohttpd-devel"
   "libogg-devel"
-  "openssl-devel"
   "zlib-devel"
 )
 debconf_template="videoserver.templates"
@@ -80,7 +84,7 @@ sources=(
 )
 hashsums=(
   "SKIP"
-  "5271fc2610ea51fbd226aa7e5b19207c7425f6561d3ee0e078ec0660ed335142"
+  "4d374637b4838b9346023a51c296b5d4cdd9e3c6ae8bf796ff28631f9d0aec28"
   "a06577a6fca1c459674ba6f95cff938cc837b34fb8a6a90fd0e13f05a530551a"
 )
 
@@ -107,29 +111,17 @@ build() {
   make
 }
 
-package:apt() {
+package() {
   cd "${srcdir}/janus-gateway-${pkgver}"
   make DESTDIR="${pkgdir}" install configs
-  install -Dm755 ../videoserver.service \
-    "${pkgdir}"/lib/systemd/system/videoserver.service
-  rm -rf "${pkgdir}"/etc
+
+  cd "${srcdir}"
+  install -Dm755 videoserver.service \
+    "${pkgdir}/usr/lib/systemd/system/videoserver.service"
+  rm -rf "${pkgdir}"/etc/janus
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
   rm -rf "${pkgdir}"/opt/zextras/common/share/man
-  rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/  
-  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
-  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
-}
-package:yum() {
-  cd "${srcdir}/janus-gateway-${pkgver}"
-  make DESTDIR="${pkgdir}" install configs
-  install -Dm755 ../videoserver.service \
-    "${pkgdir}"/usr/lib/systemd/system/videoserver.service
-  rm -rf "${pkgdir}"/etc
-  rm -rf "${pkgdir}"/opt/zextras/common/share/doc
-  rm -rf "${pkgdir}"/opt/zextras/common/share/man
-  rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/  
-  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
-  #rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
+  rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/
 }
 
 preinst:apt() {
@@ -199,7 +191,7 @@ postrm:apt() {
         delgroup --system videoserver || echo "Could not remove videoserver group."
       fi
     fi
-  
+
     hostname=$(hostname -f)
     db_subst videoserver/remove HOSTNAME "${hostname}"
     db_input high videoserver/remove || true
@@ -230,7 +222,7 @@ postinst:yum() {
 * Please execute these commands in a mailbox node 
   as zextras user to complete the setup of the video server:
 
-  zxsuite chats video-server add ${hostname} port 8188 secret ${api_secret}
+  carbonio chats video-server add ${hostname} port 8188 secret ${api_secret}
 EOF
   fi
 }

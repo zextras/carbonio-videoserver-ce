@@ -1,6 +1,6 @@
 {
     "name": "Zextras Videoserver",
-    "Description": "The test description",
+    "Description": "Carbonio videoserver",
     "build_dir": "/tmp/",
     "output": "artifacts",
     "Projects": [
