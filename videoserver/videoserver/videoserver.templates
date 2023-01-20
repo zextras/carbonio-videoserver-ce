@@ -11,7 +11,7 @@ Description: .: Congratulations! Every bit is in its right place :.
  Please execute these commands in a mailbox node 
  as zextras user to complete the setup of the video server:
  .
- zxsuite chats video-server add ${HOSTNAME} port 8188 secret ${API_SECRET}
+ carbonio chats video-server add ${HOSTNAME} port 8188 secret ${API_SECRET}
 
 Template: videoserver/remove
 Type: note
@@ -20,4 +20,4 @@ Description: .: Final steps to uninstall the video server :.
  Please execute these commands in a mailbox node 
  as zextras user to complete the removal of the video server:
  .
- zxsuite chats video-server remove ${HOSTNAME} port 8188
+ carbonio chats video-server remove ${HOSTNAME} port 8188
