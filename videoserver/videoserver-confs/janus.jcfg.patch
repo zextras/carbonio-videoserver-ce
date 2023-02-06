@@ -1,0 +1,230 @@
+diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
+--- a/conf/janus.jcfg.sample.in	2022-02-21 16:02:12.059472237 +0100
++++ b/conf/janus.jcfg.sample.in	2022-02-21 16:04:31.556017525 +0100
+@@ -11,7 +11,7 @@
+ 	loggers_folder = "@loggerdir@"			# External loggers folder
+ 
+ 		# The next settings configure logging
+-	#log_to_stdout = false					# Whether the Janus output should be written
++	log_to_stdout = true					# Whether the Janus output should be written
+ 											# to stdout or not (default=true)
+ 	#log_to_file = "/path/to/janus.log"		# Whether to use a log file or not
+ 	debug_level = 4							# Debug/logging level, valid values are 0-7
+@@ -31,7 +31,7 @@
+ 											# started, and to destroy at shutdown
+ 
+ 		# There are different ways you can authenticate the Janus and Admin APIs
+-	#api_secret = "janusrocks"		# String that all Janus requests must contain
++	api_secret = "${API_SECRET}"	# String that all Janus requests must contain
+ 									# to be accepted/authorized by the Janus core.
+ 									# Useful if you're wrapping all Janus API requests
+ 									# in your servers (that is, not in the browser,
+@@ -47,7 +47,7 @@
+ 									# without this, the Admin API MUST
+ 									# be enabled, as tokens are added and removed
+ 									# through messages sent there.
+-	admin_secret = "janusoverlord"	# String that all Janus requests must contain
++	#admin_secret = "janusoverlord"	# String that all Janus requests must contain
+ 									# to be accepted/authorized by the admin/monitor.
+ 									# only needed if you enabled the admin API
+ 									# in any of the available transports.
+@@ -56,7 +56,7 @@
+ 	#interface = "1.2.3.4"			# Interface to use (will be used in SDP)
+ 	#server_name = "MyJanusInstance"# Public name of this Janus instance
+ 									# as it will appear in an info request
+-	#session_timeout = 60			# How long (in seconds) we should wait before
++	session_timeout = 0				# How long (in seconds) we should wait before
+ 									# deciding a Janus session has timed out. A
+ 									# session times out when no request is received
+ 									# for session_timeout seconds (default=60s).
+@@ -70,7 +70,7 @@
+ 									# them (default=45s). Notice that setting this
+ 									# to 0 will NOT disable the timeout, but will
+ 									# be considered an invalid value and ignored.
+-	#reclaim_session_timeout = 0	# How long (in seconds) we should wait for a
++	reclaim_session_timeout = 0		# How long (in seconds) we should wait for a
+ 									# janus session to be reclaimed after the transport
+ 									# is gone. After the transport is gone, a session
+ 									# times out when no request is received for
+@@ -88,7 +88,7 @@
+ 									# external scripts), then uncomment and set the
+ 									# recordings_tmp_ext property to the extension
+ 									# to add to the base (e.g., tmp --> .mjr.tmp).
+-	#event_loops = 8				# By default, Janus handles each have their own
++	event_loops = 32				# By default, Janus handles each have their own
+ 									# event loop and related thread for all the media
+ 									# routing and management. If for some reason you'd
+ 									# rather limit the number of loop/threads, and
+@@ -158,7 +158,6 @@
+ 		"/sbin",
+ 		"/sys",
+ 		"/usr",
+-		"/var",
+ 			# We add what are usually the folders Janus is installed to
+ 			# as well: we don't just put "/opt/janus" because that would
+ 			# include folders like "/opt/janus/share" that is where
+@@ -214,12 +213,12 @@
+ 	#ipv6 = true
+ 	#ipv6_linklocal = true
+ 	#min_nack_queue = 500
+-	#rtp_port_range = "20000-40000"
++	rtp_port_range = "20000-40000"
+ 	#dtls_mtu = 1200
+ 	#no_media_timer = 1
+ 	#slowlink_threshold = 4
+ 	#twcc_period = 100
+-	#dtls_timeout = 500
++	dtls_timeout = 2000
+ 
+ 	# Janus can do some optimizations on the NACK queue, specifically when
+ 	# keyframes are involved. Namely, you can configure Janus so that any
+@@ -300,7 +299,7 @@
+ 	# Multiple public IP addresses can be specified as a comma separated list
+ 	# if the Janus is deployed in a DMZ between two 1-1 NAT for internal and
+ 	# external users.
+-	#nat_1_1_mapping = "1.2.3.4"
++	nat_1_1_mapping = "${PUBLIC_IP_ADDRESS}"
+ 	#keep_private_host = true
+ 
+ 	# You can configure a TURN server in two different ways: specifying a
+@@ -369,7 +368,7 @@
+ 	# Just beware that the ICE ignore list is not used if an enforce list
+ 	# has been configured. By default, Janus ignores all interfaces whose
+ 	# name starts with 'vmnet', to skip VMware interfaces:
+-	ice_ignore_list = "vmnet"
++	ice_ignore_list = ""
+ 
+ 	# In case you want to allow Janus to start even if the configured STUN or TURN
+ 	# server is unreachable, you can set 'ignore_unreachable_ice_server' to true.
+diff '--color=auto' -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/janus.plugin.audiobridge.jcfg.sample
+--- a/conf/janus.plugin.audiobridge.jcfg.sample	2021-11-23 16:50:40.528747538 +0100
++++ b/conf/janus.plugin.audiobridge.jcfg.sample	2021-11-23 16:50:44.494802335 +0100
+@@ -45,12 +45,12 @@
+ 	#record_tmp_ext = "tmp"			# Optional temporary extension to add to filenames
+ 									# while recording: e.g., setting "tmp" would mean
+ 									# .wav --> .wav.tmp until the file is closed
+-	#events = false					# Whether events should be sent to event
++	events = true					# Whether events should be sent to event
+ 									# handlers (default=true)
+ 
+ 	# By default, integers are used as a unique ID for both rooms and participants.
+ 	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
+-	#string_ids = true
++	string_ids = true
+ 
+ 	# Normally, all AudioBridge participants will join by negotiating a WebRTC
+ 	# PeerConnection: the plugin also supports adding participants that will
+@@ -68,12 +68,3 @@
+ 	#local_ip = "1.2.3.4"
+ 
+ }
+-
+-room-1234: {
+-	description = "Demo Room"
+-	secret = "adminpwd"
+-	sampling_rate = 16000
+-	record = false
+-	#record_dir = "/path/to/"
+-	#record_file = "recording.wav"
+-}
+diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus.plugin.videoroom.jcfg.sample
+--- a/conf/janus.plugin.videoroom.jcfg.sample	2021-11-23 16:50:40.528747538 +0100
++++ b/conf/janus.plugin.videoroom.jcfg.sample	2021-11-23 16:50:44.494802335 +0100
+@@ -49,37 +49,10 @@
+ 									# if this key is provided in the request
+ 	#lock_rtp_forward = true		# Whether the admin_key above should be
+ 									# enforced for RTP forwarding requests too
+-	#events = false					# Whether events should be sent to event
++	events = true					# Whether events should be sent to event
+ 									# handlers (default=true)
+ 
+ 	# By default, integers are used as a unique ID for both rooms and participants.
+ 	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
+-	#string_ids = true
+-}
+-
+-room-1234: {
+-	description = "Demo Room"
+-	secret = "adminpwd"
+-	publishers = 6
+-	bitrate = 128000
+-	fir_freq = 10
+-	#audiocodec = "opus"
+-	#videocodec = "vp8"
+-	record = false
+-	#rec_dir = "/path/to/recordings-folder"
+-}
+-
+-# This other demo room here is only there in case you want to play with
+-# the VP9 SVC support. Notice that you'll need a Chrome launched with
+-# the flag that enables that support, or otherwise you'll be using just
+-# plain VP9 (which is good if you want to test how this indeed affect
+-# what receivers will get, whether they're encoding SVC or not).
+-room-5678: {
+-	description = "VP9-SVC Demo Room"
+-	secret = "adminpwd"
+-	publishers = 6
+-	bitrate = 512000
+-	fir_freq = 10
+-	videocodec = "vp9"
+-	video_svc = true
++	string_ids = true
+ }
+diff '--color=auto' -Naur a/conf/janus.transport.websockets.jcfg.sample b/conf/janus.transport.websockets.jcfg.sample
+--- a/conf/janus.transport.websockets.jcfg.sample	2021-11-23 16:50:40.528747538 +0100
++++ b/conf/janus.transport.websockets.jcfg.sample	2021-11-23 16:50:44.494802335 +0100
+@@ -1,11 +1,11 @@
+ # WebSockets stuff: whether they should be enabled, which ports they
+ # should use, and so on.
+ general: {
+-	#events = true					# Whether to notify event handlers about transport events (default=true)
+-	json = "indented"				# Whether the JSON messages should be indented (default),
++	events = true					# Whether to notify event handlers about transport events (default=true)
++	json = "compact"				# Whether the JSON messages should be indented (default),
+ 									# plain (no indentation) or compact (no indentation and no spaces)
+-	#pingpong_trigger = 30			# After how many seconds of idle, a PING should be sent
+-	#pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
++	pingpong_trigger = 30			# After how many seconds of idle, a PING should be sent
++	pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
+ 
+ 	ws = true						# Whether to enable the WebSockets API
+ 	ws_port = 8188					# WebSockets server port
+diff '--color=auto' -Naur a/conf/janus.transport.rabbitmq.jcfg.sample b/conf/janus.transport.rabbitmq.jcfg.sample
+--- a/conf/janus.transport.rabbitmq.jcfg.sample	2022-11-24 11:47:01.415529904 +0100
++++ b/conf/janus.transport.rabbitmq.jcfg.sample	2022-11-24 11:51:15.643262375 +0100
+@@ -15,26 +15,26 @@
+ # use of the same queues and messages will get lost. The integration
+ # is disabled by default, so set enabled=true if you want to use it.
+ general: {
+-	enabled = false						# Whether the support must be enabled
+-	#events = true						# Whether to notify event handlers about transport events (default=true)
++	enabled = true						# Whether the support must be enabled
++	events = true						# Whether to notify event handlers about transport events (default=true)
+ 	json = "indented"					# Whether the JSON messages should be indented (default),
+ 										# plain (no indentation) or compact (no indentation and no spaces)
+-	host = "localhost"					# The address of the RabbitMQ server
+-	#port = 5672						# The port of the RabbitMQ server (5672 by default)
+-	#username = "guest"					# Username to use to authenticate, if needed
+-	#password = "guest"					# Password to use to authenticate, if needed
++	host = "127.78.0.16"					# The address of the RabbitMQ server
++	port = 20001						# The port of the RabbitMQ server (5672 by default)
++	username = "{RABBITMQ_USERNAME}"					# Username to use to authenticate, if needed
++	password = "{RABBITMQ_PASSWORD}"					# Password to use to authenticate, if needed
+ 	#vhost = "/"						# Virtual host to specify when logging in, if needed
+
+ 	#janus_exchange = "janus-exchange"	# Exchange for outgoing messages, using default if not provided
+ 	#janus_exchange_type = "fanout"		# Rabbitmq exchange_type can be one of the available types: direct, topic, headers and fanout (fanout by defualt).
+ 	#queue_name = "janus-gateway"		# Queue name for incoming messages (if set and janus_exchange_type is topic/direct, to_janus will be the routing key the queue is bound to the exchange on)
+-	to_janus = "to-janus"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
+-	from_janus = "from-janus"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
++	#to_janus = "to-janus"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
++	from_janus = "{FROM_JANUS_QUEUE}"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
+ 	#declare_outgoing_queue = true		# By default (for backwards compatibility), we declare an outgoing queue. Set this to false to disable that behavior
+ 	#queue_durable = false				# Whether or not incoming queue should remain after a RabbitMQ reboot
+ 	#queue_autodelete = false			# Whether or not incoming queue should autodelete after janus disconnects from RabbitMQ
+ 	#queue_exclusive = false			# Whether or not incoming queue should only allow one subscriber
+-	#heartbeat = 60 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
++	heartbeat = 60 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
+
+ 	#ssl_enabled = false				# Whether ssl support must be enabled
+ 	#ssl_verify_peer = true				# Whether peer verification must be enabled

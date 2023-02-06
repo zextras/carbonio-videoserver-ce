@@ -1,206 +1,326 @@
 pipeline {
+	parameters {
+		booleanParam defaultValue: true, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'
+	}
+	options {
+		skipDefaultCheckout()
+		buildDiscarder(logRotator(numToKeepStr: '5'))
+		timeout(time: 1, unit: 'HOURS')
+	}
 	agent {
 		node {
 			label 'base-agent-v1'
 		}
 	}
-	options {
-		buildDiscarder(logRotator(numToKeepStr: '5'))
-		timeout(time: 1, unit: 'HOURS')
-	}
 	environment {
-		NETWORK_OPTS = "--network ci_agent"
-		WORKSPACE = pwd()
+		NETWORK_OPTS = '--network ci_agent'
 	}
 	stages {
-		stage('Checkout building resources') {
+		stage('Checkout & Stash') {
+			agent {
+				node {
+					label 'base-agent-v1'
+				}
+			}
+			steps {
+				checkout scm
+				stash includes: '**', name: 'project'
+			}
+		}
+		stage('Packaging') {
 			parallel {
-				stage('Build script checkout') {
+				stage('Ubuntu 20') {
+					agent {
+						node {
+							label 'pacur-agent-ubuntu-20.04-v1'
+						}
+					}
 					steps {
-						dir('janus-builder') {
-							git branch: 'master',
-								credentialsId: 'tarsier_bot-ssh-key',
-								url: 'git@bitbucket.org:zextras/janus-builder.git'
+						unstash 'project'
+						withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+						    passwordVariable: 'SECRET',
+						    usernameVariable: 'USERNAME')]) {
+						        sh 'echo "machine zextras.jfrog.io" >> auth.conf'
+						        sh 'echo "login $USERNAME" >> auth.conf'
+						        sh 'echo "password $SECRET" >> auth.conf'
+						        sh 'sudo mv auth.conf /etc/apt'
+						}
+						sh '''
+						sudo echo "deb https://zextras.jfrog.io/artifactory/ubuntu-playground focal main" > zextras.list
+						sudo mv zextras.list /etc/apt/sources.list.d/
+						sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 52FD40243E584A21
+						'''
+						sh 'sudo pacur build ubuntu-focal videoserver'
+						stash includes: 'artifacts/', name: 'artifacts-ubuntu-focal'
+					}
+					post {
+						always {
+							archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
 						}
 					}
 				}
-				stage('Zimbra STUB checkout') {
+				stage('Rocky 8') {
+					agent {
+						node {
+							label 'pacur-agent-rocky-8-v1'
+						}
+					}
 					steps {
-						sh 'pwd'
-						dir('zimbra-package-stub') {
-							git branch: 'zimbra/9.0.0p3',
-								credentialsId: 'tarsier_bot-ssh-key',
-								url: 'git@bitbucket.org:zextras/zimbra-package-stub.git'
+						unstash 'project'
+						withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+						    passwordVariable: 'SECRET',
+						    usernameVariable: 'USERNAME')]) {
+						        sh 'echo "[Zextras]" > zextras.repo'
+						        sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-playground/" >> zextras.repo'
+						        sh 'echo "enabled=1" >> zextras.repo'
+						        sh 'echo "gpgcheck=0" >> zextras.repo'
+						        sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-playground/repomd.xml.key" >> zextras.repo'
+						        sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
+						}
+						sh 'sudo pacur build rocky-8 videoserver'
+						stash includes: 'artifacts/', name: 'artifacts-rocky-8'
+					}
+					post {
+						always {
+							archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
 						}
 					}
 				}
 			}
 		}
-		stage('Building Janus...') {
-			parallel {
-				stage('Ubuntu 18.04') {
-					steps {
-						sh 'cd janus-builder; ./build_ubuntu18'
-						script {
-							env.CONTAINER1_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu18').trim()
-						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER1_ID}:/u18"
-						sh "docker exec -t ${env.CONTAINER1_ID} bash -c \"cd /u18/; ./build.sh\""
-						sh "docker cp ${env.CONTAINER1_ID}:/u18/artifacts/. ${WORKSPACE}"
-						script {
-							def server = Artifactory.server 'zextras-artifactory'
-							def buildInfo = Artifactory.newBuildInfo()
-
-							def uploadSpec = """{
-								"files": [
-									{
-										"pattern": "videoserver*/*.deb",
-										"target": "ubuntu-rc/pool/",
-										"props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
-									}
-								]
-							}"""
-							server.upload spec: uploadSpec, buildInfo: buildInfo
-							server.publishBuildInfo buildInfo
-						}
-					}
-					post {
-						success {
-							archiveArtifacts artifacts: "*.tgz", fingerprint: true
-						}
-						always {
-							sh "docker kill ${env.CONTAINER1_ID}"
-						}
-					}
+		stage('Upload To Devel') {
+			when {
+				anyOf {
+					expression { params.DEVEL == true }
 				}
-				// stage('Ubuntu 20.04') {
-				// 	steps {
-				// 		sh 'cd janus-builder; ./build_ubuntu20'
-				// 		script {
-				// 			env.CONTAINER5_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-ubuntu20').trim()
-				// 		}
-				// 		sh "docker cp ${WORKSPACE} ${env.CONTAINER5_ID}:/u20"
-				// 		sh "docker exec -t ${env.CONTAINER5_ID} bash -c \"cd /u20/; ./build.sh\""
-				// 		sh "docker cp ${env.CONTAINER5_ID}:/u20/artifacts/. ${WORKSPACE}"
-				// 		script {
-				// 			def server = Artifactory.server 'zextras-artifactory'
-				// 			def buildInfo = Artifactory.newBuildInfo()
-
-				// 			def uploadSpec = """{
-				// 				"files": [
-				// 					{
-				// 						"pattern": "videoserver*/*.deb",
-				// 						"target": "ubuntu-rc/pool/",
-				// 						"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
-				// 					}
-				// 				]
-				// 			}"""
-				// 			server.upload spec: uploadSpec, buildInfo: buildInfo
-				// 			server.publishBuildInfo buildInfo
-				// 		}
-				// 	}
-				// 	post {
-				// 		success {
-				// 			archiveArtifacts artifacts: "*.tgz", fingerprint: true
-				// 		}
-				// 		always {
-				// 			sh "docker kill ${env.CONTAINER5_ID}"
-				// 		}
-				// 	}
-				// }                   
-				stage('CentOS 7') {
-					steps {
-						sh 'cd janus-builder; ./build_centos7'
-						script {
-							env.CONTAINER2_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-centos7').trim()
-						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER2_ID}:/r7"
-						sh "docker exec -t ${env.CONTAINER2_ID} bash -c \"cd /r7/; scl enable devtoolset-9 ./build.sh\""
-						sh "docker cp ${env.CONTAINER2_ID}:/r7/artifacts/. ${WORKSPACE}"
-						script {
-							def server = Artifactory.server 'zextras-artifactory'
-							def buildInfo = Artifactory.newBuildInfo()
-
-							def uploadSpec = """{
-								"files": [
-									{
-										"pattern": "videoserver*/(*)-(*)-(*).rpm",
-										"target": "centos7-rc/zextras/{1}/{1}-{2}-{3}.rpm",
-										"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
-									}
-								]
-							}"""
-							server.upload spec: uploadSpec, buildInfo: buildInfo
-							server.publishBuildInfo buildInfo
-						}
-					}
-					post {
-						success {
-							archiveArtifacts artifacts: "*.tgz", fingerprint: true
-						}
-						always {
-							sh "docker kill ${env.CONTAINER2_ID}"
-						}
-					}
-				}
-				stage('CentOS 8') {
-					steps {
-						sh 'cd janus-builder; ./build_centos8'
-						script {
-							env.CONTAINER3_ID = sh(returnStdout: true, script: 'docker run -dt ${NETWORK_OPTS} janus-builder-centos8').trim()
-						}
-						sh "docker cp ${WORKSPACE} ${env.CONTAINER3_ID}:/r8"
-						sh "docker exec -t ${env.CONTAINER3_ID} bash -c \"cd /r8/; ./build.sh\""
-						sh "docker cp ${env.CONTAINER3_ID}:/r8/artifacts/. ${WORKSPACE}"
-						script {
-							def server = Artifactory.server 'zextras-artifactory'
-							def buildInfo = Artifactory.newBuildInfo()
-
-							def uploadSpec = """{
-								"files": [
-									{
-										"pattern": "videoserver*/(*)-(*)-(*).rpm",
-										"target": "centos8-rc/zextras/{1}/{1}-{2}-{3}.rpm",
-										"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=Zextras"
-									}
-								]
-							}"""
-							server.upload spec: uploadSpec, buildInfo: buildInfo
-							server.publishBuildInfo buildInfo
-						}
-					}
-					post {
-						success {
-							archiveArtifacts artifacts: "*.tgz", fingerprint: true
-						}
-						always {
-							sh "docker kill ${env.CONTAINER3_ID}"
-						}
-					}
+			}
+			steps {
+				unstash 'artifacts-ubuntu-focal'
+				unstash 'artifacts-rocky-8'
+				script {
+					def server = Artifactory.server 'zextras-artifactory'
+					def buildInfo
+					def uploadSpec
+					buildInfo = Artifactory.newBuildInfo()
+					uploadSpec = '''{
+						"files": [
+							{
+								"pattern": "artifacts/*.deb",
+								"target": "ubuntu-devel/pool/",
+								"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
+							},
+							{
+								"pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libev)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libnice)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libopus)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libuv)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-x264)-(*).rpm",
+								"target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							}
+						]
+					}'''
+					server.upload spec: uploadSpec, buildInfo: buildInfo, failNoOp: false
 				}
 			}
 		}
-	}
-	post {
-		success {
-			build job: 'Bitbucket Cloud/zextras/janus-installer/master',
-				parameters: [
-				string(name: 'janusParamName', value: "${BRANCH_NAME}")
-			], propagate: false
-		}        
-		always {
-			sh 'docker rmi janus-builder-ubuntu18 --force'
-			// sh 'docker rmi janus-builder-ubuntu20 --force'
-			sh 'docker rmi janus-builder-centos7 --force'
-			sh 'docker rmi janus-builder-centos8 --force'
-
-			script {
-				GIT_COMMIT_EMAIL = sh(
-					script: 'git --no-pager show -s --format=\'%ae\'',
-					returnStdout: true
-				).trim()
+		stage('Upload & Promotion Config') {
+			when {
+				buildingTag()
 			}
-			emailext attachLog: true, body: '$DEFAULT_CONTENT', recipientProviders: [requestor()], subject: '$DEFAULT_SUBJECT', to: "${GIT_COMMIT_EMAIL}"
+			steps {
+				unstash 'artifacts-ubuntu-focal'
+				unstash 'artifacts-rocky-8'
+
+				script {
+					def server = Artifactory.server 'zextras-artifactory'
+					def buildInfo
+					def uploadSpec
+					def config
+
+					//ubuntu
+					buildInfo = Artifactory.newBuildInfo()
+					buildInfo.name += '-ubuntu'
+					uploadSpec = '''{
+						"files": [
+							{
+								"pattern": "artifacts/*focal*.deb",
+								"target": "ubuntu-rc/pool/",
+								"props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
+							}
+						]
+					}'''
+					server.upload spec: uploadSpec, buildInfo: buildInfo, failNoOp: false
+					config = [
+							'buildName'          : buildInfo.name,
+							'buildNumber'        : buildInfo.number,
+							'sourceRepo'         : 'ubuntu-rc',
+							'targetRepo'         : 'ubuntu-release',
+							'comment'            : 'Do not change anything! Just press the button',
+							'status'             : 'Released',
+							'includeDependencies': false,
+							'copy'               : true,
+							'failFast'           : true
+					]
+					Artifactory.addInteractivePromotion server: server, promotionConfig: config, displayName: 'Ubuntu Promotion to Release'
+					server.publishBuildInfo buildInfo
+
+					//rocky8
+					buildInfo = Artifactory.newBuildInfo()
+					buildInfo.name += "-centos8"
+					uploadSpec = '''{
+						"files": [
+							{
+								"pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libev)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libnice)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libopus)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libuv)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							},
+							{
+								"pattern": "artifacts/(carbonio-x264)-(*).rpm",
+								"target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+								"props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+							}
+						]
+					}'''
+
+					server.upload spec: uploadSpec, buildInfo: buildInfo, failNoOp: false
+					config = [
+							'buildName'          : buildInfo.name,
+							'buildNumber'        : buildInfo.number,
+							'sourceRepo'         : 'centos8-rc',
+							'targetRepo'         : 'centos8-release',
+							'comment'            : 'Do not change anything! Just press the button',
+							'status'             : 'Released',
+							'includeDependencies': false,
+							'copy'               : true,
+							'failFast'           : true
+					]
+					Artifactory.addInteractivePromotion server: server, promotionConfig: config, displayName: "Centos8 Promotion to Release"
+					server.publishBuildInfo buildInfo
+				}
+			}
 		}
 	}
 }
+

@@ -18,11 +18,11 @@ Doxygen documentation:     no
 
 Transports:
 
-    REST (HTTP/HTTPS):     no
+    REST (HTTP/HTTPS):     yes
 
     WebSockets:            yes
 
-    RabbitMQ:              no
+    RabbitMQ:              yes
 
     MQTT:                  no
 

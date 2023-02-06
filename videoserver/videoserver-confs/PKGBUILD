@@ -1,0 +1,117 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="carbonio-videoserver-confs"
+pkgver="1.1.0"
+pkgrel="1"
+pkgdesc="An open source, general purpose, WebRTC server (configs only)"
+pkgdesclong=(
+  "An open source, general purpose, WebRTC server (configs only)"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+depends:apt=(
+  "carbonio-curl"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-librabbitmq-c"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-openssl"
+  "carbonio-videoserver-confs"
+  "cdebconf"
+  "debconf"
+  "dialog"
+  "libc6"
+  "libconfig9"
+  "libglib2.0-0"
+  "libjansson4"
+  "libmicrohttpd12"
+  "libogg0"
+  "libterm-readline-gnu-perl"
+  "zlib1g"
+)
+depends:yum=(
+  "carbonio-curl"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-librabbitmq-c"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-openssl"
+  "jansson"
+  "libconfig"
+  "libmicrohttpd"
+  "libogg"
+  "zlib"
+)
+makedepends:apt=(
+  "carbonio-curl"
+  "carbonio-openssl"
+  "gengetopt"
+  "libconfig-dev"
+  "libjansson-dev"
+  "libmicrohttpd-dev"
+  "libogg-dev"
+  "zlib1g-dev"
+)
+makedepends:yum=(
+  "carbonio-curl"
+  "carbonio-openssl"
+  "gengetopt"
+  "jansson-devel"
+  "libconfig-devel"
+  "libmicrohttpd-devel"
+  "libogg-devel"
+  "zlib-devel"
+)
+debconf_template="carbonio-videoserver.templates"
+section="comm"
+priority="important"
+sources=(
+  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
+  "janus.jcfg.patch"
+)
+hashsums=(
+  "skip"
+  "skip"
+)
+
+build() {
+  cd "${srcdir}/janus-gateway-${pkgver}"
+  patch -Np1 -i ../janus.jcfg.patch
+  ./autogen.sh
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
+  export CFLAGS="-O2 -I/opt/zextras/common/include"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"  
+  ./configure \
+    --prefix=/opt/zextras/common \
+    --sysconfdir /etc \
+    --disable-docs \
+    --disable-turn-rest-api \
+    --disable-all-transports \
+    --enable-rest \
+    --enable-websockets \
+    --enable-rabbitmq \
+    --disable-all-plugins \
+    --enable-plugin-audiobridge \
+    --enable-plugin-videoroom \
+    --enable-post-processing \
+    --disable-all-handlers \
+    --enable-websockets-event-handler \
+    --enable-rabbitmq-event-handler \
+    --disable-json-logger
+  make
+}
+
+package() {
+  cd "${srcdir}/janus-gateway-${pkgver}"
+  make DESTDIR="${pkgdir}" install configs
+  rm -rf "${pkgdir}"/opt/
+}

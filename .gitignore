@@ -1,1 +1,6 @@
-**/**/build/
+*.deb
+*.rpm
+start
+artifacts
+.idea
+*.iml

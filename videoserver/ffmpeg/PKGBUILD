@@ -1,0 +1,99 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="carbonio-ffmpeg"
+pkgver="4.4.2"
+pkgrel="1"
+pkgdesc="Complete solution to record, convert and stream audio and video"
+pkgdesclong=(
+  "Complete solution to record, convert and stream audio and video"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+
+depends:apt=(
+  "carbonio-libfdk-aac"
+  "carbonio-libopus"
+  "carbonio-libvpx"
+  "carbonio-x264"
+  "libass9"
+  "libc6"
+  "libfreetype6"
+  "libmp3lame0"
+  "libtheora0"  
+  "libxcb1"
+  "zlib1g"
+)
+makedepends:apt=(
+  "libass-dev"
+  "libfreetype6-dev"
+  "libmp3lame-dev"
+  "libtheora-dev"
+  "libxcb1-dev"
+)
+depends:yum=(
+  "carbonio-libfdk-aac"
+  "carbonio-libopus"
+  "carbonio-libvpx"
+  "carbonio-x264"
+  "freetype"
+  "lame-libs"
+  "libass"
+  "libtheora"
+  "libxcb"
+  "zlib"
+)
+makedepends:yum=(
+  "freetype-devel"
+  "lame-devel"
+  "libass-devel"
+  "libtheora-devel"
+  "libxcb-devel"
+  "zlib-devel"
+)
+
+section="libs"
+priority="important"
+sources=(
+  "https://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.gz"
+)
+hashsums=(
+  "a4abede145de22eaf233baa1726e38e137f5698d9edd61b5763cd02b883f3c7c"
+)
+
+build() {
+  cd "${srcdir}/ffmpeg-${pkgver}"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
+
+  ./configure --prefix=/opt/zextras/common \
+    --disable-static \
+    --enable-shared \
+    --disable-debug \
+    --disable-stripping \
+    --extra-cflags="-I/opt/zextras/common/include" \
+    --extra-ldflags="-L/opt/zextras/common/lib" \
+    --bindir="/opt/zextras/common/bin" \
+    --enable-gpl \
+    --enable-libass \
+    --enable-libfdk-aac \
+    --enable-libfreetype \
+    --enable-libmp3lame \
+    --enable-libopus \
+    --enable-libtheora \
+    --enable-libvpx \
+    --enable-libx264 \
+    --enable-nonfree \
+    --enable-libxcb
+  make -j$(nproc)  
+}
+
+package() {
+  cd "${srcdir}/ffmpeg-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zextras/common/share
+  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
+}

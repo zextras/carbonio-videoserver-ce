@@ -1,0 +1,39 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="carbonio-libusrsctp"
+pkgver="0.9.5.0"
+pkgrel="1"
+pkgdesc="A portable SCTP userland stack"
+pkgdesclong=(
+  "A portable SCTP userland stack"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+section="libs"
+priority="important"
+sources=(
+  "https://github.com/sctplab/usrsctp/archive/refs/tags/${pkgver}.tar.gz"
+)
+hashsums=(
+  "260107caf318650a57a8caa593550e39bca6943e93f970c80d6c17e59d62cd92"
+)
+
+build() {
+  cd "${srcdir}/usrsctp-${pkgver}"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
+  ./bootstrap
+  ./configure \
+    --prefix=/opt/zextras/common \
+    --disable-debug
+  make
+}
+
+package() {
+  cd "${srcdir}/usrsctp-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
+  rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
+}
