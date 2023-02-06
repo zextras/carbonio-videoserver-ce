@@ -236,7 +236,7 @@ postrm:apt() {
         delgroup --system videoserver || echo "Could not remove videoserver group."
       fi
     fi
-  
+
     hostname=$(hostname -f)
     db_subst videoserver/remove HOSTNAME "${hostname}"
     db_input high videoserver/remove || true
@@ -278,7 +278,7 @@ postinst:yum() {
 * Please execute these commands in a mailbox node 
   as zextras user to complete the setup of the video server:
 
-  zxsuite chats video-server add ${hostname} port 8188 secret ${api_secret}
+  carbonio chats video-server add ${hostname} port 8188 secret ${api_secret}
 EOF
   fi
 

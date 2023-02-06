@@ -1,6 +1,6 @@
 pipeline {
 	parameters {
-		booleanParam defaultValue: true, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'
+		booleanParam defaultValue: false, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'
 	}
 	options {
 		skipDefaultCheckout()
