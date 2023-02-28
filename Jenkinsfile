@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Zextras <https://www.zextras.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 pipeline {
 	parameters {
 		booleanParam defaultValue: false, description: 'Whether to upload the packages in devel repositories', name: 'DEVEL'

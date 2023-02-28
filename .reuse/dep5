@@ -1,0 +1,16 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Carbonio videoserver
+Upstream-Contact: Smoky Beans <smokybeans@zextras.com>
+Source: https://github.com/Zextras/carbonio-videoserver
+
+Files: README.md
+Copyright: 2023 Zextras s.r.l
+License: AGPL-3.0-only
+
+Files: THIRDPARTIES
+Copyright: 2023 Zextras s.r.l
+License: AGPL-3.0-only
+
+Files: videoserver/*
+Copyright: 2023 Zextras s.r.l
+License: AGPL-3.0-only
