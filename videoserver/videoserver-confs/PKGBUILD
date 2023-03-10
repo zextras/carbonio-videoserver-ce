@@ -72,6 +72,9 @@ makedepends:yum=(
 debconf_template="videoserver.templates"
 section="comm"
 priority="important"
+backup=(
+  "/etc/janus/janus.jcfg"
+)
 sources=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
   "janus.jcfg.patch"
