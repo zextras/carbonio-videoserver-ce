@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-videoserver-confs"
-pkgver="1.1.0"
+pkgver="1.1.2"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 pkgdesclong=(
@@ -74,6 +74,9 @@ makedepends:yum=(
 debconf_template="carbonio-videoserver.templates"
 section="comm"
 priority="important"
+backup=(
+  "/etc/janus/janus.jcfg"
+)
 sources=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
   "janus.jcfg.patch"
@@ -89,7 +92,7 @@ build() {
   ./autogen.sh
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
   export CFLAGS="-O2 -I/opt/zextras/common/include"
-  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"  
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   ./configure \
     --prefix=/opt/zextras/common \
     --sysconfdir /etc \
