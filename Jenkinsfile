@@ -112,7 +112,7 @@ pipeline {
               }
             }
             always {
-              archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
+              archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
             }
           }
         }
