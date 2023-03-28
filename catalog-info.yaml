@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2023 Zextras <https://www.zextras.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: carbonio-videoserver
+  title: Carbonio Videoserver service
+  description: |
+    Service that allows to make calls, video-calls thanks to the Janus application.
+  tags:
+    - bash
+    - envoy
+    - backend
+  links:
+    - url: https://github.com/Zextras/carbonio-videoserver/blob/main/README.md
+      title: README
+spec:
+  type: service
+  lifecycle: production
+  owner: smoky-beans
