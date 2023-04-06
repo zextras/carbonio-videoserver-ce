@@ -206,10 +206,10 @@ diff '--color=auto' -Naur a/conf/janus.transport.rabbitmq.jcfg.sample b/conf/jan
 -	#port = 5672						# The port of the RabbitMQ server (5672 by default)
 -	#username = "guest"					# Username to use to authenticate, if needed
 -	#password = "guest"					# Password to use to authenticate, if needed
-+	host = "127.78.0.16"					# The address of the RabbitMQ server
++	host = "127.78.0.19"					# The address of the RabbitMQ server
 +	port = 20001						# The port of the RabbitMQ server (5672 by default)
-+	username = "{RABBITMQ_USERNAME}"					# Username to use to authenticate, if needed
-+	password = "{RABBITMQ_PASSWORD}"					# Password to use to authenticate, if needed
++	username = "<RABBITMQ_USERNAME>"					# Username to use to authenticate, if needed
++	password = "<RABBITMQ_PASSWORD>"					# Password to use to authenticate, if needed
  	#vhost = "/"						# Virtual host to specify when logging in, if needed
 
  	#janus_exchange = "janus-exchange"	# Exchange for outgoing messages, using default if not provided
@@ -217,8 +217,8 @@ diff '--color=auto' -Naur a/conf/janus.transport.rabbitmq.jcfg.sample b/conf/jan
  	#queue_name = "janus-gateway"		# Queue name for incoming messages (if set and janus_exchange_type is topic/direct, to_janus will be the routing key the queue is bound to the exchange on)
 -	to_janus = "to-janus"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
 -	from_janus = "from-janus"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
-+	#to_janus = "to-janus"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
-+	from_janus = "{FROM_JANUS_QUEUE}"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
++	to_janus = "<TO_JANUS_QUEUE>"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
++	from_janus = "<FROM_JANUS_QUEUE>"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
  	#declare_outgoing_queue = true		# By default (for backwards compatibility), we declare an outgoing queue. Set this to false to disable that behavior
  	#queue_durable = false				# Whether or not incoming queue should remain after a RabbitMQ reboot
  	#queue_autodelete = false			# Whether or not incoming queue should autodelete after janus disconnects from RabbitMQ

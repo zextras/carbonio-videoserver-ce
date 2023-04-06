@@ -191,7 +191,7 @@ pipeline {
               {
                 "pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
                 "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
-                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/(carbonio-videoserver)-(*).rpm",

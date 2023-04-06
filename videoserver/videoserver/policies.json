@@ -3,6 +3,9 @@
     {
       "carbonio-videoserver/": {
         "policy": "read"
+      },
+      "carbonio-message-broker/": {
+        "policy": "read"
       }
     }
   ],
