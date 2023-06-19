@@ -4,7 +4,7 @@ targets=(
 )
 pkgname="carbonio-videoserver"
 pkgver="1.1.2"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="An open source, general purpose, WebRTC server"
 pkgdesclong=(
   "An open source, general purpose, WebRTC server"
@@ -176,7 +176,49 @@ postinst:apt() {
     db_input high videoserver/add || true
     db_go
   fi
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable videoserver.service >/dev/null 2>&1 || :
+    systemctl restart videoserver.service >/dev/null 2>&1 || :
+  fi
 }
+
+preinst:yum() {
+  getent group videoserver >/dev/null || groupadd -r videoserver
+  getent passwd videoserver >/dev/null || \
+  useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
+}
+postinst:yum() {
+  if [ $1 -eq 1 ]; then
+    hostname=$(hostname -f)
+    api_secret=$(openssl rand -base64 24)
+    sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
+
+    echo "================================================================================================="
+    echo ".: Congratulations! Every bit is in its right place :."
+    echo "             Please execute these steps:"
+    echo "* Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg"
+    echo "* Please execute these commands in a mailbox node "
+    echo "  as zextras user to complete the setup of the video server:"
+    echo "  carbonio chats video-server add ${hostname} port 8188 secret ${api_secret}"
+    echo "================================================================================================="
+  fi
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable videoserver.service >/dev/null 2>&1 || :
+    systemctl restart videoserver.service >/dev/null 2>&1 || :
+  fi
+}
+
+prerm() {
+  if [ -d /run/systemd/system ]; then
+    systemctl --no-reload disable videoserver.service >/dev/null 2>&1 || :
+    systemctl stop videoserver.service >/dev/null 2>&1 || :
+  fi
+}
+
 postrm:apt() {
   . /usr/share/debconf/confmodule
 
@@ -200,29 +242,14 @@ postrm:apt() {
   
     db_purge
   fi
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+  fi
 }
 
-preinst:yum() {
-  getent group videoserver >/dev/null || groupadd -r videoserver
-  getent passwd videoserver >/dev/null || \
-  useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
-}
-postinst:yum() {
-  if [ $1 -eq 1 ]; then
-    hostname=$(hostname -f)
-    api_secret=$(openssl rand -base64 24)
-    sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg 
-    cat <<EOF
-
-.: Congratulations! Every bit is in its right place :.
-
-        Please execute these steps:
-* Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg
-
-* Please execute these commands in a mailbox node 
-  as zextras user to complete the setup of the video server:
-
-  carbonio chats video-server add ${hostname} port 8188 secret ${api_secret}
-EOF
+postrm:yum() {
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
   fi
 }
