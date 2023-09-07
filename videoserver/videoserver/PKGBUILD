@@ -4,7 +4,7 @@ targets=(
 )
 pkgname="carbonio-videoserver"
 pkgver="1.1.2"
-pkgrel="2"
+pkgrel="3"
 pkgdesc="An open source, general purpose, WebRTC server"
 pkgdesclong=(
   "An open source, general purpose, WebRTC server"
@@ -99,7 +99,7 @@ hashsums=(
   "42ac03f61de1ea2c6f26ec0dbc47f1aaf971dc66c74555310d527851ec934608"
   "2092df7f948c095119fbbd27d2c969a50942604bc5ed0c96ca1c425461b0cf69"
   "db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c"
-  "a6a9b6ef62ca32dc07ac5674f6b9c7a136845547f36e7f10d246eebf0e5fb35f"
+  "c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6"
   "380b18ddd6b0ed0db03a58ac8e426ec858b91d5e1a332b6b19f389f443af7274"
   "531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e"
 )

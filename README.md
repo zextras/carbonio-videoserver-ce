@@ -33,7 +33,7 @@ JavaScript modules:        no
 
 - Echo Test:             no
 - Streaming:             no
-- Video Call:            yes
+- Video Call:            no
 - SIP Gateway:           no
 - NoSIP (RTP Bridge):    no
 - Audio Bridge:          yes
@@ -48,7 +48,7 @@ JavaScript modules:        no
 
 - Sample event handler:  no
 - WebSocket ev. handler: yes
-- RabbitMQ event handler:no
+- RabbitMQ event handler:yes
 - MQTT event handler:    no
 - Nanomsg event handler: no
 - GELF event handler:    no

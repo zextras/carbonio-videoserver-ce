@@ -2,7 +2,7 @@
   "key_prefix": [
     {
       "carbonio-videoserver/": {
-        "policy": "read"
+        "policy": "write"
       },
       "carbonio-message-broker/": {
         "policy": "read"

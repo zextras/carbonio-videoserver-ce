@@ -4,7 +4,7 @@ targets=(
 )
 pkgname="carbonio-videoserver-confs"
 pkgver="1.1.2"
-pkgrel="2"
+pkgrel="3"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 pkgdesclong=(
   "An open source, general purpose, WebRTC server (configs only)"

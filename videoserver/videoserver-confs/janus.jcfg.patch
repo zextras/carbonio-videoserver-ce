@@ -96,6 +96,15 @@ diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.i
  
  	# In case you want to allow Janus to start even if the configured STUN or TURN
  	# server is unreachable, you can set 'ignore_unreachable_ice_server' to true.
+@@ -447,7 +447,7 @@
+ # events): if you'd rather receive a single containing all media stats in a
+ # single array, set 'combine_media_stats' to true.
+ events: {
+-	#broadcast = true
++	broadcast = true
+ 	#combine_media_stats = true
+ 	#disable = "libjanus_sampleevh.so"
+ 	#stats_period = 5
 diff '--color=auto' -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/janus.plugin.audiobridge.jcfg.sample
 --- a/conf/janus.plugin.audiobridge.jcfg.sample	2021-11-23 16:50:40.528747538 +0100
 +++ b/conf/janus.plugin.audiobridge.jcfg.sample	2021-11-23 16:50:44.494802335 +0100
@@ -137,7 +146,7 @@ diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus
 -	#events = false					# Whether events should be sent to event
 +	events = true					# Whether events should be sent to event
  									# handlers (default=true)
- 
+
  	# By default, integers are used as a unique ID for both rooms and participants.
  	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
 -	#string_ids = true
@@ -170,6 +179,82 @@ diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus
 -	video_svc = true
 +	string_ids = true
  }
+diff '--color=auto' -Naur a/conf/janus.transport.http.jcfg.sample b/conf/janus.transport.http.jcfg.sample
+--- a/conf/janus.transport.http.jcfg.sample	2023-08-24 12:25:58.464879774 +0200
++++ b/conf/janus.transport.http.jcfg.sample	2023-08-24 13:01:19.531681633 +0200
+@@ -7,14 +7,14 @@
+ # support IPv6), you should set the web server 'ip' property to '0.0.0.0'.
+ # To see debug logs from the HTTP server library, set 'mhd_debug'.
+ general: {
+-	#events = true					# Whether to notify event handlers about transport events (default=true)
++	events = false					# Whether to notify event handlers about transport events (default=true)
+ 	json = "indented"				# Whether the JSON messages should be indented (default),
+ 									# plain (no indentation) or compact (no indentation and no spaces)
+ 	base_path = "/janus"			# Base path to bind to in the web server (plain HTTP only)
+ 	http = true						# Whether to enable the plain HTTP interface
+ 	port = 8088						# Web server HTTP port
+ 	#interface = "eth0"				# Whether we should bind this server to a specific interface only
+-	#ip = "192.168.0.1"				# Whether we should bind this server to a specific IP address (v4 or v6) only
++	ip = "127.0.0.1"				# Whether we should bind this server to a specific IP address (v4 or v6) only
+ 	https = false					# Whether to enable HTTPS (default=false)
+ 	#secure_port = 8089				# Web server HTTPS port, if enabled
+ 	#secure_interface = "eth0"		# Whether we should bind this server to a specific interface only
+@@ -39,10 +39,10 @@
+ # endpoint is disabled by default, enable it by setting admin_http=true.
+ admin: {
+ 	admin_base_path = "/admin"			# Base path to bind to in the admin/monitor web server (plain HTTP only)
+-	admin_http = false					# Whether to enable the plain HTTP interface
++	admin_http = true					# Whether to enable the plain HTTP interface
+ 	admin_port = 7088					# Admin/monitor web server HTTP port
+ 	#admin_interface = "eth0"			# Whether we should bind this server to a specific interface only
+-	#admin_ip = "192.168.0.1"			# Whether we should bind this server to a specific IP address (v4 or v6) only
++	admin_ip = "127.0.0.1"			# Whether we should bind this server to a specific IP address (v4 or v6) only
+ 	admin_https = false					# Whether to enable HTTPS (default=false)
+ 	#admin_secure_port = 7889			# Admin/monitor web server HTTPS port, if enabled
+ 	#admin_secure_interface = "eth0"	# Whether we should bind this server to a specific interface only
+diff '--color=auto' -Naur a/conf/janus.eventhandler.rabbitmqevh.jcfg.sample b/conf/janus.eventhandler.rabbitmqevh.jcfg.sample
+--- a/conf/janus.eventhandler.rabbitmqevh.jcfg.sample	2022-10-25 13:00:53.428887322 +0200
++++ b/conf/janus.eventhandler.rabbitmqevh.jcfg.sample	2023-08-24 12:52:58.591914018 +0200
+@@ -1,27 +1,27 @@
+ # This configures the RabbitMQ event handler.
+
+ general: {
+-	enabled = false					# By default the module is not enabled
+-	events = "all"					# Comma separated list of the events mask you're interested
++	enabled = true					# By default the module is not enabled
++	events = "jsep, plugins"					# Comma separated list of the events mask you're interested
+ 									# in. Valid values are none, sessions, handles, jsep, webrtc,
+ 									# media, plugins, transports, core, external and all. By
+ 									# default we subscribe to everything (all)
+-	grouping = true					# Whether events should be sent individually , or if it's ok
++	grouping = false					# Whether events should be sent individually , or if it's ok
+ 									# to group them. The default is 'yes' to limit the number of
+ 									# messages
+-	json = "indented"				# Whether the JSON messages should be indented (default),
++	json = "compact"				# Whether the JSON messages should be indented (default),
+ 									# plain (no indentation) or compact (no indentation and no spaces)
+
+-	host = "localhost"				# The address of the RabbitMQ server
+-	#port = 5672					# The port of the RabbitMQ server (5672 by default)
+-	#username = "guest"				# Username to use to authenticate, if needed
+-	#password = "guest"				# Password to use to authenticate, if needed
+-	#vhost = "/"					# Virtual host to specify when logging in, if needed
++	host = "127.78.0.19"				# The address of the RabbitMQ server
++	port = 20001					# The port of the RabbitMQ server (5672 by default)
++	username = "<RABBITMQ_USERNAME>"				# Username to use to authenticate, if needed
++	password = "<RABBITMQ_PASSWORD>"				# Password to use to authenticate, if needed
++	vhost = "/"					# Virtual host to specify when logging in, if needed
+ 	#exchange = "janus-exchange"
+ 	route_key = "janus-events"		# Routing key to use when publishing messages
+-	#exchange_type = "fanout" 		# Rabbitmq exchange_type can be one of the available types: direct, topic, headers and fanout (fanout by defualt).
+-	#heartbeat = 60 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
+-	#declare_outgoing_queue = true # By default (for backwards compatibility), we declare an outgoing queue. Set this to false to disable that behavior
++	exchange_type = "direct" 		# Rabbitmq exchange_type can be one of the available types: direct, topic, headers and fanout (fanout by defualt).
++	heartbeat = 15 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
++	declare_outgoing_queue = false # By default (for backwards compatibility), we declare an outgoing queue. Set this to false to disable that behavior
+
+ 	#ssl_enable = false				# Whether ssl support must be enabled
+ 	#ssl_verify_peer = true			# Whether peer verification must be enabled
 diff '--color=auto' -Naur a/conf/janus.transport.websockets.jcfg.sample b/conf/janus.transport.websockets.jcfg.sample
 --- a/conf/janus.transport.websockets.jcfg.sample	2021-11-23 16:50:40.528747538 +0100
 +++ b/conf/janus.transport.websockets.jcfg.sample	2021-11-23 16:50:44.494802335 +0100
@@ -186,45 +271,6 @@ diff '--color=auto' -Naur a/conf/janus.transport.websockets.jcfg.sample b/conf/j
 -	#pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
 +	pingpong_trigger = 30			# After how many seconds of idle, a PING should be sent
 +	pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
- 
+
  	ws = true						# Whether to enable the WebSockets API
  	ws_port = 8188					# WebSockets server port
-diff '--color=auto' -Naur a/conf/janus.transport.rabbitmq.jcfg.sample b/conf/janus.transport.rabbitmq.jcfg.sample
---- a/conf/janus.transport.rabbitmq.jcfg.sample	2022-11-24 11:47:01.415529904 +0100
-+++ b/conf/janus.transport.rabbitmq.jcfg.sample	2022-11-24 11:51:15.643262375 +0100
-@@ -15,26 +15,26 @@
- # use of the same queues and messages will get lost. The integration
- # is disabled by default, so set enabled=true if you want to use it.
- general: {
--	enabled = false						# Whether the support must be enabled
--	#events = true						# Whether to notify event handlers about transport events (default=true)
-+	enabled = true						# Whether the support must be enabled
-+	events = true						# Whether to notify event handlers about transport events (default=true)
- 	json = "indented"					# Whether the JSON messages should be indented (default),
- 										# plain (no indentation) or compact (no indentation and no spaces)
--	host = "localhost"					# The address of the RabbitMQ server
--	#port = 5672						# The port of the RabbitMQ server (5672 by default)
--	#username = "guest"					# Username to use to authenticate, if needed
--	#password = "guest"					# Password to use to authenticate, if needed
-+	host = "127.78.0.19"					# The address of the RabbitMQ server
-+	port = 20001						# The port of the RabbitMQ server (5672 by default)
-+	username = "<RABBITMQ_USERNAME>"					# Username to use to authenticate, if needed
-+	password = "<RABBITMQ_PASSWORD>"					# Password to use to authenticate, if needed
- 	#vhost = "/"						# Virtual host to specify when logging in, if needed
-
- 	#janus_exchange = "janus-exchange"	# Exchange for outgoing messages, using default if not provided
- 	#janus_exchange_type = "fanout"		# Rabbitmq exchange_type can be one of the available types: direct, topic, headers and fanout (fanout by defualt).
- 	#queue_name = "janus-gateway"		# Queue name for incoming messages (if set and janus_exchange_type is topic/direct, to_janus will be the routing key the queue is bound to the exchange on)
--	to_janus = "to-janus"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
--	from_janus = "from-janus"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
-+	to_janus = "<TO_JANUS_QUEUE>"				# Name of the queue for incoming messages if queue_name isn't set, otherwise, the routing key that queue_name is bound to
-+	from_janus = "<FROM_JANUS_QUEUE>"			# Routing key of the message sent from janus (as well as the name of the outgoing queue if declare_outgoing_queue = true)
- 	#declare_outgoing_queue = true		# By default (for backwards compatibility), we declare an outgoing queue. Set this to false to disable that behavior
- 	#queue_durable = false				# Whether or not incoming queue should remain after a RabbitMQ reboot
- 	#queue_autodelete = false			# Whether or not incoming queue should autodelete after janus disconnects from RabbitMQ
- 	#queue_exclusive = false			# Whether or not incoming queue should only allow one subscriber
--	#heartbeat = 60 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
-+	heartbeat = 60 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
-
- 	#ssl_enabled = false				# Whether ssl support must be enabled
- 	#ssl_verify_peer = true				# Whether peer verification must be enabled
