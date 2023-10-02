@@ -139,7 +139,7 @@ diff '--color=auto' -Naur a/conf/janus.plugin.audiobridge.jcfg.sample b/conf/jan
 diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus.plugin.videoroom.jcfg.sample
 --- a/conf/janus.plugin.videoroom.jcfg.sample	2021-11-23 16:50:40.528747538 +0100
 +++ b/conf/janus.plugin.videoroom.jcfg.sample	2021-11-23 16:50:44.494802335 +0100
-@@ -49,37 +49,10 @@
+@@ -58,22 +58,11 @@
  									# if this key is provided in the request
  	#lock_rtp_forward = true		# Whether the admin_key above should be
  									# enforced for RTP forwarding requests too
@@ -150,35 +150,20 @@ diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus
  	# By default, integers are used as a unique ID for both rooms and participants.
  	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
 -	#string_ids = true
--}
--
++	string_ids = true
+ }
+
 -room-1234: {
 -	description = "Demo Room"
 -	secret = "adminpwd"
 -	publishers = 6
--	bitrate = 128000
+-	bitrate = 128000	# This is a low cap, increase if you want to use simulcast or SVC
 -	fir_freq = 10
 -	#audiocodec = "opus"
 -	#videocodec = "vp8"
 -	record = false
 -	#rec_dir = "/path/to/recordings-folder"
 -}
--
--# This other demo room here is only there in case you want to play with
--# the VP9 SVC support. Notice that you'll need a Chrome launched with
--# the flag that enables that support, or otherwise you'll be using just
--# plain VP9 (which is good if you want to test how this indeed affect
--# what receivers will get, whether they're encoding SVC or not).
--room-5678: {
--	description = "VP9-SVC Demo Room"
--	secret = "adminpwd"
--	publishers = 6
--	bitrate = 512000
--	fir_freq = 10
--	videocodec = "vp9"
--	video_svc = true
-+	string_ids = true
- }
 diff '--color=auto' -Naur a/conf/janus.transport.http.jcfg.sample b/conf/janus.transport.http.jcfg.sample
 --- a/conf/janus.transport.http.jcfg.sample	2023-08-24 12:25:58.464879774 +0200
 +++ b/conf/janus.transport.http.jcfg.sample	2023-08-24 13:01:19.531681633 +0200
