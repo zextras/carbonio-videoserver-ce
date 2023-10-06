@@ -93,9 +93,9 @@ sources=(
 )
 hashsums=(
   "skip"
-  "4d374637b4838b9346023a51c296b5d4cdd9e3c6ae8bf796ff28631f9d0aec28"
+  "e2a56fe078902f43229aaed675b7f2aa92dd709ff0e496aa9a86e849b9c15413"
   "f21207a682102744cd81a96d1d2faa60a856adb83aa87f8ce34ffb43e4934e6e"
-  "0e48b4daffd88b2453828c63f303961b151d8c502281c0be6db3859185cdf3a7"
+  "0261836223af6f4c77ad326eac98a95087028bd0c067a22f11c6731793a6dd60"
   "42ac03f61de1ea2c6f26ec0dbc47f1aaf971dc66c74555310d527851ec934608"
   "2092df7f948c095119fbbd27d2c969a50942604bc5ed0c96ca1c425461b0cf69"
   "db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c"
@@ -203,11 +203,6 @@ postinst:apt() {
     api_secret=$(openssl rand -base64 24)
     sed -i "s#nat_1_1_mapping = \"\${PUBLIC_IP_ADDRESS}\"#nat_1_1_mapping = \"$public_ip\"#" /etc/janus/janus.jcfg
     sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
-    hostname=$(hostname -f)
-    db_subst videoserver/add API_SECRET "${api_secret}"
-    db_subst videoserver/add HOSTNAME "${hostname}"
-    db_input high videoserver/add || true
-    db_go
 
     if [ -d /run/systemd/system ]; then
       systemctl daemon-reload >/dev/null 2>&1 || :
@@ -235,19 +230,8 @@ preinst:yum() {
 }
 postinst:yum() {
   if [ $1 -eq 1 ]; then
-    hostname=$(hostname -f)
     api_secret=$(openssl rand -base64 24)
     sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
-    cat <<EOF
-
-    echo "================================================================================================="
-    echo ".: Congratulations! Every bit is in its right place :."
-    echo "             Please execute these steps:"
-    echo "* Set \${PUBLIC_IP_ADDRESS} value within /etc/janus/janus.jcfg"
-    echo "* Please execute these commands in a mailbox node "
-    echo "  as zextras user to complete the setup of the video server:"
-    echo "  carbonio chats video-server add ${hostname} port 8188 secret ${api_secret}"
-    echo "================================================================================================="
   fi
 
   if [ -d /run/systemd/system ]; then
@@ -272,8 +256,6 @@ prerm() {
 }
 
 postrm:apt() {
-  . /usr/share/debconf/confmodule
-
   if [ "$1" = "purge" ]; then
     if getent passwd videoserver >/dev/null; then
       if which deluser >/dev/null; then
@@ -285,14 +267,6 @@ postrm:apt() {
         delgroup --system videoserver || echo "Could not remove videoserver group."
       fi
     fi
-
-    hostname=$(hostname -f)
-    db_subst videoserver/remove HOSTNAME "${hostname}"
-    db_input high videoserver/remove || true
-    db_get videoserver/remove
-    db_go
-  
-    db_purge
 
     rm -f /etc/carbonio/videoserver/service-discover/token
     if [ -d /run/systemd/system ]; then

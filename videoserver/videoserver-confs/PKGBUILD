@@ -71,7 +71,6 @@ makedepends:yum=(
   "libogg-devel"
   "zlib-devel"
 )
-debconf_template="carbonio-videoserver.templates"
 section="comm"
 priority="important"
 backup=(

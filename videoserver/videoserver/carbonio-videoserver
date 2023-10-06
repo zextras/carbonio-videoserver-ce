@@ -76,15 +76,13 @@ consul reload
 # Limit token visibility as much as possible
 export -n CONSUL_HTTP_TOKEN
 
-##TODO Allow ws-collaboration reading this value from videoserver consul k/v store
 CONSUL_VIDEOSERVER_TOKEN_PATH="/etc/carbonio/videoserver/service-discover/token"
-CONSUL_MESSAGE_BROKER_TOKEN_PATH="/etc/carbonio/message-broker/service-discover/token"
 
 consul kv put -token-file="${CONSUL_VIDEOSERVER_TOKEN_PATH}" "carbonio-videoserver/api-secret" "$(grep api_secret /etc/janus/janus.jcfg | cut -f 2 -d '"')"
 
 get_consul_kv() {
   KEY=$1
-  CONSUL_VALUE=$(consul kv get -token-file="$CONSUL_MESSAGE_BROKER_TOKEN_PATH" "$KEY" || echo "")
+  CONSUL_VALUE=$(consul kv get -token-file="$CONSUL_VIDEOSERVER_TOKEN_PATH" "$KEY" || echo "")
   EXIT_CODE=$?
   if [[ "$EXIT_CODE" != "0" ]]; then
     CONSUL_VALUE=""
