@@ -1,18 +1,11 @@
-targets=(
-  "centos"
-  "ubuntu"
-)
 pkgname="carbonio-videoserver-confs"
 pkgver="1.1.4"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
-pkgdesclong=(
-  "An open source, general purpose, WebRTC server (configs only)"
-)
-arch="amd64"
+arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
-depends:apt=(
+depends__apt=(
   "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
@@ -35,7 +28,7 @@ depends:apt=(
   "libterm-readline-gnu-perl"
   "zlib1g"
 )
-depends:yum=(
+depends__yum=(
   "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
@@ -51,7 +44,7 @@ depends:yum=(
   "libogg"
   "zlib"
 )
-makedepends:apt=(
+makedepends__apt=(
   "carbonio-curl"
   "carbonio-openssl"
   "gengetopt"
@@ -61,7 +54,7 @@ makedepends:apt=(
   "libogg-dev"
   "zlib1g-dev"
 )
-makedepends:yum=(
+makedepends__yum=(
   "carbonio-curl"
   "carbonio-openssl"
   "gengetopt"
@@ -74,42 +67,44 @@ makedepends:yum=(
 section="comm"
 priority="important"
 backup=(
-  "/etc/janus/janus.jcfg"
+  "etc/janus/janus.jcfg"
 )
-sources=(
+source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
   "janus.jcfg.patch"
 )
-hashsums=(
-  "skip"
-  "skip"
-)
+sha256sums=('292397ee925b957fec3e946b8b40d559fcdfc80d171ab9618f10df0e1ebe800f'
+  '3d6d90378874ff53be118421104622a41cea985c22cc00e64f92bd31e8cc6d3f')
 
 build() {
   cd "${srcdir}/janus-gateway-${pkgver}"
   patch -Np1 -i ../janus.jcfg.patch
-  ./autogen.sh
-  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
-  export CFLAGS="-O2 -I/opt/zextras/common/include"
+  export CFLAGS="-I/opt/zextras/common/include"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
+    -L/opt/zextras/common/lib \
+    -L/usr/lib/x86_64-linux-gnu \
+    -L/usr/lib"
   export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
+
+  ./autogen.sh
   ./configure \
-    --prefix=/opt/zextras/common \
-    --sysconfdir /etc \
-    --disable-docs \
-    --disable-turn-rest-api \
-    --disable-all-transports \
-    --enable-rest \
-    --enable-websockets \
-    --enable-rabbitmq \
+    --disable-all-handlers \
     --disable-all-plugins \
+    --disable-all-transports \
+    --disable-docs \
+    --disable-json-logger \
+    --disable-turn-rest-api \
     --enable-plugin-audiobridge \
     --enable-plugin-videoroom \
     --enable-post-processing \
-    --disable-all-handlers \
-    --enable-websockets-event-handler \
+    --enable-rabbitmq \
     --enable-rabbitmq-event-handler \
-    --disable-json-logger
-  make
+    --enable-rest \
+    --enable-websockets \
+    --enable-websockets-event-handler \
+    --prefix=/opt/zextras/common \
+    --sysconfdir /etc
+  make -j8
 }
 
 package() {

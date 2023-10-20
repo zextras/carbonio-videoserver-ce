@@ -1,42 +1,34 @@
-targets=(
-  "centos"
-  "ubuntu"
-)
 pkgname="carbonio-libfdk-aac"
 pkgver="2.0.2"
 pkgrel="1"
 pkgdesc="Fraunhofer FDK AAC codec library"
-pkgdesclong=(
-  "Fraunhofer FDK AAC codec library"
-)
-arch="amd64"
+arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
-makedepends:apt=(
+makedepends__apt=(
   "autoconf"
   "libtool-bin"
 )
-makedepends:yum=(
+makedepends__yum=(
   "autoconf"
   "libtool"
 )
 section="libs"
 priority="important"
-sources=(
+source=(
   "https://github.com/mstorsjo/fdk-aac/archive/v${pkgver}.tar.gz"
 )
-hashsums=(
-  "7812b4f0cf66acda0d0fe4302545339517e702af7674dd04e5fe22a5ade16a90"
-)
+sha256sums=('7812b4f0cf66acda0d0fe4302545339517e702af7674dd04e5fe22a5ade16a90')
 
 build() {
   cd "${srcdir}/fdk-aac-${pkgver}"
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib"
 
   ./autogen.sh
-  ./configure --prefix=/opt/zextras/common \
+  ./configure \
+    --prefix=/opt/zextras/common \
     --disable-static
-  make -j$(nproc)
+  make -j8
 }
 
 package() {

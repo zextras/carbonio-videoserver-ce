@@ -37,7 +37,7 @@ pipeline {
         stash includes: '**', name: 'project'
       }
     }
-    stage('Packaging') {
+    stage('Packaging Ubuntu') {
       when {
         anyOf {
           branch "main"
@@ -48,7 +48,7 @@ pipeline {
         stage('Ubuntu 20') {
           agent {
             node {
-              label 'pacur-agent-ubuntu-20.04-v1'
+              label 'yap-agent-ubuntu-20.04-v2'
             }
           }
           steps {
@@ -66,8 +66,8 @@ pipeline {
             sudo mv zextras.list /etc/apt/sources.list.d/
             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 52FD40243E584A21
             '''
-            sh 'sudo pacur build ubuntu-focal videoserver'
-            stash includes: 'artifacts/', name: 'artifacts-ubuntu-focal'
+            sh 'sudo yap build ubuntu-focal videoserver'
+            stash includes: 'artifacts/*focal*.deb', name: 'artifacts-ubuntu-focal'
           }
           post {
             failure {
@@ -78,14 +78,61 @@ pipeline {
               }
             }
             always {
-              archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
+              archiveArtifacts artifacts: 'artifacts/*focal*.deb', fingerprint: true
             }
           }
         }
+        stage('Ubuntu 22') {
+          agent {
+            node {
+              label 'yap-agent-ubuntu-22.04-v2'
+            }
+          }
+          steps {
+            unstash 'project'
+            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+              passwordVariable: 'SECRET',
+              usernameVariable: 'USERNAME')]) {
+                sh 'echo "machine zextras.jfrog.io" >> auth.conf'
+                sh 'echo "login $USERNAME" >> auth.conf'
+                sh 'echo "password $SECRET" >> auth.conf'
+                sh 'sudo mv auth.conf /etc/apt'
+            }
+            sh '''
+            sudo echo "deb https://zextras.jfrog.io/artifactory/ubuntu-rc jammy main" > zextras.list
+            sudo mv zextras.list /etc/apt/sources.list.d/
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 52FD40243E584A21
+            '''
+            sh 'sudo yap build ubuntu-jammy videoserver'
+            stash includes: 'artifacts/*jammy*.deb', name: 'artifacts-ubuntu-jammy'
+          }
+          post {
+            failure {
+              script {
+                if (env.BRANCH_NAME.equals("main")) {
+                  sendFailureEmail(STAGE_NAME)
+                }
+              }
+            }
+            always {
+              archiveArtifacts artifacts: 'artifacts/*jammy*.deb', fingerprint: true
+            }
+          }
+        }
+      }
+    }
+    stage('Packaging RHEL') {
+      when {
+        anyOf {
+          branch "main"
+          expression { params.PLAYGROUND == true }
+        }
+      }
+      parallel {
         stage('Rocky 8') {
           agent {
             node {
-              label 'pacur-agent-rocky-8-v1'
+              label 'yap-agent-rocky-8-v2'
             }
           }
           steps {
@@ -100,8 +147,8 @@ pipeline {
                 sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-rc/repomd.xml.key" >> zextras.repo'
                 sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
             }
-            sh 'sudo pacur build rocky-8 videoserver'
-            stash includes: 'artifacts/', name: 'artifacts-rocky-8'
+            sh 'sudo yap build rocky-8 videoserver'
+            stash includes: 'artifacts/x86_64/*el8*.rpm', name: 'artifacts-rocky-8'
           }
           post {
             failure {
@@ -112,7 +159,41 @@ pipeline {
               }
             }
             always {
-              archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
+              archiveArtifacts artifacts: 'artifacts/x86_64/*el8*.rpm', fingerprint: true
+            }
+          }
+        }
+        stage('Rocky 9') {
+          agent {
+            node {
+              label 'yap-agent-rocky-9-v2'
+            }
+          }
+          steps {
+            unstash 'project'
+            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+              passwordVariable: 'SECRET',
+              usernameVariable: 'USERNAME')]) {
+                sh 'echo "[Zextras]" > zextras.repo'
+                sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-rc/" >> zextras.repo'
+                sh 'echo "enabled=1" >> zextras.repo'
+                sh 'echo "gpgcheck=0" >> zextras.repo'
+                sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-rc/repomd.xml.key" >> zextras.repo'
+                sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
+            }
+            sh 'sudo yap build rocky-9 videoserver'
+            stash includes: 'artifacts/x86_64/*el9*.rpm', name: 'artifacts-rocky-9'
+          }
+          post {
+            failure {
+              script {
+                if (env.BRANCH_NAME.equals("main")) {
+                  sendFailureEmail(STAGE_NAME)
+                }
+              }
+            }
+            always {
+              archiveArtifacts artifacts: 'artifacts/x86_64/*el9*.rpm', fingerprint: true
             }
           }
         }
@@ -124,7 +205,9 @@ pipeline {
       }
       steps {
         unstash 'artifacts-ubuntu-focal'
+        unstash 'artifacts-ubuntu-jammy'
         unstash 'artifacts-rocky-8'
+        unstash 'artifacts-rocky-9'
 
         script {
           def server = Artifactory.server 'zextras-artifactory'
@@ -134,78 +217,153 @@ pipeline {
           uploadSpec = '''{
             "files": [
               {
-                "pattern": "artifacts/*.deb",
+                "pattern": "artifacts/*focal*.deb",
                 "target": "ubuntu-playground/pool/",
                 "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
               },
               {
-                "pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/*jammy*.deb",
+                "target": "ubuntu-playground/pool/",
+                "props": "deb.distribution=jammy;deb.component=main;deb.architecture=amd64"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libev)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libnice)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libopus)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libuv)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-videoserver)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-x264)-(*).rpm",
-                "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el8.x86_64.rpm",
+                "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-videoserver)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el9.x86_64.rpm",
+                "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               }
             ]
@@ -220,7 +378,9 @@ pipeline {
       }
       steps {
         unstash 'artifacts-ubuntu-focal'
+        unstash 'artifacts-ubuntu-jammy'
         unstash 'artifacts-rocky-8'
+        unstash 'artifacts-rocky-9'
 
         script {
           def server = Artifactory.server 'zextras-artifactory'
@@ -230,78 +390,153 @@ pipeline {
           uploadSpec = '''{
             "files": [
               {
-                "pattern": "artifacts/*.deb",
+                "pattern": "artifacts/*focal*.deb",
                 "target": "ubuntu-devel/pool/",
                 "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
               },
               {
-                "pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/*jammy*.deb",
+                "target": "ubuntu-devel/pool/",
+                "props": "deb.distribution=jammy;deb.component=main;deb.architecture=amd64"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libev)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libnice)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libopus)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libuv)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-videoserver)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-x264)-(*).rpm",
-                "target": "centos8-devel/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el8.x86_64.rpm",
+                "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-videoserver)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el9.x86_64.rpm",
+                "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               }
             ]
@@ -328,7 +563,9 @@ pipeline {
       }
       steps {
         unstash 'artifacts-ubuntu-focal'
+        unstash 'artifacts-ubuntu-jammy'
         unstash 'artifacts-rocky-8'
+		unstash 'artifacts-rocky-9'
 
         script {
           def server = Artifactory.server 'zextras-artifactory'
@@ -345,6 +582,11 @@ pipeline {
                 "pattern": "artifacts/*focal*.deb",
                 "target": "ubuntu-rc/pool/",
                 "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
+              },
+              {
+                "pattern": "artifacts/*jammy*.deb",
+                "target": "ubuntu-rc/pool/",
+                "props": "deb.distribution=jammy;deb.component=main;deb.architecture=amd64"
               }
             ]
           }'''
@@ -371,73 +613,73 @@ pipeline {
           uploadSpec = '''{
             "files": [
               {
-                "pattern": "artifacts/(carbonio-ffmpeg)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libev)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libfdk-aac)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libnice)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libopus)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-librabbitmq-c)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libsrtp)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libusrsctp)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libuv)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libvpx)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-libwebsockets)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-videoserver)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-videoserver)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-videoserver-confs)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
-                "pattern": "artifacts/(carbonio-x264)-(*).rpm",
-                "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
+                "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el8.x86_64.rpm",
+                "target": "centos8-rc/zextras/{1}/{1}-{*}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               }
             ]
@@ -458,6 +700,101 @@ pipeline {
           Artifactory.addInteractivePromotion server: server,
           promotionConfig: config,
           displayName: "RHEL8 Promotion to Release"
+          server.publishBuildInfo buildInfo
+
+          //rocky9
+          buildInfo = Artifactory.newBuildInfo()
+          buildInfo.name += "-rhel9"
+          uploadSpec = '''{
+            "files": [
+              {
+                "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-videoserver)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              },
+              {
+                "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
+              }
+            ]
+          }'''
+
+          server.upload spec: uploadSpec, buildInfo: buildInfo, failNoOp: false
+          config = [
+            'buildName'          : buildInfo.name,
+            'buildNumber'        : buildInfo.number,
+            'sourceRepo'         : 'rhel9-rc',
+            'targetRepo'         : 'rhel9-release',
+            'comment'            : 'Do not change anything! Just press the button',
+            'status'             : 'Released',
+            'includeDependencies': false,
+            'copy'               : true,
+            'failFast'           : true
+          ]
+          Artifactory.addInteractivePromotion server: server,
+          promotionConfig: config,
+          displayName: "RHEL9 Promotion to Release"
           server.publishBuildInfo buildInfo
         }
       }

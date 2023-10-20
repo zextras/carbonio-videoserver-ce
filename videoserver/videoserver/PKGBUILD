@@ -1,18 +1,11 @@
-targets=(
-  "centos"
-  "ubuntu"
-)
 pkgname="carbonio-videoserver"
 pkgver="1.1.4"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
-pkgdesclong=(
-  "An open source, general purpose, WebRTC server"
-)
-arch="amd64"
-maintainer="Zextras <packages@zextras.com"
+arch=('x86_64')
+maintainer="Zextras <packages@zextras.com>"
 url="https://zextras.com"
-depends:apt=(
+depends__apt=(
   "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
@@ -37,7 +30,7 @@ depends:apt=(
   "service-discover"
   "zlib1g"
 )
-depends:yum=(
+depends__yum=(
   "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
@@ -56,7 +49,7 @@ depends:yum=(
   "service-discover"
   "zlib"
 )
-makedepends:apt=(
+makedepends__apt=(
   "carbonio-curl"
   "carbonio-openssl"
   "gengetopt"
@@ -66,7 +59,7 @@ makedepends:apt=(
   "libogg-dev"
   "zlib1g-dev"
 )
-makedepends:yum=(
+makedepends__yum=(
   "carbonio-curl"
   "carbonio-openssl"
   "gengetopt"
@@ -79,7 +72,7 @@ makedepends:yum=(
 debconf_template="carbonio-videoserver.templates"
 section="comm"
 priority="important"
-sources=(
+source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${pkgver}.tar.gz"
   "carbonio-videoserver.templates"
   "carbonio-videoserver.service"
@@ -91,43 +84,45 @@ sources=(
   "policies.json"
   "service-protocol.json"
 )
-hashsums=(
-  "skip"
-  "e2a56fe078902f43229aaed675b7f2aa92dd709ff0e496aa9a86e849b9c15413"
-  "f21207a682102744cd81a96d1d2faa60a856adb83aa87f8ce34ffb43e4934e6e"
-  "0261836223af6f4c77ad326eac98a95087028bd0c067a22f11c6731793a6dd60"
-  "42ac03f61de1ea2c6f26ec0dbc47f1aaf971dc66c74555310d527851ec934608"
-  "2092df7f948c095119fbbd27d2c969a50942604bc5ed0c96ca1c425461b0cf69"
-  "db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c"
-  "c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6"
-  "380b18ddd6b0ed0db03a58ac8e426ec858b91d5e1a332b6b19f389f443af7274"
-  "531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e"
-)
+sha256sums=('292397ee925b957fec3e946b8b40d559fcdfc80d171ab9618f10df0e1ebe800f'
+  'e2a56fe078902f43229aaed675b7f2aa92dd709ff0e496aa9a86e849b9c15413'
+  'f21207a682102744cd81a96d1d2faa60a856adb83aa87f8ce34ffb43e4934e6e'
+  '0261836223af6f4c77ad326eac98a95087028bd0c067a22f11c6731793a6dd60'
+  '42ac03f61de1ea2c6f26ec0dbc47f1aaf971dc66c74555310d527851ec934608'
+  '2092df7f948c095119fbbd27d2c969a50942604bc5ed0c96ca1c425461b0cf69'
+  'db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c'
+  'c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6'
+  'cbe699652a2569ac1c5b9d9dd983d8d3788013c346a5c247425e460398771455'
+  '9837979c044613b6a3942511c4080c4c17b0d7a229e635cf0e05869a3dadddc0')
 
 build() {
   cd "${srcdir}/janus-gateway-${pkgver}"
-  ./autogen.sh
-  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib -L/opt/zextras/common/lib"
-  export CFLAGS="-O2 -I/opt/zextras/common/include"
+  export CFLAGS="-I/opt/zextras/common/include"
+  export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
+    -L/opt/zextras/common/lib \
+    -L/usr/lib/x86_64-linux-gnu \
+    -L/usr/lib"
   export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
+
+  ./autogen.sh
   ./configure \
-    --prefix=/opt/zextras/common \
-    --sysconfdir /etc \
-    --disable-docs \
-    --disable-turn-rest-api \
-    --disable-all-transports \
-    --enable-rest \
-    --enable-websockets \
-    --enable-rabbitmq \
+    --disable-all-handlers \
     --disable-all-plugins \
+    --disable-all-transports \
+    --disable-docs \
+    --disable-json-logger \
+    --disable-turn-rest-api \
     --enable-plugin-audiobridge \
     --enable-plugin-videoroom \
     --enable-post-processing \
-    --disable-all-handlers \
-    --enable-websockets-event-handler \
+    --enable-rabbitmq \
     --enable-rabbitmq-event-handler \
-    --disable-json-logger
-  make
+    --enable-rest \
+    --enable-websockets \
+    --enable-websockets-event-handler \
+    --prefix=/opt/zextras/common \
+    --sysconfdir /etc
+  make -j8
 }
 
 package() {
@@ -157,28 +152,25 @@ package() {
   rm -rf "${pkgdir}"/opt/zextras/common/share/janus/demos/
 }
 
-preinst:apt() {
-  # Automatically added by dh_installinit/11.1.6ubuntu2
+preinst__apt() {
   if [ -x "/etc/init.d/carbonio-videoserver" ]; then
-  	invoke-rc.d carbonio-videoserver stop || exit 1
+    invoke-rc.d carbonio-videoserver stop || exit 1
   fi
-  # End automatically added section
-  # Automatically added by dh_systemd_start/11.1.6ubuntu2
   if [ -d /run/systemd/system ]; then
-  	deb-systemd-invoke stop 'carbonio-videoserver.service' >/dev/null || true
+    deb-systemd-invoke stop 'carbonio-videoserver.service' >/dev/null || true
   fi
-  # End automatically added section
 }
-postinst:apt() {
+
+postinst__apt() {
   . /usr/share/debconf/confmodule
-  
+
   if [ "$1" = "configure" ]; then
-  
+
     # creating videoserver group if it isn't already there
     if ! getent group videoserver >/dev/null; then
       addgroup --system --force-badname --quiet videoserver
     fi
-  
+
     # creating videoserver user if it isn't already there
     if ! getent passwd videoserver >/dev/null; then
       adduser --system --force-badname --quiet \
@@ -188,14 +180,14 @@ postinst:apt() {
         videoserver
       usermod -c "videoserver WebRTC group" videoserver
     fi
-  
+
     if ! test -d /var/lib/videoserver; then
       mkdir /var/lib/videoserver
       chown -R videoserver:videoserver /var/lib/videoserver
       # This directory can contain sensitive data and should not be world-readable
       chmod 0700 /var/lib/videoserver
     fi
-  
+
     db_input high videoserver/public-ip || true
     db_go
     db_get videoserver/public-ip
@@ -217,10 +209,10 @@ postinst:apt() {
   echo "======================================================"
 }
 
-preinst:yum() {
+preinst__yum() {
   getent group videoserver >/dev/null || groupadd -r videoserver
-  getent passwd videoserver >/dev/null || \
-  useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
+  getent passwd videoserver >/dev/null ||
+    useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
@@ -228,7 +220,8 @@ preinst:yum() {
     systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
   fi
 }
-postinst:yum() {
+
+postinst__yum() {
   if [ $1 -eq 1 ]; then
     api_secret=$(openssl rand -base64 24)
     sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
@@ -255,7 +248,7 @@ prerm() {
   fi
 }
 
-postrm:apt() {
+postrm__apt() {
   if [ "$1" = "purge" ]; then
     if getent passwd videoserver >/dev/null; then
       if which deluser >/dev/null; then
@@ -275,7 +268,7 @@ postrm:apt() {
   fi
 }
 
-postrm:yum() {
+postrm__yum() {
   rm -f /etc/carbonio/videoserver/service-discover/token
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :

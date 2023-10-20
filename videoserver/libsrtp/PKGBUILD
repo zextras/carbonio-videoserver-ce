@@ -1,15 +1,8 @@
-targets=(
-  "centos"
-  "ubuntu"
-)
 pkgname="carbonio-libsrtp"
 pkgver="2.4.2"
 pkgrel="1"
 pkgdesc="Library for SRTP (Secure Realtime Transport Protocol)"
-pkgdesclong=(
-  "Library for SRTP (Secure Realtime Transport Protocol)"
-)
-arch="amd64"
+arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 depends=(
@@ -20,12 +13,10 @@ makedepends=(
 )
 section="libs"
 priority="important"
-sources=(
-"https://github.com/cisco/libsrtp/archive/bd0f27ec0e299ad101a396dde3f7c90d48efc8fc.tar.gz"
+source=(
+  "https://github.com/cisco/libsrtp/archive/bd0f27ec0e299ad101a396dde3f7c90d48efc8fc.tar.gz"
 )
-hashsums=(
-  "dcb374501166f9699ef2e7ad5433a79fb04bf229544cfff2bcd55156be4456b8"
-)
+sha256sums=('dcb374501166f9699ef2e7ad5433a79fb04bf229544cfff2bcd55156be4456b8')
 
 build() {
   cd "${srcdir}/libsrtp-bd0f27ec0e299ad101a396dde3f7c90d48efc8fc"
@@ -33,8 +24,8 @@ build() {
   export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
 
   ./configure \
-    --prefix=/opt/zextras/common \
-    --enable-openssl
+    --enable-openssl \
+    --prefix=/opt/zextras/common
   make all
   make shared_library
 }

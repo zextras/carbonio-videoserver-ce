@@ -1,42 +1,33 @@
-targets=(
-  "centos"
-  "ubuntu"
-)
 pkgname="carbonio-librabbitmq-c"
 pkgver="0.11.0"
 pkgrel="1"
 pkgdesc="RabbitMQ(amqp) library written in C-language"
-pkgdesclong=(
-  "RabbitMQ(amqp) library written in C-language"
-)
-arch="amd64"
+arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 section="libs"
 priority="important"
-depends:apt=(
+depends__apt=(
   "carbonio-openssl"
 )
-makedepends:apt=(
+makedepends__apt=(
   "cmake"
   "carbonio-openssl"
 )
-depends:yum=(
+depends__yum=(
   "carbonio-openssl"
 )
-makedepends:yum=(
+makedepends__yum=(
   "cmake"
   "carbonio-openssl"
 )
 
 section="libs"
 priority="important"
-sources=(
+source=(
   "https://github.com/alanxz/rabbitmq-c/archive/v${pkgver}.tar.gz"
 )
-hashsums=(
-  "skip"
-)
+sha256sums=('437d45e0e35c18cf3e59bcfe5dfe37566547eb121e69fca64b98f5d2c1c2d424')
 
 build() {
   export CFLAGS="-I/opt/zextras/common/include"
