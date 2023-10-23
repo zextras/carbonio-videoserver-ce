@@ -3,7 +3,7 @@ diff '--color=auto' -Naur a/conf/janus.eventhandler.rabbitmqevh.jcfg.sample b/co
 +++ b/conf/janus.eventhandler.rabbitmqevh.jcfg.sample	2023-10-17 17:20:13.172501719 +0200
 @@ -1,27 +1,27 @@
  # This configures the RabbitMQ event handler.
- 
+
  general: {
 -	enabled = false					# By default the module is not enabled
 -	events = "all"					# Comma separated list of the events mask you're interested
@@ -19,13 +19,13 @@ diff '--color=auto' -Naur a/conf/janus.eventhandler.rabbitmqevh.jcfg.sample b/co
 -	json = "indented"				# Whether the JSON messages should be indented (default),
 +	json = "compact"				# Whether the JSON messages should be indented (default),
  									# plain (no indentation) or compact (no indentation and no spaces)
- 
+
 -	host = "localhost"				# The address of the RabbitMQ server
 -	#port = 5672					# The port of the RabbitMQ server (5672 by default)
 -	#username = "guest"				# Username to use to authenticate, if needed
 -	#password = "guest"				# Password to use to authenticate, if needed
 -	#vhost = "/"					# Virtual host to specify when logging in, if needed
-+	host = "127.78.0.19"				# The address of the RabbitMQ server
++	host = "127.0.0.1"				# The address of the RabbitMQ server
 +	port = 20001					# The port of the RabbitMQ server (5672 by default)
 +	username = "<RABBITMQ_USERNAME>"				# Username to use to authenticate, if needed
 +	password = "<RABBITMQ_PASSWORD>"				# Password to use to authenticate, if needed
@@ -38,7 +38,7 @@ diff '--color=auto' -Naur a/conf/janus.eventhandler.rabbitmqevh.jcfg.sample b/co
 +	exchange_type = "direct" 		# Rabbitmq exchange_type can be one of the available types: direct, topic, headers and fanout (fanout by defualt).
 +	heartbeat = 15 				# Defines the seconds without communication that should pass before considering the TCP connection unreachable.
 +	declare_outgoing_queue = false # By default (for backwards compatibility), we declare an outgoing queue. Set this to false to disable that behavior
- 
+
  	#ssl_enable = false				# Whether ssl support must be enabled
  	#ssl_verify_peer = true			# Whether peer verification must be enabled
 diff '--color=auto' -Naur a/conf/janus.jcfg.sample.in b/conf/janus.jcfg.sample.in
@@ -189,13 +189,13 @@ diff '--color=auto' -Naur a/conf/janus.plugin.videoroom.jcfg.sample b/conf/janus
 -	#events = false					# Whether events should be sent to event
 +	events = true					# Whether events should be sent to event
  									# handlers (default=true)
- 
+
  	# By default, integers are used as a unique ID for both rooms and participants.
  	# In case you want to use strings instead (e.g., a UUID), set string_ids to true.
 -	#string_ids = true
 +	string_ids = true
  }
- 
+
 -room-1234: {
 -	description = "Demo Room"
 -	secret = "adminpwd"
@@ -256,6 +256,6 @@ diff '--color=auto' -Naur a/conf/janus.transport.websockets.jcfg.sample b/conf/j
 -	#pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
 +	pingpong_trigger = 30			# After how many seconds of idle, a PING should be sent
 +	pingpong_timeout = 10			# After how many seconds of not getting a PONG, a timeout should be detected
- 
+
  	ws = true						# Whether to enable the WebSockets API
  	ws_port = 8188					# WebSockets server port

@@ -71,11 +71,6 @@ EOF
     systemctl daemon-reload
 fi
 
-consul reload
-
-# Limit token visibility as much as possible
-export -n CONSUL_HTTP_TOKEN
-
 CONSUL_VIDEOSERVER_TOKEN_PATH="/etc/carbonio/videoserver/service-discover/token"
 
 consul kv put -token-file="${CONSUL_VIDEOSERVER_TOKEN_PATH}" "carbonio-videoserver/api-secret" "$(grep api_secret /etc/janus/janus.jcfg | cut -f 2 -d '"')"
@@ -95,6 +90,11 @@ if [[ "$USERNAME" != "" && "$PASSWORD" != "" ]]; then
   sed -i "s/<RABBITMQ_USERNAME>/$USERNAME/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
   sed -i "s/<RABBITMQ_PASSWORD>/$PASSWORD/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
 fi
+
+consul reload
+
+# Limit token visibility as much as possible
+export -n CONSUL_HTTP_TOKEN
 
 systemctl restart carbonio-videoserver.service
 systemctl restart carbonio-videoserver-sidecar.service
