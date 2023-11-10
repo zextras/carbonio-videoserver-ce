@@ -74,7 +74,7 @@ source=(
   "janus.jcfg.patch"
 )
 sha256sums=('292397ee925b957fec3e946b8b40d559fcdfc80d171ab9618f10df0e1ebe800f'
-  '3d6d90378874ff53be118421104622a41cea985c22cc00e64f92bd31e8cc6d3f')
+  '667552cdec3a848fb1f136819d8116e73f586d28411c468abf08b288b9eb2756')
 
 build() {
   cd "${srcdir}/janus-gateway-${pkgver}"
