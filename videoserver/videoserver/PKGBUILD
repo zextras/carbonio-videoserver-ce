@@ -1,4 +1,4 @@
-pkgname="carbonio-videoserver"
+pkgname="carbonio-videoserver-ce"
 pkgver="1.1.4"
 pkgrel="2"
 pkgdesc="An open source, general purpose, WebRTC server"
