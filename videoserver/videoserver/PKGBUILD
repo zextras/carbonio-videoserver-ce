@@ -1,6 +1,6 @@
 pkgname="carbonio-videoserver-ce"
 pkgver="1.1.4"
-pkgrel="2"
+pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com>"
@@ -15,7 +15,7 @@ depends__apt=(
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
   "carbonio-openssl"
-  "carbonio-videoserver-confs"
+  "carbonio-videoserver-confs-ce"
   "cdebconf"
   "debconf"
   "dialog"
