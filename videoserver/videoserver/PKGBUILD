@@ -40,7 +40,7 @@ depends__yum=(
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
   "carbonio-openssl"
-  "carbonio-videoserver-confs"
+  "carbonio-videoserver-confs-ce"
   "jansson"
   "libconfig"
   "libmicrohttpd"
