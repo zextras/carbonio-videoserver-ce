@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Carbonio videoserver
+Upstream-Name: Carbonio videoserver CE
 Upstream-Contact: Smoky Beans <smokybeans@zextras.com>
-Source: https://github.com/Zextras/carbonio-videoserver
+Source: https://github.com/Zextras/carbonio-videoserver-ce
 
 Files: README.md
 Copyright: 2023 Zextras s.r.l

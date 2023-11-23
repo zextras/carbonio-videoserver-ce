@@ -5,8 +5,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: carbonio-videoserver
-  title: Carbonio Videoserver service
+  name: carbonio-videoserver-ce
+  title: Carbonio Videoserver service for CE
   description: |
     Service that allows to make calls, video-calls thanks to the Janus application.
   tags:
@@ -14,7 +14,7 @@ metadata:
     - envoy
     - backend
   links:
-    - url: https://github.com/Zextras/carbonio-videoserver/blob/main/README.md
+    - url: https://github.com/Zextras/carbonio-videoserver-ce/blob/main/README.md
       title: README
 spec:
   type: service
