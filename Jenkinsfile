@@ -709,72 +709,72 @@ pipeline {
             "files": [
               {
                 "pattern": "artifacts/x86_64/(carbonio-ffmpeg)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libev)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libfdk-aac)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libnice)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libopus)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-librabbitmq-c)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libsrtp)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libusrsctp)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libuv)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libvpx)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-libwebsockets)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               },
               {
                 "pattern": "artifacts/x86_64/(carbonio-x264)-(*).el9.x86_64.rpm",
-                "target": "rhel9-rc/zextras/{1}/{1}-{*}.el9.x86_64.rpm",
+                "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
               }
             ]
