@@ -1,6 +1,6 @@
 pkgname="carbonio-libwebsockets"
 pkgver="4.3.2"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="C library for websocket clients and servers"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"

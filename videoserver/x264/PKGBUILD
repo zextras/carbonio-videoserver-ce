@@ -1,6 +1,6 @@
 pkgname="carbonio-x264"
 pkgver="0.164.r3081"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="Open Source H264/AVC video encoder"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com>"

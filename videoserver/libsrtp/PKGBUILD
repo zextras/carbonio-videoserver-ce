@@ -1,6 +1,6 @@
 pkgname="carbonio-libsrtp"
 pkgver="2.4.2"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="Library for SRTP (Secure Realtime Transport Protocol)"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
