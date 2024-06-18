@@ -1,6 +1,6 @@
 pkgname="carbonio-librabbitmq-c"
 pkgver="0.11.0"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="RabbitMQ(amqp) library written in C-language"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
