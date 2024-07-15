@@ -7,9 +7,6 @@ pipeline {
     booleanParam defaultValue: false,
     description: 'Whether to upload the packages in playground repository',
     name: 'PLAYGROUND'
-    booleanParam defaultValue: false,
-    description: 'Whether to upload the packages in rc repository',
-    name: 'RC'
   }
   options {
     skipDefaultCheckout()
@@ -37,13 +34,7 @@ pipeline {
         stash includes: '**', name: 'project'
       }
     }
-    stage('Packaging Ubuntu') {
-      when {
-        anyOf {
-          branch "main"
-          expression { params.PLAYGROUND == true }
-        }
-      }
+    stage('Building packages') {
       parallel {
         stage('Ubuntu 20') {
           agent {
@@ -65,13 +56,20 @@ pipeline {
             sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-rc focal main" > zextras.list
             sudo mv zextras.list /etc/apt/sources.list.d/
             '''
-            sh 'sudo yap build ubuntu-focal videoserver'
+            script {
+              if (BRANCH_NAME == 'devel') {
+                def timestamp = new Date().format('yyyyMMddHHmmss')
+                sh "sudo yap build ubuntu-focal videoserver -r ${timestamp}"
+              } else {
+                sh 'sudo yap build ubuntu-focal videoserver'
+              }
+            }
             stash includes: 'artifacts/*focal*.deb', name: 'artifacts-ubuntu-focal'
           }
           post {
             failure {
               script {
-                if (env.BRANCH_NAME.equals("main")) {
+                if ("main".equals(BRANCH_NAME) || "devel".equals(BRANCH_NAME)) {
                   sendFailureEmail(STAGE_NAME)
                 }
               }
@@ -101,13 +99,20 @@ pipeline {
             sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-rc jammy main" > zextras.list
             sudo mv zextras.list /etc/apt/sources.list.d/
             '''
-            sh 'sudo yap build ubuntu-jammy videoserver'
+            script {
+              if (BRANCH_NAME == 'devel') {
+                def timestamp = new Date().format('yyyyMMddHHmmss')
+                sh "sudo yap build ubuntu-jammy videoserver -r ${timestamp}"
+              } else {
+                sh 'sudo yap build ubuntu-jammy videoserver'
+              }
+            }
             stash includes: 'artifacts/*jammy*.deb', name: 'artifacts-ubuntu-jammy'
           }
           post {
             failure {
               script {
-                if (env.BRANCH_NAME.equals("main")) {
+                if ("main".equals(BRANCH_NAME) || "devel".equals(BRANCH_NAME)) {
                   sendFailureEmail(STAGE_NAME)
                 }
               }
@@ -117,16 +122,6 @@ pipeline {
             }
           }
         }
-      }
-    }
-    stage('Packaging RHEL') {
-      when {
-        anyOf {
-          branch "main"
-          expression { params.PLAYGROUND == true }
-        }
-      }
-      parallel {
         stage('Rocky 8') {
           agent {
             node {
@@ -145,13 +140,20 @@ pipeline {
                 sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-rc/repomd.xml.key" >> zextras.repo'
                 sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
             }
-            sh 'sudo yap build rocky-8 videoserver'
+            script {
+              if (BRANCH_NAME == 'devel') {
+                def timestamp = new Date().format('yyyyMMddHHmmss')
+                sh "sudo yap build rocky-8 videoserver -r ${timestamp}"
+              } else {
+                sh 'sudo yap build rocky-8 videoserver'
+              }
+            }
             stash includes: 'artifacts/x86_64/*el8*.rpm', name: 'artifacts-rocky-8'
           }
           post {
             failure {
               script {
-                if (env.BRANCH_NAME.equals("main")) {
+                if ("main".equals(BRANCH_NAME) || "devel".equals(BRANCH_NAME)) {
                   sendFailureEmail(STAGE_NAME)
                 }
               }
@@ -179,13 +181,20 @@ pipeline {
                 sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-rc/repomd.xml.key" >> zextras.repo'
                 sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
             }
-            sh 'sudo yap build rocky-9 videoserver'
+            script {
+              if (BRANCH_NAME == 'devel') {
+                def timestamp = new Date().format('yyyyMMddHHmmss')
+                sh "sudo yap build rocky-9 videoserver -r ${timestamp}"
+              } else {
+                sh 'sudo yap build rocky-9 videoserver'
+              }
+            }
             stash includes: 'artifacts/x86_64/*el9*.rpm', name: 'artifacts-rocky-9'
           }
           post {
             failure {
               script {
-                if (env.BRANCH_NAME.equals("main")) {
+                if ("main".equals(BRANCH_NAME) || "devel".equals(BRANCH_NAME)) {
                   sendFailureEmail(STAGE_NAME)
                 }
               }
@@ -372,7 +381,7 @@ pipeline {
     }
     stage('Upload To Devel') {
       when {
-        branch "main"
+        branch "devel"
       }
       steps {
         unstash 'artifacts-ubuntu-focal'
@@ -545,19 +554,14 @@ pipeline {
       post {
         failure {
           script {
-            if (env.BRANCH_NAME.equals("main")) {
-              sendFailureEmail(STAGE_NAME)
-            }
+            sendFailureEmail(STAGE_NAME)
           }
         }
       }
     }
     stage('Upload To Release') {
       when {
-        allOf {
-          branch "main"
-          expression { params.RC == true }
-        }
+        buildingTag()
       }
       steps {
         unstash 'artifacts-ubuntu-focal'
@@ -799,9 +803,7 @@ pipeline {
       post {
         failure {
           script {
-            if (env.BRANCH_NAME.equals("main")) {
-              sendFailureEmail(STAGE_NAME)
-            }
+            sendFailureEmail(STAGE_NAME)
           }
         }
       }
