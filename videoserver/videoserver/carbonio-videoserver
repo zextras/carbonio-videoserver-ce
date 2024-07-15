@@ -83,8 +83,8 @@ get_consul_kv() {
     CONSUL_VALUE=""
   fi
 }
-get_consul_kv "carbonio-message-broker/username"; USERNAME=$CONSUL_VALUE
-get_consul_kv "carbonio-message-broker/password"; PASSWORD=$CONSUL_VALUE
+get_consul_kv "carbonio-message-broker/default/username"; USERNAME=$CONSUL_VALUE
+get_consul_kv "carbonio-message-broker/default/password"; PASSWORD=$CONSUL_VALUE
 
 if [[ "$USERNAME" != "" && "$PASSWORD" != "" ]]; then
   sed -i "s/<RABBITMQ_USERNAME>/$USERNAME/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
