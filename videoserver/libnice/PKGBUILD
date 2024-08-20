@@ -1,6 +1,6 @@
 pkgname="carbonio-libnice"
 pkgver="0.1.19"
-pkgrel="3"
+pkgrel="4"
 pkgdesc="An implementation of the IETF's draft ICE (for p2p UDP data streams)"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
@@ -17,9 +17,9 @@ depends__yum=(
   "carbonio-openssl"
 )
 makedepends__yum=(
+  "carbonio-openssl"
   "meson"
   "ninja-build"
-  "openssl-devel"
 )
 section="libs"
 priority="important"
@@ -56,6 +56,4 @@ build__yum() {
 package() {
   cd "${srcdir}/libnice-${pkgver}"
   DESTDIR="${pkgdir}" meson install -C build/
-  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
-  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
