@@ -1,28 +1,24 @@
 pkgname="carbonio-libwebsockets"
-pkgver="4.3.2"
-pkgrel="2"
+pkgver="4.3.3"
+pkgrel="1"
 pkgdesc="C library for websocket clients and servers"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
-depends__apt=(
+depends=(
   "carbonio-libev"
   "carbonio-libuv"
-  "openssl"
+  "carbonio-openssl"
 )
 makedepends__apt=(
   "cmake"
-  "libssl-dev"
-)
-depends__yum=(
-  "carbonio-libev"
-  "carbonio-libuv"
-  "openssl"
+  "carbonio-openssl"
+  "zlib1g-dev"
 )
 makedepends__yum=(
+  "carbonio-openssl"
   "cmake"
   "libuv"
-  "openssl-devel"
   "zlib-devel"
 )
 
@@ -31,11 +27,11 @@ priority="important"
 source=(
   "https://github.com/warmcat/libwebsockets/archive/v${pkgver}.tar.gz"
 )
-sha256sums=('6a85a1bccf25acc7e8e5383e4934c9b32a102880d1e4c37c70b27ae2a42406e1')
+sha256sums=('6fd33527b410a37ebc91bb64ca51bdabab12b076bc99d153d7c5dd405e4bdf90')
 
 build() {
   cd "${srcdir}"
-  mkdir build
+  mkdir build || true
   cmake \
     -D CMAKE_INSTALL_PREFIX=/opt/zextras/common \
     -D CMAKE_SHARED_LINKER_FLAGS="-Wl,-rpath,/opt/zextras/common/lib" \
@@ -45,7 +41,7 @@ build() {
     -D LWS_IPV6=OFF \
     -D LWS_LIBUV_INCLUDE_DIRS="/opt/zextras/common/include" \
     -D LWS_LINK_TESTAPPS_DYNAMIC=ON \
-    -D LWS_OPENSSL_INCLUDE_DIRS="/opt/zextras/common/include/openssl" \
+    -D LWS_OPENSSL_INCLUDE_DIRS="/opt/zextras/common/include" \
     -D LWS_OPENSSL_LIBRARIES="/opt/zextras/common/lib/libcrypto.so;/opt/zextras/common/lib/libssl.so" \
     -D LWS_UNIX_SOCK=ON \
     -D LWS_WITH_ACME=ON \
