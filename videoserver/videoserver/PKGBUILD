@@ -30,6 +30,31 @@ depends__apt=(
   "service-discover"
   "zlib1g"
 )
+depends__ubuntu_noble=(
+  "carbonio-curl"
+  "carbonio-ffmpeg"
+  "carbonio-libnice"
+  "carbonio-libopus"
+  "carbonio-librabbitmq-c"
+  "carbonio-libsrtp"
+  "carbonio-libusrsctp"
+  "carbonio-libwebsockets"
+  "carbonio-openssl"
+  "carbonio-videoserver-confs-ce"
+  "cdebconf"
+  "debconf"
+  "dialog"
+  "libc6"
+  "libconfig9"
+  "libglib2.0-0t64"
+  "libjansson4"
+  "libmicrohttpd12t64"
+  "libogg0"
+  "libterm-readline-gnu-perl"
+  "pending-setups"
+  "service-discover"
+  "zlib1g"
+)
 depends__yum=(
   "carbonio-curl"
   "carbonio-ffmpeg"
@@ -153,11 +178,8 @@ package() {
 }
 
 preinst__apt() {
-  if [ -x "/etc/init.d/carbonio-videoserver" ]; then
-    invoke-rc.d carbonio-videoserver stop || exit 1
-  fi
   if [ -d /run/systemd/system ]; then
-    deb-systemd-invoke stop 'carbonio-videoserver.service' >/dev/null || true
+    systemd stop videoserver.service >/dev/null || true
   fi
 }
 
@@ -195,12 +217,12 @@ postinst__apt() {
     api_secret=$(openssl rand -base64 24)
     sed -i "s#nat_1_1_mapping = \"\${PUBLIC_IP_ADDRESS}\"#nat_1_1_mapping = \"$public_ip\"#" /etc/janus/janus.jcfg
     sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
+  fi
 
-    if [ -d /run/systemd/system ]; then
-      systemctl daemon-reload >/dev/null 2>&1 || :
-      systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
-      systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
-    fi
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
   fi
 
   echo "======================================================"
@@ -213,12 +235,6 @@ preinst__yum() {
   getent group videoserver >/dev/null || groupadd -r videoserver
   getent passwd videoserver >/dev/null ||
     useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
-
-  if [ -d /run/systemd/system ]; then
-    systemctl daemon-reload >/dev/null 2>&1 || :
-    systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
-    systemctl enable carbonio-videoserver-sidecar.service >/dev/null 2>&1 || :
-  fi
 }
 
 postinst__yum() {

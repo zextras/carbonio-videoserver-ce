@@ -1,6 +1,6 @@
 pkgname="carbonio-ffmpeg"
-pkgver="4.4.2"
-pkgrel="2"
+pkgver="4.4.5"
+pkgrel="1"
 pkgdesc="Complete solution to record, convert and stream audio and video"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
@@ -52,7 +52,7 @@ priority="important"
 source=(
   "https://ffmpeg.org/releases/ffmpeg-${pkgver}.tar.gz"
 )
-sha256sums=('058efd4b6459bc9df54186f17a989d0af619a793aa62f07e96b88632706d6a17')
+sha256sums=('77e0eedd8ebeafde5807011e700fdea82b306b9f76fe469b4abc5dfefd9579bd')
 
 build() {
   cd "${srcdir}/ffmpeg-${pkgver}"

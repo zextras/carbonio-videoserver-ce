@@ -1,6 +1,6 @@
 pkgname="carbonio-libnice"
-pkgver="0.1.19"
-pkgrel="3"
+pkgver="0.1.22"
+pkgrel="1"
 pkgdesc="An implementation of the IETF's draft ICE (for p2p UDP data streams)"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
@@ -13,25 +13,42 @@ makedepends__apt=(
   "ninja-build"
   "python3-pip"
 )
+makedepends__ubuntu_noble=(
+  "carbonio-openssl"
+  "meson"
+  "ninja-build"
+)
 depends__yum=(
   "carbonio-openssl"
 )
 makedepends__yum=(
+  "carbonio-openssl"
   "meson"
   "ninja-build"
-  "openssl-devel"
 )
 section="libs"
 priority="important"
 source=(
   "https://github.com/libnice/libnice/archive/${pkgver}.tar.gz"
 )
-sha256sums=('319502c8346f4295ad4c390fdf0bc2c810548b051005dcfa1f5c24b152daa318')
+sha256sums=('3048b847fd89f43474c1a77257c875a85e4d85c879d12743f3ce2947125eb8de')
 
 build__apt() {
   cd "${srcdir}/libnice-${pkgver}"
   export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   pip3 install meson
+  meson \
+    --libdir=lib \
+    --prefix=/opt/zextras/common build \
+    --warnlevel 2 \
+    --werror \
+    -Dgtk_doc=disabled
+  meson compile -C build
+}
+
+build__ubuntu_noble() {
+  cd "${srcdir}/libnice-${pkgver}"
+  export PKG_CONFIG_PATH="/opt/zextras/common/lib/pkgconfig"
   meson \
     --libdir=lib \
     --prefix=/opt/zextras/common build \
@@ -56,6 +73,4 @@ build__yum() {
 package() {
   cd "${srcdir}/libnice-${pkgver}"
   DESTDIR="${pkgdir}" meson install -C build/
-  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.a
-  # rm -rf "${pkgdir}"/opt/zextras/common/lib/*.la
 }
