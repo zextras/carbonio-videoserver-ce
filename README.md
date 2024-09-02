@@ -39,65 +39,6 @@ sudo yum install carbonio-videoserver-ce
   connect with it properly. If you do that, please remember to restart the
   service: `systemctl restart carbonio-videoserver`
 
-## How it's configured
-
-| configuration             | value                          |
-|---------------------------|--------------------------------|
-| compiler                  | gcc                            |
-| libsrtp version           | 2.x                            |
-| SSL/crypto library        | OpenSSL                        |
-| DTLS set-timeout          | not available                  |
-| Mutex implementation      | GMutex (native futex on Linux) |
-
-| configuration              | present |
-|----------------------------|---------|
-| DataChannels support       | yes     |
-| Recordings post-processor  | yes     |
-| TURN REST API client       | no      |
-| Doxygen documentation      | no      |
-| Javascript modules         | no      |
-
-
-| Trasports         | present |
-|-------------------|---------|
-| REST (HTTP/HTTPS) | yes     |
-| Websockets        | yes     |
-| RabbitMQ          | yes     |
-| MQTT              | no      |
-| Unix Sockets      | no      |
-| Nanomsg           | no      |
-
-
-| Plugins             | present |
-|---------------------|---------|
-| Echo test           | no      |
-| Streaming           | no      |
-| Video call          | no      |
-| SIP Gateway         | no      |
-| NoSIP (RTP Bridge)  | no      |
-| Audio Bridge        | yes     |
-| Video Room          | yes     |
-| Voice Mail          | no      |
-| Record&Play         | no      |
-| Text Room           | no      |
-| Lua Interpreter     | no      |
-| Duktape Interpreter | no      |
-
-
-| Event handlers          | present |
-|-------------------------|---------|
-| Sample event handler    | no      |
-| Websocket event handler | yes     |
-| RabbitMQ event handler  | yes     |
-| MQTT event handler      | no      |
-| Nanomsg event handler   | no      |
-| GELF event handler      | no      |
-
-
-| External loggers | present |
-|------------------|---------|
-| JSON file logger | no      |
-
 ***
 
 ## License 📚
