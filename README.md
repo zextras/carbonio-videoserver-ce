@@ -1,61 +1,104 @@
-# Carbonio video server configuration
+<h1 align="center">Carbonio VideoServer CE 🚀</h1>
 
-Compiler:                  gcc
+<div align="center">
+VideoServer service for Zextras Carbonio
 
-libsrtp version:           2.x
+[![Contributors][contributors-badge]][contributors]
+[![Activity][activity-badge]][activity]
+[![License][license-badge]](COPYING)
+[![Project][project-badge]][project]
+[![Twitter][twitter-badge]][twitter]
 
-SSL/crypto library:        OpenSSL
+</div>
 
-DTLS set-timeout:          not available
+***
 
-Mutex implementation:      GMutex (native futex on Linux)
+## How to install 🏁
 
-DataChannels support:      yes
+### Installation
 
-Recordings post-processor: yes
+Install `carbonio-videoserver-ce` via apt:
 
-TURN REST API client:      no
+```bash
+sudo apt install carbonio-videoserver-ce
+```
 
-Doxygen documentation:     no
+or via yum:
 
-JavaScript modules:        no
+ ```bash
+sudo yum install carbonio-videoserver-ce
+```
 
-## Transports:
+### Configuration
 
-- REST (HTTP/HTTPS):     yes
-- WebSockets:            yes
-- RabbitMQ:              yes
-- MQTT:                  no
-- Unix Sockets:          no
-- Nanomsg:               no
+- Execute `pending-setups` in order to register the service in
+  the `service-discover`
+- You need to set the `nat_1_1_mapping` config parameter in the
+  `/etc/janus/janus.jcfg` with the public IP of the node where
+  carbonio-videoserver-ce has been installed in order to let clients to
+  connect with it properly. If you do that, please remember to restart the
+  service: `systemctl restart carbonio-videoserver`
 
-## Plugins:
+## How it's configured
 
-- Echo Test:             no
-- Streaming:             no
-- Video Call:            no
-- SIP Gateway:           no
-- NoSIP (RTP Bridge):    no
-- Audio Bridge:          yes
-- Video Room:            yes
-- Voice Mail:            no
-- Record&Play:           no
-- Text Room:             no
-- Lua Interpreter:       no
-- Duktape Interpreter:   no
+| configuration             | value                          |
+|---------------------------|--------------------------------|
+| compiler                  | gcc                            |
+| libsrtp version           | 2.x                            |
+| SSL/crypto library        | OpenSSL                        |
+| DTLS set-timeout          | not available                  |
+| Mutex implementation      | GMutex (native futex on Linux) |
 
-## Event handlers:
+| configuration              | present |
+|----------------------------|---------|
+| DataChannels support       | yes     |
+| Recordings post-processor  | yes     |
+| TURN REST API client       | no      |
+| Doxygen documentation      | no      |
+| Javascript modules         | no      |
 
-- Sample event handler:  no
-- WebSocket ev. handler: yes
-- RabbitMQ event handler:yes
-- MQTT event handler:    no
-- Nanomsg event handler: no
-- GELF event handler:    no
 
-## External loggers:
+| Trasports         | present |
+|-------------------|---------|
+| REST (HTTP/HTTPS) | yes     |
+| Websockets        | yes     |
+| RabbitMQ          | yes     |
+| MQTT              | no      |
+| Unix Sockets      | no      |
+| Nanomsg           | no      |
 
-- JSON file logger:      no
+
+| Plugins             | present |
+|---------------------|---------|
+| Echo test           | no      |
+| Streaming           | no      |
+| Video call          | no      |
+| SIP Gateway         | no      |
+| NoSIP (RTP Bridge)  | no      |
+| Audio Bridge        | yes     |
+| Video Room          | yes     |
+| Voice Mail          | no      |
+| Record&Play         | no      |
+| Text Room           | no      |
+| Lua Interpreter     | no      |
+| Duktape Interpreter | no      |
+
+
+| Event handlers          | present |
+|-------------------------|---------|
+| Sample event handler    | no      |
+| Websocket event handler | yes     |
+| RabbitMQ event handler  | yes     |
+| MQTT event handler      | no      |
+| Nanomsg event handler   | no      |
+| GELF event handler      | no      |
+
+
+| External loggers | present |
+|------------------|---------|
+| JSON file logger | no      |
+
+***
 
 ## License 📚
 
