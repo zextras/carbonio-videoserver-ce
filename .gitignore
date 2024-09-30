@@ -8,3 +8,4 @@ start
 artifacts
 .idea
 *.iml
+*.tar.gz
