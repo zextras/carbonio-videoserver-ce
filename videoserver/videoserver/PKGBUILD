@@ -1,5 +1,5 @@
 pkgname="carbonio-videoserver-ce"
-pkgver="1.1.6"
+pkgver="1.1.7"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
@@ -119,7 +119,7 @@ debconf_template="carbonio-videoserver.templates"
 section="comm"
 priority="important"
 source=(
-  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.1.4.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.2.4.tar.gz"
   "carbonio-videoserver.templates"
   "carbonio-videoserver.service"
   "carbonio-videoserver"
@@ -130,7 +130,7 @@ source=(
   "policies.json"
   "service-protocol.json"
 )
-sha256sums=('292397ee925b957fec3e946b8b40d559fcdfc80d171ab9618f10df0e1ebe800f'
+sha256sums=('fd91b55294e896370e725f41df4c2780f97b3fd7e030a0574a8340e0da4ae3df'
   'e2a56fe078902f43229aaed675b7f2aa92dd709ff0e496aa9a86e849b9c15413'
   'f21207a682102744cd81a96d1d2faa60a856adb83aa87f8ce34ffb43e4934e6e'
   'ccac4aabd346a7797efffe9049c18152a8230157603dea92076547801b7825ed'
@@ -142,7 +142,7 @@ sha256sums=('292397ee925b957fec3e946b8b40d559fcdfc80d171ab9618f10df0e1ebe800f'
   '531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e')
 
 build() {
-  cd "${srcdir}/janus-gateway-1.1.4"
+  cd "${srcdir}/janus-gateway-1.2.4"
   export CFLAGS="-I/opt/zextras/common/include"
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
     -L/opt/zextras/common/lib \
@@ -172,7 +172,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/janus-gateway-1.1.4"
+  cd "${srcdir}/janus-gateway-1.2.4"
   make DESTDIR="${pkgdir}" install configs
 
   cd "${srcdir}"
