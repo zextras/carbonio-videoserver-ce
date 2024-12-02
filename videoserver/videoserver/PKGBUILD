@@ -1,5 +1,5 @@
 pkgname="carbonio-videoserver-ce"
-pkgver="1.1.7"
+pkgver="1.1.8"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
@@ -120,10 +120,10 @@ section="comm"
 priority="important"
 source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.2.4.tar.gz"
-  "carbonio-videoserver.templates"
-  "carbonio-videoserver.service"
   "carbonio-videoserver"
+  "carbonio-videoserver.templates"
   "carbonio-videoserver.hcl"
+  "carbonio-videoserver.service"
   "carbonio-videoserver-sidecar.service"
   "carbonio-videoserver-setup.sh"
   "intentions.json"
@@ -131,10 +131,10 @@ source=(
   "service-protocol.json"
 )
 sha256sums=('fd91b55294e896370e725f41df4c2780f97b3fd7e030a0574a8340e0da4ae3df'
+  'd17bc24f113932f079b04e5ff2fff053f47983ef02723bea8149b23738b097ba'
   'e2a56fe078902f43229aaed675b7f2aa92dd709ff0e496aa9a86e849b9c15413'
+  '02138103667e72fe7007a0adcdf053498dd16ddb9ba836c69192c54f9b80a112'
   'f21207a682102744cd81a96d1d2faa60a856adb83aa87f8ce34ffb43e4934e6e'
-  'ccac4aabd346a7797efffe9049c18152a8230157603dea92076547801b7825ed'
-  'a44ddebe2c41b306f75cf9affbf4069a2ca4a97dfec652f30b9e035a5fcb5183'
   '1fe4e4f4cb2a16c3cddb7cf9d1d6172e373ba2d34b868fff81e10b022ae65c0a'
   'db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c'
   'c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6'
@@ -235,9 +235,7 @@ postinst__apt() {
     db_go
     db_get videoserver/public-ip
     public_ip="$RET"
-    api_secret=$(openssl rand -base64 24)
     sed -i "s#nat_1_1_mapping = \"\${PUBLIC_IP_ADDRESS}\"#nat_1_1_mapping = \"$public_ip\"#" /etc/janus/janus.jcfg
-    sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
   fi
 
   if [ -d /run/systemd/system ]; then
@@ -259,11 +257,6 @@ preinst__yum() {
 }
 
 postinst__yum() {
-  if [ $1 -eq 1 ]; then
-    api_secret=$(openssl rand -base64 24)
-    sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
-  fi
-
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
     systemctl enable carbonio-videoserver.service >/dev/null 2>&1 || :
