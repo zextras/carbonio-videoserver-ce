@@ -89,7 +89,7 @@ if [[ "$VIDEOSERVER_API_SECRET" != "" ]]; then
 else
   api_secret=$(openssl rand -base64 24)
   sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
-  consul kv put -token-file="${CONSUL_VIDEOSERVER_TOKEN_PATH}" "carbonio-videoserver/api-secret" "$(api_secret)"
+  consul kv put -token-file="${CONSUL_VIDEOSERVER_TOKEN_PATH}" "carbonio-videoserver/api-secret" "${api_secret}"
 fi
 
 get_consul_kv "carbonio-message-broker/default/username"; USERNAME=$CONSUL_VALUE
