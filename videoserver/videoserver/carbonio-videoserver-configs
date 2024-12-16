@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# SPDX-FileCopyrightText: 2023 Zextras <https://www.zextras.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+# This script add and set configuration values needed by videoserver
+
+CONSUL_TOKEN_PATH="/etc/carbonio/videoserver/service-discover/token"
+
+get_consul_kv() {
+  KEY=$1
+  CONSUL_VALUE=$(consul kv get -token-file="$CONSUL_TOKEN_PATH" "${KEY}")
+}
+
+get_consul_kv "carbonio-videoserver/api-secret"; VIDEOSERVER_API_SECRET=$CONSUL_VALUE >/dev/null 2>&1
+
+if [[ "$VIDEOSERVER_API_SECRET" != "" ]]; then
+  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$VIDEOSERVER_API_SECRET\"#" /etc/janus/janus.jcfg
+else
+  api_secret=$(openssl rand -base64 24)
+  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
+  consul kv put -token-file="${CONSUL_TOKEN_PATH}" "carbonio-videoserver/api-secret" "${api_secret}"
+fi
+
+get_consul_kv "carbonio-message-broker/default/username"; USERNAME=$CONSUL_VALUE >/dev/null 2>&1
+get_consul_kv "carbonio-message-broker/default/password"; PASSWORD=$CONSUL_VALUE >/dev/null 2>&1
+
+if [[ "$USERNAME" != "" && "$PASSWORD" != "" ]]; then
+  sed -i "s/<RABBITMQ_USERNAME>/$USERNAME/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
+  sed -i "s/<RABBITMQ_PASSWORD>/$PASSWORD/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
+fi
