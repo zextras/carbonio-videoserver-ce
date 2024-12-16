@@ -46,10 +46,6 @@ makedepends__yum=(
 )
 section="comm"
 priority="important"
-backup=(
-  "etc/janus/janus.jcfg"
-  "etc/janus/janus.eventhandler.rabbitmqevh.jcfg"
-)
 source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.2.4.tar.gz"
   "janus.jcfg.patch"
