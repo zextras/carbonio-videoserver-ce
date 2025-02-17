@@ -1,6 +1,0 @@
-Template: videoserver/public-ip
-Type: string
-Description: .: Public IP server :.
- .
- Please insert the Public IP server to bind with.
-
