@@ -1,5 +1,5 @@
 pkgname="carbonio-videoserver-confs-ce"
-pkgver="1.1.11"
+pkgver="1.1.12"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 arch=('x86_64')
@@ -46,6 +46,10 @@ makedepends__yum=(
 )
 section="comm"
 priority="important"
+backup=(
+  "etc/janus/janus.jcfg"
+  "etc/janus/janus.eventhandler.rabbitmqevh.jcfg"
+)
 source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.2.4.tar.gz"
   "janus.jcfg.patch"
