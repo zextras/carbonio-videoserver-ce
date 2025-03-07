@@ -1,6 +1,6 @@
 pkgname="carbonio-videoserver-confs-ce"
 pkgver="1.1.12"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="An open source, general purpose, WebRTC server (configs only)"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"

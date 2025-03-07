@@ -1,6 +1,6 @@
 pkgname="carbonio-videoserver-ce"
 pkgver="1.1.12"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com>"
@@ -250,8 +250,8 @@ postinst__apt() {
 
 preinst__yum() {
   getent group videoserver >/dev/null || groupadd -r videoserver
-  getent passwd videoserver >/dev/null ||
-    useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
+  getent passwd videoserver >/dev/null \
+    || useradd -r -g videoserver -d /var/lib/videoserver -s /sbin/nologin videoserver
 }
 
 postinst__yum() {

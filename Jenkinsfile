@@ -15,20 +15,14 @@ pipeline {
   }
   agent {
     node {
-      label 'base-agent-v1'
+      label 'base'
     }
   }
   environment {
-    NETWORK_OPTS = '--network ci_agent'
     FAILURE_EMAIL_RECIPIENTS='smokybeans@zextras.com'
   }
   stages {
     stage('Checkout & Stash') {
-      agent {
-        node {
-          label 'base-agent-v1'
-        }
-      }
       steps {
         checkout scm
         script {
@@ -42,32 +36,35 @@ pipeline {
         stage('Ubuntu 20') {
           agent {
             node {
-              label 'yap-agent-ubuntu-20.04-v2'
+              label 'yap-ubuntu-20-v1'
             }
           }
           steps {
-            unstash 'project'
-            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
-              passwordVariable: 'SECRET',
-              usernameVariable: 'USERNAME')]) {
+            container('yap') {
+              unstash 'project'
+              withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+                passwordVariable: 'SECRET',
+                usernameVariable: 'USERNAME')]) {
                 sh 'echo "machine zextras.jfrog.io" >> auth.conf'
                 sh 'echo "login $USERNAME" >> auth.conf'
                 sh 'echo "password $SECRET" >> auth.conf'
                 sh 'sudo mv auth.conf /etc/apt'
-            }
-            sh '''
-            sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-devel focal main" > zextras.list
-            sudo mv zextras.list /etc/apt/sources.list.d/
-            '''
-            script {
-              if (BRANCH_NAME == 'devel') {
-                def timestamp = new Date().format('yyyyMMddHHmmss')
-                sh "sudo yap build ubuntu-focal videoserver -r ${timestamp}"
-              } else {
-                sh 'sudo yap build ubuntu-focal videoserver'
               }
+              sh '''
+              sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-devel focal main" > zextras.list
+              sudo mv zextras.list /etc/apt/sources.list.d/
+              '''
+              script {
+                sh 'sudo yap prepare ubuntu-focal'
+                if (BRANCH_NAME == 'devel') {
+                  def timestamp = new Date().format('yyyyMMddHHmmss')
+                  sh "sudo yap build ubuntu-focal videoserver -r ${timestamp}"
+                } else {
+                  sh 'sudo yap build ubuntu-focal videoserver'
+                }
+              }
+              stash includes: 'artifacts/*focal*.deb', name: 'artifacts-ubuntu-focal'
             }
-            stash includes: 'artifacts/*focal*.deb', name: 'artifacts-ubuntu-focal'
           }
           post {
             failure {
@@ -85,32 +82,35 @@ pipeline {
         stage('Ubuntu 22') {
           agent {
             node {
-              label 'yap-agent-ubuntu-22.04-v2'
+              label 'yap-ubuntu-22-v1'
             }
           }
           steps {
-            unstash 'project'
-            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
-              passwordVariable: 'SECRET',
-              usernameVariable: 'USERNAME')]) {
+            container('yap') {
+              unstash 'project'
+              withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+                passwordVariable: 'SECRET',
+                usernameVariable: 'USERNAME')]) {
                 sh 'echo "machine zextras.jfrog.io" >> auth.conf'
                 sh 'echo "login $USERNAME" >> auth.conf'
                 sh 'echo "password $SECRET" >> auth.conf'
                 sh 'sudo mv auth.conf /etc/apt'
-            }
-            sh '''
-            sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-devel jammy main" > zextras.list
-            sudo mv zextras.list /etc/apt/sources.list.d/
-            '''
-            script {
-              if (BRANCH_NAME == 'devel') {
-                def timestamp = new Date().format('yyyyMMddHHmmss')
-                sh "sudo yap build ubuntu-jammy videoserver -r ${timestamp}"
-              } else {
-                sh 'sudo yap build ubuntu-jammy videoserver'
               }
+              sh '''
+              sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-devel jammy main" > zextras.list
+              sudo mv zextras.list /etc/apt/sources.list.d/
+              '''
+              script {
+                sh 'sudo yap prepare ubuntu-jammy'
+                if (BRANCH_NAME == 'devel') {
+                  def timestamp = new Date().format('yyyyMMddHHmmss')
+                  sh "sudo yap build ubuntu-jammy videoserver -r ${timestamp}"
+                } else {
+                  sh 'sudo yap build ubuntu-jammy videoserver'
+                }
+              }
+              stash includes: 'artifacts/*jammy*.deb', name: 'artifacts-ubuntu-jammy'
             }
-            stash includes: 'artifacts/*jammy*.deb', name: 'artifacts-ubuntu-jammy'
           }
           post {
             failure {
@@ -128,32 +128,35 @@ pipeline {
         stage('Ubuntu 24') {
           agent {
             node {
-              label 'yap-agent-ubuntu-24.04-v2'
+              label 'yap-ubuntu-24-v1'
             }
           }
           steps {
-            unstash 'project'
-            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
-              passwordVariable: 'SECRET',
-              usernameVariable: 'USERNAME')]) {
-                sh 'echo "machine zextras.jfrog.io" >> auth.conf'
-                sh 'echo "login $USERNAME" >> auth.conf'
-                sh 'echo "password $SECRET" >> auth.conf'
-                sh 'sudo mv auth.conf /etc/apt'
-            }
-            sh '''
-            sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-devel noble main" > zextras.list
-            sudo mv zextras.list /etc/apt/sources.list.d/
-            '''
-            script {
-              if (BRANCH_NAME == 'devel') {
-                def timestamp = new Date().format('yyyyMMddHHmmss')
-                sh "sudo yap build ubuntu-noble videoserver -r ${timestamp}"
-              } else {
-                sh 'sudo yap build ubuntu-noble videoserver'
+            container('yap') {
+              unstash 'project'
+              withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+                passwordVariable: 'SECRET',
+                usernameVariable: 'USERNAME')]) {
+                  sh 'echo "machine zextras.jfrog.io" >> auth.conf'
+                  sh 'echo "login $USERNAME" >> auth.conf'
+                  sh 'echo "password $SECRET" >> auth.conf'
+                  sh 'sudo mv auth.conf /etc/apt'
               }
+              sh '''
+              sudo echo "deb [trusted=yes] https://zextras.jfrog.io/artifactory/ubuntu-devel noble main" > zextras.list
+              sudo mv zextras.list /etc/apt/sources.list.d/
+              '''
+              script {
+                sh 'sudo yap prepare ubuntu-noble'
+                if (BRANCH_NAME == 'devel') {
+                  def timestamp = new Date().format('yyyyMMddHHmmss')
+                  sh "sudo yap build ubuntu-noble videoserver -r ${timestamp}"
+                } else {
+                  sh 'sudo yap build ubuntu-noble videoserver'
+                }
+              }
+              stash includes: 'artifacts/*noble*.deb', name: 'artifacts-ubuntu-noble'
             }
-            stash includes: 'artifacts/*noble*.deb', name: 'artifacts-ubuntu-noble'
           }
           post {
             failure {
@@ -171,30 +174,33 @@ pipeline {
         stage('Rocky 8') {
           agent {
             node {
-              label 'yap-agent-rocky-8-v2'
+              label 'yap-rocky-8-v1'
             }
           }
           steps {
-            unstash 'project'
-            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
-              passwordVariable: 'SECRET',
-              usernameVariable: 'USERNAME')]) {
-                sh 'echo "[Zextras]" > zextras.repo'
-                sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-devel/" >> zextras.repo'
-                sh 'echo "enabled=1" >> zextras.repo'
-                sh 'echo "gpgcheck=0" >> zextras.repo'
-                sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-devel/repomd.xml.key" >> zextras.repo'
-                sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
-            }
-            script {
-              if (BRANCH_NAME == 'devel') {
-                def timestamp = new Date().format('yyyyMMddHHmmss')
-                sh "sudo yap build rocky-8 videoserver -r ${timestamp}"
-              } else {
-                sh 'sudo yap build rocky-8 videoserver'
+            container('yap') {
+              unstash 'project'
+              withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+                passwordVariable: 'SECRET',
+                usernameVariable: 'USERNAME')]) {
+                  sh 'echo "[Zextras]" > zextras.repo'
+                  sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-devel/" >> zextras.repo'
+                  sh 'echo "enabled=1" >> zextras.repo'
+                  sh 'echo "gpgcheck=0" >> zextras.repo'
+                  sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/centos8-devel/repomd.xml.key" >> zextras.repo'
+                  sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
               }
+              script {
+                sh 'sudo yap prepare rocky-8'
+                if (BRANCH_NAME == 'devel') {
+                  def timestamp = new Date().format('yyyyMMddHHmmss')
+                  sh "sudo yap build rocky-8 videoserver -r ${timestamp}"
+                } else {
+                  sh 'sudo yap build rocky-8 videoserver'
+                }
+              }
+              stash includes: 'artifacts/*el8*.rpm', name: 'artifacts-rocky-8'
             }
-            stash includes: 'artifacts/x86_64/*el8*.rpm', name: 'artifacts-rocky-8'
           }
           post {
             failure {
@@ -205,37 +211,40 @@ pipeline {
               }
             }
             always {
-              archiveArtifacts artifacts: 'artifacts/x86_64/*el8*.rpm', fingerprint: true
+              archiveArtifacts artifacts: 'artifacts/*el8*.rpm', fingerprint: true
             }
           }
         }
         stage('Rocky 9') {
           agent {
             node {
-              label 'yap-agent-rocky-9-v2'
+              label 'yap-rocky-9-v1'
             }
           }
           steps {
-            unstash 'project'
-            withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
-              passwordVariable: 'SECRET',
-              usernameVariable: 'USERNAME')]) {
-                sh 'echo "[Zextras]" > zextras.repo'
-                sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-devel/" >> zextras.repo'
-                sh 'echo "enabled=1" >> zextras.repo'
-                sh 'echo "gpgcheck=0" >> zextras.repo'
-                sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-devel/repomd.xml.key" >> zextras.repo'
-                sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
-            }
-            script {
-              if (BRANCH_NAME == 'devel') {
-                def timestamp = new Date().format('yyyyMMddHHmmss')
-                sh "sudo yap build rocky-9 videoserver -r ${timestamp}"
-              } else {
-                sh 'sudo yap build rocky-9 videoserver'
+            container('yap') {
+              unstash 'project'
+              withCredentials([usernamePassword(credentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+                passwordVariable: 'SECRET',
+                usernameVariable: 'USERNAME')]) {
+                  sh 'echo "[Zextras]" > zextras.repo'
+                  sh 'echo "baseurl=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-devel/" >> zextras.repo'
+                  sh 'echo "enabled=1" >> zextras.repo'
+                  sh 'echo "gpgcheck=0" >> zextras.repo'
+                  sh 'echo "gpgkey=https://$USERNAME:$SECRET@zextras.jfrog.io/artifactory/rhel9-devel/repomd.xml.key" >> zextras.repo'
+                  sh 'sudo mv zextras.repo /etc/yum.repos.d/zextras.repo'
               }
+              script {
+                sh 'sudo yap prepare rocky-9'
+                if (BRANCH_NAME == 'devel') {
+                  def timestamp = new Date().format('yyyyMMddHHmmss')
+                  sh "sudo yap build rocky-9 videoserver -r ${timestamp}"
+                } else {
+                  sh 'sudo yap build rocky-9 videoserver'
+                }
+              }
+              stash includes: 'artifacts/*el9*.rpm', name: 'artifacts-rocky-9'
             }
-            stash includes: 'artifacts/x86_64/*el9*.rpm', name: 'artifacts-rocky-9'
           }
           post {
             failure {
@@ -246,7 +255,7 @@ pipeline {
               }
             }
             always {
-              archiveArtifacts artifacts: 'artifacts/x86_64/*el9*.rpm', fingerprint: true
+              archiveArtifacts artifacts: 'artifacts/*el9*.rpm', fingerprint: true
             }
           }
         }
@@ -286,22 +295,22 @@ pipeline {
                 "props": "deb.distribution=noble;deb.component=main;deb.architecture=amd64;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el8.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-ce)-(*).el8.x86_64.rpm",
                 "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el8.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-confs-ce)-(*).el8.x86_64.rpm",
                 "target": "centos8-playground/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
                 "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
                 "target": "rhel9-playground/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               }
@@ -345,22 +354,22 @@ pipeline {
                 "props": "deb.distribution=noble;deb.component=main;deb.architecture=amd64;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el8.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-ce)-(*).el8.x86_64.rpm",
                 "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el8.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-confs-ce)-(*).el8.x86_64.rpm",
                 "target": "centos8-devel/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
                 "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
                 "target": "rhel9-devel/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               }
@@ -439,12 +448,12 @@ pipeline {
           uploadSpec = """{
             "files": [
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el8.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-ce)-(*).el8.x86_64.rpm",
                 "target": "centos8-rc/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el8.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-confs-ce)-(*).el8.x86_64.rpm",
                 "target": "centos8-rc/zextras/{1}/{1}-{2}.el8.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               }
@@ -474,12 +483,12 @@ pipeline {
           uploadSpec = """{
             "files": [
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-ce)-(*).el9.x86_64.rpm",
                 "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               },
               {
-                "pattern": "artifacts/x86_64/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
+                "pattern": "artifacts/(carbonio-videoserver-confs-ce)-(*).el9.x86_64.rpm",
                 "target": "rhel9-rc/zextras/{1}/{1}-{2}.el9.x86_64.rpm",
                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
               }
