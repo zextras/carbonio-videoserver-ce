@@ -1,6 +1,6 @@
 pkgname="carbonio-videoserver-ce"
-pkgver="1.1.12"
-pkgrel="2"
+pkgver="1.1.13"
+pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
 maintainer="Zextras <packages@zextras.com>"
@@ -128,17 +128,19 @@ source=(
   "intentions.json"
   "policies.json"
   "service-protocol.json"
+  "carbonio-message-broker-consul-check"
 )
 sha256sums=('fd91b55294e896370e725f41df4c2780f97b3fd7e030a0574a8340e0da4ae3df'
   '9e24a6a5003bfe58b7d0223e49d2d1ca22f4b5556aecbb62f14e423f63ae2fb6'
   '02138103667e72fe7007a0adcdf053498dd16ddb9ba836c69192c54f9b80a112'
-  'f21207a682102744cd81a96d1d2faa60a856adb83aa87f8ce34ffb43e4934e6e'
+  'dbdc9bfd9b6168c3155de060493034b1b1f3ee5a7591863f27afbe0eb2deb4c3'
   '1fe4e4f4cb2a16c3cddb7cf9d1d6172e373ba2d34b868fff81e10b022ae65c0a'
   'db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c'
   '1138cb7d84dac2734176ca68de6c66f0f81b9a8ba943becddd7e9babcc642edc'
   'c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6'
   'cbe699652a2569ac1c5b9d9dd983d8d3788013c346a5c247425e460398771455'
-  '531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e')
+  '531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e'
+  '5a6bff6083d723748d0085c073634ba1a664e02fac1da35681b7da28740f84e4')
 
 build() {
   cd "${srcdir}/janus-gateway-1.2.4"
@@ -193,6 +195,8 @@ package() {
     "${pkgdir}/etc/carbonio/videoserver/service-discover/policies.json"
   install -Dm 644 service-protocol.json \
     "${pkgdir}/etc/carbonio/videoserver/service-discover/service-protocol.json"
+  install -Dm 755 carbonio-message-broker-consul-check \
+    "${pkgdir}/usr/bin/carbonio-message-broker-consul-check"
   rm -rf "${pkgdir}"/etc/janus
   rm -rf "${pkgdir}"/opt/zextras/common/share/doc
   rm -rf "${pkgdir}"/opt/zextras/common/share/man
