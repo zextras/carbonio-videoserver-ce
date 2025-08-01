@@ -1,6 +1,7 @@
 [Unit]
 Description=Zextras Videoserver
 Wants=network.target
+PartOf=carbonio.target
 
 [Service]
 Type=simple
@@ -14,4 +15,4 @@ TasksMax=infinity
 Nice=-10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=carbonio.target
