@@ -15,4 +15,4 @@ TasksMax=infinity
 Nice=-10
 
 [Install]
-WantedBy=carbonio.target
+WantedBy=multi-user.target
