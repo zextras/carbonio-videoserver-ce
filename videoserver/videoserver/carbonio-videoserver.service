@@ -1,6 +1,7 @@
 [Unit]
 Description=Zextras Videoserver
 Wants=network.target
+PartOf=carbonio.target
 
 [Service]
 Type=simple
