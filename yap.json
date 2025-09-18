@@ -1,15 +1,15 @@
 {
     "name": "Zextras Videoserver CE",
-    "Description": "Carbonio Videoserver CE",
+    "description": "Carbonio Videoserver CE",
     "buildDir": "/tmp/",
     "output": "artifacts",
-    "Projects": [
+    "projects": [
         {
-            "name": "videoserver-confs",
+            "name": "videoserver/videoserver-confs",
             "install": true
         },
         {
-            "name": "videoserver"
+            "name": "videoserver/videoserver"
         }
     ]
 }
