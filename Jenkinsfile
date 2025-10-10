@@ -14,12 +14,8 @@ library(
 pipeline {
   agent {
     node {
-      label 'base'
+      label 'zextras-v1'
     }
-  }
-
-  environment {
-    FAILURE_EMAIL_RECIPIENTS='smokybeans@zextras.com'
   }
 
   options {
@@ -44,6 +40,43 @@ pipeline {
         checkout scm
         script {
           gitMetadata()
+        }
+      }
+    }
+
+    stage('Publish docker image') {
+      when {
+        anyOf {
+          branch 'devel'
+          buildingTag()
+          expression { params.PLAYGROUND == true }
+        }
+      }
+      steps {
+        container('dind') {
+          withDockerRegistry(credentialsId: 'private-registry', url: 'https://registry.dev.zextras.com') {
+            script {
+              Set<String> tags = []
+              if (env.BRANCH_NAME == 'devel') {
+                tags.add('latest')
+              } else if (env.GIT_TAG) {
+                tags.add(env.GIT_TAG)
+              } else if (params.PLAYGROUND == true) {
+                tags.add(env.BRANCH_NAME.replaceAll('/', '-'))
+              }
+
+              dockerHelper.buildImage([
+                imageName: 'registry.dev.zextras.com/dev/carbonio-videoserver-ce',
+                imageTags: tags,
+                dockerfile: 'videoserver/docker/Dockerfile',
+                ocLabels: [
+                  title: 'Carbonio Videoserver CE',
+                  descriptionFile: 'videoserver/docker/description.md',
+                  version: env.GIT_TAG ?: 'devel',
+                ]
+              ])
+            }
+          }
         }
       }
     }
@@ -110,15 +143,6 @@ pipeline {
           ])
         }
       }
-      post {
-        failure {
-          script {
-            if ("main".equals(BRANCH_NAME) || "devel".equals(BRANCH_NAME)) {
-              sendFailureEmail(STAGE_NAME)
-            }
-          }
-        }
-      }
     }
 
     stage('Upload artifacts')
@@ -128,31 +152,6 @@ pipeline {
           packages: yapHelper.getPackageNames()
         ])
       }
-      post {
-        failure {
-          script {
-            if ("main".equals(BRANCH_NAME) || "devel".equals(BRANCH_NAME)) {
-              sendFailureEmail(STAGE_NAME)
-            }
-          }
-        }
-      }
     }
   }
-}
-
-void sendFailureEmail(String step) {
-  String commitInfo = sh(
-     script: 'git log -1 --pretty=tformat:\'<ul><li>Revision: %H</li><li>Title: %s</li><li>Author: %ae</li></ul>\'',
-     returnStdout: true
-  )
-  
-  emailext body: """\
-    <b>${step.capitalize()}</b> step has failed on trunk.<br /><br />
-    Last commit info: <br />
-    ${commitInfo}<br /><br />
-    Check the failing build at the <a href=\"${BUILD_URL}\">following link</a><br />
-  """,
-  subject: "[VIDEOSERVER TRUNK FAILURE] Trunk ${step} step failure",
-  to: FAILURE_EMAIL_RECIPIENTS
 }
