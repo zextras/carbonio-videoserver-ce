@@ -9,3 +9,4 @@ artifacts
 .idea
 *.iml
 *.tar.gz
+.vscode
