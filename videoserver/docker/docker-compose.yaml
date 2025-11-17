@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: 2025 Zextras <https://www.zextras.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+services:
+  carbonio-videoserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carbonio-videoserver
+    restart: unless-stopped
+    networks:
+      - carbonio-network
+    volumes:
+      - shared-videoserver:/var/lib/videoserver
+    ports:
+      - "8088:8088"
+      - "7088:7088"
+      - "8188:8188"
+      - "8089:8080"
+      - "20000-21000:20000-21000/udp"
+    develop:
+      watch:
+        - action: rebuild
+          path: config/janus.jcfg
+        - action: rebuild
+          path: config/janus.eventhandler.rabbitmqevh.jcfg
+        - action: rebuild
+          path: config/janus.eventhandler.rabbitmqevh.jcfg.sample
+        - action: rebuild
+          path: config/janus.plugin.audiobridge.jcfg
+        - action: rebuild
+          path: config/janus.plugin.audiobridge.jcfg.sample
+        - action: rebuild
+          path: config/janus.plugin.videoroom.jcfg
+        - action: rebuild
+          path: config/janus.plugin.videoroom.jcfg.sample
+        - action: rebuild
+          path: config/janus.transport.http.jcfg
+        - action: rebuild
+          path: config/janus.transport.http.jcfg.sample
+        - action: rebuild
+          path: config/janus.transport.websockets.jcfg
+        - action: rebuild
+          path: config/janus.transport.websockets.jcfg.sample
+networks:
+  carbonio-network:
+    name: carbonio-network
+    external: true
+
+volumes:
+  shared-videoserver:
