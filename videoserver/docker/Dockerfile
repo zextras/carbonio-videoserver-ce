@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 # 🧱 Fase 1: Build
-FROM debian:bullseye AS builder
+FROM debian:bookworm AS builder
 
 RUN apt-get -y update && \
 	apt-get install -y \
