@@ -8,20 +8,24 @@ RETRY_DELAY=10
 # Query Consul for the health status of 'carbonio-message-broker'
 CONSUL_URL="http://localhost:8500/v1/health/checks/carbonio-message-broker"
 
-# Retry logic
+# Function to check if RabbitMQ is ready by sending AMQP protocol header
+check_rabbitmq_ready() {
+  bash -c 'echo -ne "AMQP\x00\x00\x09\x01" > /dev/tcp/127.0.0.1/20001' 2>/dev/null
+}
+
 for ((i=1; i<=MAX_RETRIES; i++)); do
   # Check if the service is healthy
   HEALTH_STATUS=$(curl -s $CONSUL_URL | jq -r '.[0].Status')
 
-  if [ "$HEALTH_STATUS" == "passing" ]; then
-    echo "Carbonio message broker is healthy."
+  # Check if the service is healthy and ready
+  if [ "$HEALTH_STATUS" == "passing" ] && check_rabbitmq_ready; then
+    echo "Carbonio message broker is healthy and ready."
     exit 0
   fi
 
-  echo "Retry $i/$MAX_RETRIES: Carbonio message broker not healthy, retrying in $RETRY_DELAY seconds..."
+  echo "Retry $i/$MAX_RETRIES: Carbonio message broker not ready, retrying in $RETRY_DELAY seconds..."
   sleep $RETRY_DELAY
 done
 
-# If we reached here, it means the service is not healthy after retries
-echo "Carbonio message broker is not healthy after $MAX_RETRIES retries."
+echo "Carbonio message broker is not ready after $MAX_RETRIES retries."
 exit 1
