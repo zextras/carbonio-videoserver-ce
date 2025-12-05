@@ -1,5 +1,5 @@
 pkgname="carbonio-videoserver-ce"
-pkgver="1.1.15"
+pkgver="1.1.16"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
@@ -141,7 +141,7 @@ sha256sums=(
   'c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6'
   'cbe699652a2569ac1c5b9d9dd983d8d3788013c346a5c247425e460398771455'
   '531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e'
-  '5a6bff6083d723748d0085c073634ba1a664e02fac1da35681b7da28740f84e4'
+  'f843bce1b2b436bf017f5c3f325c7e94787e123579d18d6c4670d3968b3ff7a7'
 )
 
 build() {
