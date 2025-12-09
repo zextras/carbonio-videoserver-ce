@@ -1,5 +1,5 @@
 pkgname="carbonio-videoserver-ce"
-pkgver="1.1.16"
+pkgver="1.1.17"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
@@ -181,7 +181,7 @@ package() {
   cd "${srcdir}"
   install -Dm 755 carbonio-videoserver \
     "${pkgdir}/usr/bin/carbonio-videoserver"
-  install -Dm 755 carbonio-videoserver.service \
+  install -Dm 644 carbonio-videoserver.service \
     "${pkgdir}/usr/lib/systemd/system/carbonio-videoserver.service"
   install -Dm 644 carbonio-videoserver-sidecar.service \
     "${pkgdir}/lib/systemd/system/carbonio-videoserver-sidecar.service"
