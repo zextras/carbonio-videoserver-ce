@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 library(
-  identifier: 'jenkins-packages-build-library@1.0.4',
+  identifier: 'jenkins-lib-common@1.1.2',
   retriever: modernSCM([
     $class: 'GitSCMSource',
-    remote: 'git@github.com:zextras/jenkins-packages-build-library.git',
-    credentialsId: 'jenkins-integration-with-github-account'
+    credentialsId: 'jenkins-integration-with-github-account',
+    remote: 'git@github.com:zextras/jenkins-lib-common.git'
   ])
 )
 
@@ -24,60 +24,28 @@ pipeline {
     timeout(time: 1, unit: 'HOURS')
   }
 
-  parameters {
-    booleanParam defaultValue: false,
-      description: 'Whether to upload the packages in playground repository',
-      name: 'PLAYGROUND'
-  }
-
-  tools {
-    jfrog 'jfrog-cli'
-  }
-
   stages {
-    stage('Checkout & Stash') {
+    stage('Setup') {
       steps {
         checkout scm
         script {
           gitMetadata()
+          properties(defaultPipelineProperties())
         }
       }
     }
 
     stage('Publish docker image') {
-      when {
-        anyOf {
-          branch 'devel'
-          buildingTag()
-          expression { params.PLAYGROUND == true }
-        }
-      }
       steps {
-        container('dind') {
-          withDockerRegistry(credentialsId: 'private-registry', url: 'https://registry.dev.zextras.com') {
-            script {
-              Set<String> tags = []
-              if (env.BRANCH_NAME == 'devel') {
-                tags.add('latest')
-              } else if (env.GIT_TAG) {
-                tags.add(env.GIT_TAG)
-              } else if (params.PLAYGROUND == true) {
-                tags.add(env.BRANCH_NAME.replaceAll('/', '-'))
-              }
-
-              dockerHelper.buildImage([
-                imageName: 'registry.dev.zextras.com/dev/carbonio-videoserver-ce',
-                imageTags: tags,
-                dockerfile: 'videoserver/docker/Dockerfile',
-                ocLabels: [
-                  title: 'Carbonio Videoserver CE',
-                  descriptionFile: 'videoserver/docker/description.md',
-                  version: env.GIT_TAG ?: 'devel',
-                ]
-              ])
-            }
-          }
-        }
+        dockerStage([
+          dockerfile: 'videoserver/docker/Dockerfile',
+          imageName: 'registry.dev.zextras.com/dev/carbonio-videoserver-ce',
+          ocLabels: [
+            title: 'Carbonio Videoserver CE',
+            descriptionFile: 'videoserver/docker/description.md',
+            version: env.GIT_TAG ?: 'devel',
+          ]
+        ])
       }
     }
 
@@ -148,9 +116,12 @@ pipeline {
 
     stage('Upload artifacts')
     {
+      tools {
+        jfrog 'jfrog-cli'
+      }
       steps {
         uploadStage([
-          packages: yapHelper.getPackageNames()
+          packages: yapHelper.resolvePackageNames()
         ])
       }
     }
