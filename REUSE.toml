@@ -1,0 +1,46 @@
+version = 1
+SPDX-PackageName = "Carbonio videoserver CE"
+SPDX-PackageSupplier = "Smoky Beans <smokybeans@zextras.com>"
+SPDX-PackageDownloadLocation = "https://github.com/Zextras/carbonio-videoserver-ce"
+
+[[annotations]]
+path = "README.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras s.r.l"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "CHANGELOG.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Zextras"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "THIRDPARTIES"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras s.r.l"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = ".github/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Zextras"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = ".releaserc.json"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Zextras"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "yap.json"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Zextras"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "videoserver/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras s.r.l"
+SPDX-License-Identifier = "AGPL-3.0-only"
