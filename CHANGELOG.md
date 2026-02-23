@@ -1,3 +1,10 @@
+## [1.1.18](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.17...v1.1.18) (2026-02-23)
+
+### Bug Fixes
+
+* Jenkins build updating upload artifacts stage ([#52](https://github.com/zextras/carbonio-videoserver-ce/issues/52)) ([fe80ab2](https://github.com/zextras/carbonio-videoserver-ce/commit/fe80ab218b39693e6dc53a25ae0f7688af043bce))
+* PKGBUILD path in releaserc.json ([#55](https://github.com/zextras/carbonio-videoserver-ce/issues/55)) ([a351189](https://github.com/zextras/carbonio-videoserver-ce/commit/a351189927a7f2521be8cd70eb8d90ab8988c0da))
+
 ## [](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.17...v) (2026-01-09)
 ## [1.1.17](https://github.com/zextras/carbonio-videoserver-ce/compare/1.1.5...v1.1.17) (2025-12-09)
 
