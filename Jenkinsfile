@@ -12,7 +12,7 @@ library(
 )
 
 library(
-    identifier: 'jenkins-lib-common@1.3.1',
+    identifier: 'jenkins-lib-common@1.3.3',
     retriever: modernSCM([
         $class: 'GitSCMSource',
         credentialsId: 'jenkins-integration-with-github-account',
@@ -71,6 +71,9 @@ pipeline {
                         env.REPO_ENV = env.GIT_TAG ? 'rc' : 'devel'
                     }
 
+                    updatePkgbuildRelease(pkgbuildPath: 'videoserver/videoserver/PKGBUILD')
+                    updatePkgbuildRelease(pkgbuildPath: 'videoserver/videoserver-confs/PKGBUILD')
+
                     buildStage([
                         prepare: true,
                         overrides: [
@@ -118,6 +121,8 @@ pipeline {
                             ],
                         ]
                     ])
+
+                    sh 'git checkout -- videoserver/videoserver/PKGBUILD videoserver/videoserver-confs/PKGBUILD'
                 }
             }
         }
