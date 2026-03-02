@@ -1,3 +1,9 @@
+## [1.1.19](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.18...v1.1.19) (2026-03-02)
+
+### Bug Fixes
+
+* prod package name ([#60](https://github.com/zextras/carbonio-videoserver-ce/issues/60)) ([5ffd1cc](https://github.com/zextras/carbonio-videoserver-ce/commit/5ffd1cc27ed736042184d659e29c8b06bb2c6b7f))
+
 ## [1.1.18](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.17...v1.1.18) (2026-02-24)
 
 ### Bug Fixes
