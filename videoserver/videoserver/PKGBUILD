@@ -85,7 +85,6 @@ makedepends__apt=(
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
   "carbonio-openssl"
-  "gengetopt"
   "git"
   "libconfig-dev"
   "libglib2.0-dev"
@@ -105,7 +104,6 @@ makedepends__yum=(
   "carbonio-libusrsctp"
   "carbonio-libwebsockets"
   "carbonio-openssl"
-  "gengetopt"
   "git"
   "glib2-devel"
   "jansson-devel"
@@ -118,7 +116,7 @@ makedepends__yum=(
 section="comm"
 priority="important"
 source=(
-  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.2.4.tar.gz"
+  "https://github.com/meetecho/janus-gateway/archive/refs/tags/v1.4.0.tar.gz"
   "621-carbonio-videoserver.sh"
   "carbonio-videoserver"
   "carbonio-videoserver.hcl"
@@ -131,7 +129,7 @@ source=(
   "carbonio-message-broker-consul-check"
 )
 sha256sums=(
-  'fd91b55294e896370e725f41df4c2780f97b3fd7e030a0574a8340e0da4ae3df'
+  'SKIP'
   'db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c'
   '9e24a6a5003bfe58b7d0223e49d2d1ca22f4b5556aecbb62f14e423f63ae2fb6'
   '02138103667e72fe7007a0adcdf053498dd16ddb9ba836c69192c54f9b80a112'
@@ -145,7 +143,7 @@ sha256sums=(
 )
 
 build() {
-  cd "${srcdir}/janus-gateway-1.2.4"
+  cd "${srcdir}/janus-gateway-1.4.0"
   export CFLAGS="-I/opt/zextras/common/include"
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
     -L/opt/zextras/common/lib \
@@ -175,7 +173,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/janus-gateway-1.2.4"
+  cd "${srcdir}/janus-gateway-1.4.0"
   make DESTDIR="${pkgdir}" install configs
 
   cd "${srcdir}"
