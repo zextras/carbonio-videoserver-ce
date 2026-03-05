@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-# 🧱 Fase 1: Build
 FROM debian:bullseye AS builder
 
 RUN apt-get -y update && \
@@ -11,7 +10,7 @@ RUN apt-get -y update && \
 	libjansson-dev libssl-dev libsofia-sip-ua-dev libglib2.0-dev \
 	libopus-dev libogg-dev libcurl4-openssl-dev liblua5.3-dev \
 	libconfig-dev libusrsctp-dev libwebsockets-dev libnanomsg-dev \
-	librabbitmq-dev pkg-config gengetopt libtool automake \
+	librabbitmq-dev pkg-config libtool automake \
 	build-essential wget git gtk-doc-tools && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -31,7 +30,7 @@ RUN cd /tmp && \
 
 # Janus build
 RUN cd /usr/local/src && \
-	git clone --branch v1.2.4 --depth 1 https://github.com/meetecho/janus-gateway.git
+	git clone --branch v1.4.0 --depth 1 https://github.com/meetecho/janus-gateway.git
 
 RUN cd /usr/local/src/janus-gateway && \
 	sh autogen.sh && \
@@ -70,6 +69,10 @@ COPY videoserver/docker/config/janus.transport.websockets.jcfg.sample /usr/local
 
 RUN mkdir -p /usr/local/lib/janus/loggers
 
+COPY videoserver/docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 8088 7088 8188
-EXPOSE 10000-10200/udp
-CMD ["/usr/local/bin/janus"]
+EXPOSE 20000-20200/udp
+
+ENTRYPOINT ["/entrypoint.sh"]
