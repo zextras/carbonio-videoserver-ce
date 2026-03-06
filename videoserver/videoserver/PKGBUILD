@@ -129,7 +129,7 @@ source=(
   "carbonio-message-broker-consul-check"
 )
 sha256sums=(
-  'SKIP'
+  'ba0d588ad2500e98cdc82e3dc2051c37ba52fa4ff374d92cfcd1145eb4315596'
   'db88dadbaa7ebce1f3c5aa8b6af031096887f6f82c1870b358fd2ca679aa370c'
   '9e24a6a5003bfe58b7d0223e49d2d1ca22f4b5556aecbb62f14e423f63ae2fb6'
   '02138103667e72fe7007a0adcdf053498dd16ddb9ba836c69192c54f9b80a112'
