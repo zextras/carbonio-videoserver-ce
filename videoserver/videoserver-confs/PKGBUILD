@@ -51,7 +51,7 @@ source=(
   "janus.jcfg.patch"
 )
 sha256sums=(
-  'SKIP'
+  'ba0d588ad2500e98cdc82e3dc2051c37ba52fa4ff374d92cfcd1145eb4315596'
   '6abb8b07d13d79fe677768a7fcc02d3293d63d17c437f747afa73baf6c6cb640'
 )
 
