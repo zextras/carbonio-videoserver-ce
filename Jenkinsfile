@@ -11,7 +11,7 @@ library(
     ])
 )
 
-dt3_packagePipeline(
+dt3_pipeline(
     repoName: 'carbonio-videoserver-ce',
     packaging: [
         pkgbuildPaths: ['videoserver/videoserver/PKGBUILD', 'videoserver/videoserver-confs/PKGBUILD'],
