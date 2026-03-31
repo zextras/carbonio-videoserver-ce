@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 Zextras <https://www.zextras.com>
+
+SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 ## [1.1.19](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.18...v1.1.19) (2026-03-02)
 
 ### Bug Fixes
