@@ -17,6 +17,8 @@ dt3_pipeline(
         pkgbuildPaths: ['videoserver/videoserver/PKGBUILD', 'videoserver/videoserver-confs/PKGBUILD'],
         prepare: true,
         zextrasRepoCredentialsId: 'artifactory-jenkins-gradle-properties-splitted',
+        rockySinglePkg: false,
+        ubuntuSinglePkg: false,
     ],
     docker: [[
         dockerfile: 'videoserver/docker/Dockerfile',
