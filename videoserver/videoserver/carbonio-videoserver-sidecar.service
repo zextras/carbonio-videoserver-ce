@@ -1,5 +1,5 @@
 [Unit]
-Description=Carbonio Videoserver sidecar proxy
+Description=Carbonio Videoserver Sidecar
 Documentation=https://docs.zextras.com/
 Requires=network-online.target
 After=network-online.target service-discover.service
