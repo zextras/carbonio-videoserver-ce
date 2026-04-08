@@ -14,6 +14,7 @@ library(
 dt3_pipeline(
     repoName: 'carbonio-videoserver-ce',
     packaging: [
+        addCarbonioRepos: true,
         pkgbuildPaths: ['videoserver/videoserver/PKGBUILD', 'videoserver/videoserver-confs/PKGBUILD'],
         prepare: true,
         zextrasRepoCredentialsId: 'artifactory-jenkins-gradle-properties-splitted',

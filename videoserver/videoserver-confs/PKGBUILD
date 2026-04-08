@@ -7,6 +7,7 @@ maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 makedepends__apt=(
   "autoconf"
+  "automake"
   "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
@@ -20,10 +21,12 @@ makedepends__apt=(
   "libjansson-dev"
   "libmicrohttpd-dev"
   "libogg-dev"
+  "libtool-bin"
   "zlib1g-dev"
 )
 makedepends__yum=(
   "autoconf"
+  "automake"
   "carbonio-curl"
   "carbonio-ffmpeg"
   "carbonio-libnice"
@@ -58,7 +61,7 @@ sha256sums=(
 build() {
   cd "${srcdir}/janus-gateway-1.4.0"
   patch -Np1 -i ../janus.jcfg.patch
-  export CFLAGS="-I/opt/zextras/common/include"
+  export CFLAGS="-I/opt/zextras/common/include -ffile-prefix-map=${srcdir}=."
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
     -L/opt/zextras/common/lib \
     -L/usr/lib/x86_64-linux-gnu \
@@ -83,7 +86,7 @@ build() {
     --enable-websockets-event-handler \
     --prefix=/opt/zextras/common \
     --sysconfdir /etc
-  make -j8
+  make -j"$(( $(nproc) / 2 ))"
 }
 
 package() {

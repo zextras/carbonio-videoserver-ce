@@ -76,34 +76,19 @@ depends__yum=(
 )
 makedepends__apt=(
   "autoconf"
-  "carbonio-curl"
-  "carbonio-ffmpeg"
-  "carbonio-libnice"
-  "carbonio-libopus"
-  "carbonio-librabbitmq-c"
-  "carbonio-libsrtp"
-  "carbonio-libusrsctp"
-  "carbonio-libwebsockets"
-  "carbonio-openssl"
+  "automake"
   "git"
   "libconfig-dev"
   "libglib2.0-dev"
   "libjansson-dev"
   "libmicrohttpd-dev"
   "libogg-dev"
+  "libtool-bin"
   "zlib1g-dev"
 )
 makedepends__yum=(
   "autoconf"
-  "carbonio-curl"
-  "carbonio-ffmpeg"
-  "carbonio-libnice"
-  "carbonio-libopus"
-  "carbonio-librabbitmq-c"
-  "carbonio-libsrtp"
-  "carbonio-libusrsctp"
-  "carbonio-libwebsockets"
-  "carbonio-openssl"
+  "automake"
   "git"
   "glib2-devel"
   "jansson-devel"
@@ -144,7 +129,7 @@ sha256sums=(
 
 build() {
   cd "${srcdir}/janus-gateway-1.4.0"
-  export CFLAGS="-I/opt/zextras/common/include"
+  export CFLAGS="-I/opt/zextras/common/include -ffile-prefix-map=${srcdir}=."
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
     -L/opt/zextras/common/lib \
     -L/usr/lib/x86_64-linux-gnu \
@@ -169,7 +154,7 @@ build() {
     --enable-websockets-event-handler \
     --prefix=/opt/zextras/common \
     --sysconfdir /etc
-  make -j8
+  make -j"$(( $(nproc) / 2 ))"
 }
 
 package() {
