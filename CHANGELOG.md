@@ -1,3 +1,14 @@
+## [1.2.0](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.19...v1.2.0) (2026-05-04)
+
+### Features
+
+* systemd hardening and service-discover.target orchestration ([#67](https://github.com/zextras/carbonio-videoserver-ce/issues/67)) ([da7f771](https://github.com/zextras/carbonio-videoserver-ce/commit/da7f771e106829317ad91d69d621642505907b55))
+
+### Bug Fixes
+
+* enable multi-OS builds for distro-specific packages ([#69](https://github.com/zextras/carbonio-videoserver-ce/issues/69)) ([0989aa9](https://github.com/zextras/carbonio-videoserver-ce/commit/0989aa99bb893e4778c883b6465922439105afad))
+* **pkgbuild:** add missing makedepends and reproducibility flags ([9bca64a](https://github.com/zextras/carbonio-videoserver-ce/commit/9bca64a81cbe8aa80ba9283b33bf6c4e8a4891ff))
+
 <!--
 SPDX-FileCopyrightText: 2026 Zextras <https://www.zextras.com>
 
