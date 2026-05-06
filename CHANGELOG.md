@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.0...v1.2.1) (2026-05-06)
+
+### Bug Fixes
+
+* **ci:** reset pkgrel to SNAPSHOT placeholder ([#71](https://github.com/zextras/carbonio-videoserver-ce/issues/71)) ([a6a6c5f](https://github.com/zextras/carbonio-videoserver-ce/commit/a6a6c5fa6c62e8f92bc7ac409bb95f28598dbfc5))
+
 ## [1.2.0](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.1.19...v1.2.0) (2026-05-04)
 
 ### Features
