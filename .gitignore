@@ -10,3 +10,5 @@ artifacts
 *.iml
 *.tar.gz
 .vscode
+.ccache
+.DS_Store
