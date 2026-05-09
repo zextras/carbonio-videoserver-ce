@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.1...v1.2.2) (2026-05-09)
+
+### Bug Fixes
+
+* **build:** add lib64 to PKG_CONFIG_PATH and LDFLAGS for RHEL8 ([#74](https://github.com/zextras/carbonio-videoserver-ce/issues/74)) ([d85b4eb](https://github.com/zextras/carbonio-videoserver-ce/commit/d85b4eb89dc12b20649fa57af4903783676c6507))
+
 ## [1.2.1](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.0...v1.2.1) (2026-05-06)
 
 ### Bug Fixes
