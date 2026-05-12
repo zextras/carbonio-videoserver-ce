@@ -5,10 +5,6 @@
     "output": "artifacts",
     "projects": [
         {
-            "name": "videoserver/videoserver-confs",
-            "install": true
-        },
-        {
             "name": "videoserver/videoserver"
         }
     ]

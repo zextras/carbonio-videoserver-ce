@@ -1,5 +1,6 @@
 _pkgver="1.4.0"
-pkgname="carbonio-videoserver-ce"
+pkgbase="carbonio-videserver"
+pkgname=("${pkgbase}-ce" "${pkgbase}-confs-ce")
 pkgver="1.1.19"
 pkgrel="SNAPSHOT"
 pkgdesc="An open source, general purpose, WebRTC server"
@@ -111,6 +112,7 @@ source=(
   "carbonio-videoserver-sidecar-legacy.service"
   "carbonio-videoserver-configs"
   "intentions.json"
+  "janus.jcfg.patch"
   "policies.json"
   "service-protocol.json"
   "carbonio-message-broker-consul-check"
@@ -125,6 +127,7 @@ sha256sums=(
   'f1cf024d28282bffb527bd0e874072b4b62ddc2baeb5872173dffdd606239e89'
   '1138cb7d84dac2734176ca68de6c66f0f81b9a8ba943becddd7e9babcc642edc'
   'c30836dda6d88e8e8d2fa66b0372536a2284888aa484fafbeee70c957a29f7e6'
+  '6abb8b07d13d79fe677768a7fcc02d3293d63d17c437f747afa73baf6c6cb640'
   'cbe699652a2569ac1c5b9d9dd983d8d3788013c346a5c247425e460398771455'
   '531fc71566b22f3d9ae5662b6cdefe21cd2bc55e73ed01e111e510a6f4d37d6e'
   'f843bce1b2b436bf017f5c3f325c7e94787e123579d18d6c4670d3968b3ff7a7'
@@ -217,6 +220,8 @@ _postinst_message() {
 
 build() {
   cd "${srcdir}/janus-gateway-${_pkgver}"
+  patch -Np1 -i ../janus.jcfg.patch
+
   export CFLAGS="-I/opt/zextras/common/include -ffile-prefix-map=${srcdir}=."
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
     -Wl,-rpath,/opt/zextras/common/lib64 \
@@ -248,17 +253,27 @@ build() {
   make
 }
 
-package() {
+package-carbonio-videserver-ce() {
   _package_common
   _package_systemd
 }
 
-package__rocky_8() {
+package-carbonio-videserver-confs-ce() {
+  cd "${srcdir}/janus-gateway-${_pkgver}"
+  make DESTDIR="${pkgdir}" install configs
+}
+
+package__rocky_8-carbonio-videserver-ce() {
   _package_common
   _package_legacy
 }
 
 package__ubuntu_jammy() {
+  _package_common
+  _package_legacy
+}
+
+package__ubuntu_jammy-carbonio-videserver-ce() {
   _package_common
   _package_legacy
 }

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 library(
-    identifier: 'jenkins-lib-common@dt3-migration',
+    identifier: 'jenkins-lib-common@IN-951-dt3-migration',
     retriever: modernSCM([
         $class: 'GitSCMSource',
         credentialsId: 'jenkins-integration-with-github-account',
@@ -17,9 +17,8 @@ dt3_pipeline(
     repoName: 'carbonio-videoserver-ce',
     packaging: [
         addCarbonioRepos: true,
-        pkgbuildPaths: ['videoserver/videoserver/PKGBUILD', 'videoserver/videoserver-confs/PKGBUILD'],
+        pkgbuildPaths: ['videoserver/videoserver/PKGBUILD'],
         prepare: true,
-        zextrasRepoCredentialsId: 'artifactory-jenkins-gradle-properties-splitted',
         rockySinglePkg: false,
         ubuntuSinglePkg: false,
     ],
