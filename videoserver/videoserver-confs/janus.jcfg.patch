@@ -8,7 +8,7 @@ diff '--color=auto' -Naur a/conf/janus.eventhandler.rabbitmqevh.jcfg.sample b/co
 -	enabled = false					# By default the module is not enabled
 -	events = "all"					# Comma separated list of the events mask you're interested
 +	enabled = true					# By default the module is not enabled
-+	events = "jsep, plugins"					# Comma separated list of the events mask you're interested
++	events = "jsep, plugins, core"	# Comma separated list of the events mask you're interested
  									# in. Valid values are none, sessions, handles, jsep, webrtc,
  									# media, plugins, transports, core, external and all. By
  									# default we subscribe to everything (all)
