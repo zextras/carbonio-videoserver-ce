@@ -30,3 +30,9 @@ if [[ "$USERNAME" != "" && "$PASSWORD" != "" ]]; then
   sed -i "s/<RABBITMQ_USERNAME>/$USERNAME/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
   sed -i "s/<RABBITMQ_PASSWORD>/$PASSWORD/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
 fi
+
+# add core to events list if not already present, otherwise rabbitmqevh won't be able to receive events from janus
+RABBITMQ_EVH_CFG="/etc/janus/janus.eventhandler.rabbitmqevh.jcfg"
+if ! grep -qE 'events[[:space:]]*=[[:space:]]*"[^"]*core' "$RABBITMQ_EVH_CFG"; then
+  sed -i -E 's/(events[[:space:]]*=[[:space:]]*"[^"]*)"(.*)/\1, core"\2/' "$RABBITMQ_EVH_CFG"
+fi
