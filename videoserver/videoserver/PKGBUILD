@@ -29,6 +29,7 @@ depends__apt=(
   "libterm-readline-gnu-perl"
   "pending-setups"
   "service-discover"
+  "service-discover-base"
   "zlib1g"
 )
 depends__ubuntu_noble=(
@@ -54,6 +55,7 @@ depends__ubuntu_noble=(
   "libterm-readline-gnu-perl"
   "pending-setups"
   "service-discover"
+  "service-discover-base"
   "zlib1g"
 )
 depends__yum=(
@@ -73,6 +75,7 @@ depends__yum=(
   "libogg"
   "pending-setups"
   "service-discover"
+  "service-discover-base"
   "zlib"
 )
 makedepends__apt=(
