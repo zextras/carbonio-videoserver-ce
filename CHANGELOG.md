@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.2...v1.2.3) (2026-05-26)
+
+### Bug Fixes
+
+* **config:** update events mask to include core in RabbitMQ event handler configuration ([#76](https://github.com/zextras/carbonio-videoserver-ce/issues/76)) ([4b454a3](https://github.com/zextras/carbonio-videoserver-ce/commit/4b454a363c2a968f629ec8c08ee6b0320e49deec))
+* **deps:** add explicit service-discover-base dependency ([#78](https://github.com/zextras/carbonio-videoserver-ce/issues/78)) ([0fbe83b](https://github.com/zextras/carbonio-videoserver-ce/commit/0fbe83b952165e11323c1d9b9b47a5be66f8e8c0))
+
 ## [1.2.2](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.1...v1.2.2) (2026-05-09)
 
 ### Bug Fixes
