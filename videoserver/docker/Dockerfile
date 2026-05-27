@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-FROM debian:bullseye AS builder
+FROM debian:bookworm-20260518 AS builder
 
 RUN apt-get -y update && \
 	apt-get install -y \
