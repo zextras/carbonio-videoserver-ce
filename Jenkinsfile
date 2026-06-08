@@ -17,8 +17,6 @@ dt3_pipeline(
         addCarbonioRepos: true,
         pkgbuildPaths: ['videoserver/videoserver/PKGBUILD', 'videoserver/videoserver-confs/PKGBUILD'],
         prepare: true,
-        rockySinglePkg: false,
-        ubuntuSinglePkg: false,
     ],
     docker: [[
         dockerfile: 'videoserver/docker/Dockerfile',
