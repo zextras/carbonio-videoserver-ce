@@ -1,3 +1,9 @@
+## [1.2.4](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.3...v1.2.4) (2026-06-08)
+
+### Bug Fixes
+
+* restore janus.jcfg.patch file to the previous version to avoid upgrade conflicts ([#84](https://github.com/zextras/carbonio-videoserver-ce/issues/84)) ([b5be5af](https://github.com/zextras/carbonio-videoserver-ce/commit/b5be5af9e1302d5b52d79732a106af3939ffa763))
+
 ## [1.2.3](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.2...v1.2.3) (2026-05-26)
 
 ### Bug Fixes
