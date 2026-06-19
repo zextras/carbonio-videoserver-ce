@@ -1,3 +1,5 @@
+## [1.2.5](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.4...v1.2.5) (2026-06-19)
+
 ## [1.2.4](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.2.3...v1.2.4) (2026-06-08)
 
 ### Bug Fixes
