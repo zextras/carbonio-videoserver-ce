@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-FROM docker.io/library/debian:bullseye AS builder
+FROM docker.io/library/debian:bullseye-20260610 AS builder
 
 RUN apt-get -y update && \
 	apt-get install -y \
