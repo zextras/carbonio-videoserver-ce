@@ -1,6 +1,6 @@
 _pkgver="1.4.0"
 pkgname="carbonio-videoserver-ce"
-pkgver="1.2.5"
+pkgver="1.2.6"
 pkgrel="1"
 pkgdesc="An open source, general purpose, WebRTC server"
 arch=('x86_64')
