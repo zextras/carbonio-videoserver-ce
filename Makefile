@@ -36,13 +36,14 @@ THIRDS_MOUNT =
 THIRDS_ARG   = none
 endif
 
-# Auto-detect host OS: macOS uses build-macos.sh (QEMU workarounds),
-# Linux uses build-linux.sh (LTO enabled, native x86_64).
+# Auto-detect host OS: macOS (Apple Silicon/Rosetta) needs QEMU workarounds
+# in build.sh (janus tarball pre-downloaded via curl — yap's Go HTTP client
+# hits TLS "bad record MAC" under emulation). Native Linux/CI skips them.
 HOST_OS := $(shell uname)
 ifeq ($(HOST_OS),Darwin)
-  BUILD_SCRIPT = /project/build-macos.sh
+  QEMU_FLAG = --qemu-workarounds
 else
-  BUILD_SCRIPT = /project/build-linux.sh
+  QEMU_FLAG =
 endif
 
 # Container mount options
@@ -97,21 +98,21 @@ build:
 	@echo "==> Thirds packages: $(THIRDS_ARG)"
 	@mkdir -p $(OUTPUT_DIR)/$(TARGET) $(CCACHE_DIR)
 	$(CONTAINER_RUNTIME) run $(CONTAINER_OPTS) $(THIRDS_MOUNT) $(YAP_IMAGE) \
-		$(BUILD_SCRIPT) $(THIRDS_ARG) $(TARGET)
+		/project/build.sh $(THIRDS_ARG) $(TARGET) $(QEMU_FLAG)
 
 ## build-macos: Build with QEMU workarounds (macOS / Apple Silicon)
 build-macos:
 	@echo "==> Thirds packages: $(THIRDS_ARG)"
 	@mkdir -p $(OUTPUT_DIR)/$(TARGET) $(CCACHE_DIR)
 	$(CONTAINER_RUNTIME) run $(CONTAINER_OPTS) $(THIRDS_MOUNT) $(YAP_IMAGE) \
-		/project/build-macos.sh $(THIRDS_ARG) $(TARGET)
+		/project/build.sh $(THIRDS_ARG) $(TARGET) --qemu-workarounds
 
 ## build-linux: Build with LTO enabled (Linux / CI)
 build-linux:
 	@echo "==> Thirds packages: $(THIRDS_ARG)"
 	@mkdir -p $(OUTPUT_DIR)/$(TARGET) $(CCACHE_DIR)
 	$(CONTAINER_RUNTIME) run $(CONTAINER_OPTS) $(THIRDS_MOUNT) $(YAP_IMAGE) \
-		/project/build-linux.sh $(THIRDS_ARG) $(TARGET)
+		/project/build.sh $(THIRDS_ARG) $(TARGET)
 
 ## build-all: Build packages for all distros — run with -jN for parallel builds
 build-all: $(addprefix build-, $(ALL_DISTROS))

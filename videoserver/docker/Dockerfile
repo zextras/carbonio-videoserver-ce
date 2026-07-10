@@ -2,77 +2,96 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-FROM docker.io/library/debian:bullseye AS builder
+# syntax=docker/dockerfile:1.24
 
-RUN apt-get -y update && \
-	apt-get install -y \
-	libavutil-dev libavformat-dev libavcodec-dev libmicrohttpd-dev \
-	libjansson-dev libssl-dev libsofia-sip-ua-dev libglib2.0-dev \
-	libopus-dev libogg-dev libcurl4-openssl-dev liblua5.3-dev \
-	libconfig-dev libusrsctp-dev libwebsockets-dev libnanomsg-dev \
-	librabbitmq-dev pkg-config libtool automake \
-	build-essential wget git gtk-doc-tools && \
-	apt-get clean && rm -rf /var/lib/apt/lists/*
+# Stage 1: runs natively on BUILDPLATFORM (amd64 CI builder) — no QEMU.
+# carbonio-videoserver-ce / -confs-ce are prebuilt by the "Build deb/rpm"
+# stage (yap: native amd64 + cross-compiled arm64) and unstashed into
+# artifacts/ before this build runs (see Jenkinsfile). We fetch the
+# actual runtime libs janus needs for TARGETARCH via an explicit
+# `apt-get download` list (pure network fetch, no execution) and unpack
+# every package with `dpkg -x` — never `dpkg -i`/`apt-get install`, so
+# no maintainer scripts run (postinst does a live `curl ifconfig.me`
+# call and systemctl calls that are meaningless in a container) and no
+# target-arch code ever executes on the BUILDPLATFORM host.
+#
+# Deliberately NOT using the package's full Depends closure: it drags
+# in service-discover-base -> carbonio-core -> carbonio-mailbox-jar +
+# carbonio-openjdk + carbonio-mariadb + envoyproxy (466MB), none of
+# which this single-process container (entrypoint just execs janus)
+# ever invokes. cdebconf/debconf/dialog are postinst-only and are
+# skipped for the same reason dpkg -x is used at all.
+FROM --platform=$BUILDPLATFORM docker.io/library/ubuntu:jammy AS installer
 
-# Libsrtp
-RUN cd /tmp && \
-	wget https://github.com/cisco/libsrtp/archive/v2.3.0.tar.gz && \
-	tar xfv v2.3.0.tar.gz && cd libsrtp-2.3.0 && \
-	./configure --prefix=/usr --enable-openssl && \
-	make shared_library && make install
+ARG TARGETARCH
+ARG BUILDARCH=amd64
 
-# Libnice
-RUN cd /tmp && \
-	git clone https://gitlab.freedesktop.org/libnice/libnice && \
-	cd libnice && git checkout 0.1.17 && \
-	./autogen.sh && ./configure --prefix=/usr && \
-	make && make install
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates \
+ # Cross-arch setup when TARGETARCH != BUILDARCH
+ && if [ "${TARGETARCH}" != "${BUILDARCH}" ]; then \
+      dpkg --add-architecture ${TARGETARCH} \
+      && sed -i 's|^deb |deb [arch='"${BUILDARCH}"'] |' /etc/apt/sources.list \
+      && printf 'Types: deb\nURIs: http://ports.ubuntu.com/ubuntu-ports/\nSuites: jammy jammy-updates jammy-security\nComponents: main restricted universe multiverse\nArchitectures: %s\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n' "${TARGETARCH}" \
+         > /etc/apt/sources.list.d/ports-${TARGETARCH}.sources; \
+    fi \
+ && printf 'deb [arch=%s trusted=yes] https://repo.area51-zextras.com/devel/ubuntu jammy main\n' "${TARGETARCH}" \
+    > /etc/apt/sources.list.d/zextras.list \
+ && apt-get update
 
-# Janus build
-RUN cd /usr/local/src && \
-	git clone --branch v1.4.0 --depth 1 https://github.com/meetecho/janus-gateway.git
+COPY artifacts/ /tmp/artifacts/
 
-RUN cd /usr/local/src/janus-gateway && \
-	sh autogen.sh && \
-	./configure \
-	--disable-all-handlers \
-	--disable-all-plugins \
-	--disable-all-transports \
-	--disable-docs \
-	--disable-json-logger \
-	--disable-turn-rest-api \
-	--enable-plugin-audiobridge \
-	--enable-plugin-videoroom \
-	--enable-post-processing \
-	--enable-rabbitmq \
-	--enable-rabbitmq-event-handler \
-	--enable-rest \
-	--enable-websockets \
-	--enable-websockets-event-handler && \
-	make -j$(nproc) && make install && make configs
+RUN set -e; \
+	pkg_ce=$(ls /tmp/artifacts/carbonio-videoserver-ce_*_${TARGETARCH}.deb); \
+	pkg_confs=$(ls /tmp/artifacts/carbonio-videoserver-confs-ce_*_${TARGETARCH}.deb); \
+	mkdir -p /staging /tmp/debs && cd /tmp/debs && \
+	apt-get download \
+		carbonio-curl:${TARGETARCH} \
+		carbonio-ffmpeg:${TARGETARCH} \
+		carbonio-libnice:${TARGETARCH} \
+		carbonio-libopus:${TARGETARCH} \
+		carbonio-librabbitmq-c:${TARGETARCH} \
+		carbonio-libsrtp:${TARGETARCH} \
+		carbonio-libusrsctp:${TARGETARCH} \
+		carbonio-openssl:${TARGETARCH} \
+		libc6:${TARGETARCH} \
+		libconfig9:${TARGETARCH} \
+		libglib2.0-0:${TARGETARCH} \
+		libjansson4:${TARGETARCH} \
+		libmicrohttpd12:${TARGETARCH} \
+		libogg0:${TARGETARCH} \
+		libterm-readline-gnu-perl:${TARGETARCH} \
+		zlib1g:${TARGETARCH} && \
+	cd / && for deb in /tmp/debs/*.deb "$pkg_ce" "$pkg_confs"; do dpkg -x "$deb" /staging; done && \
+	rm -rf /tmp/debs /tmp/artifacts /var/lib/apt/lists/*
 
+# Janus scans this directory for logger plugins at startup; the package
+# doesn't ship an empty dir (dpkg can't package one without an explicit
+# `install -d`), so create it ourselves.
+RUN mkdir -p /staging/opt/zextras/common/lib/janus/loggers
 
-FROM builder AS runtime
+COPY videoserver/docker/config/janus.jcfg /staging/etc/janus/
+COPY videoserver/docker/config/janus.jcfg.sample /staging/etc/janus/
+COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg /staging/etc/janus/
+COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg.sample /staging/etc/janus/
+COPY videoserver/docker/config/janus.plugin.audiobridge.jcfg /staging/etc/janus/
+COPY videoserver/docker/config/janus.plugin.audiobridge.jcfg.sample /staging/etc/janus/
+COPY videoserver/docker/config/janus.plugin.videoroom.jcfg /staging/etc/janus/
+COPY videoserver/docker/config/janus.plugin.videoroom.jcfg.sample /staging/etc/janus/
+COPY videoserver/docker/config/janus.transport.http.jcfg /staging/etc/janus/
+COPY videoserver/docker/config/janus.transport.http.jcfg.sample /staging/etc/janus/
 
-COPY videoserver/docker/config/janus.jcfg /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.jcfg.sample /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg.sample /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.plugin.audiobridge.jcfg /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.plugin.audiobridge.jcfg.sample /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.plugin.videoroom.jcfg /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.plugin.videoroom.jcfg.sample /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.transport.http.jcfg /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.transport.http.jcfg.sample /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.transport.websockets.jcfg /usr/local/etc/janus/
-COPY videoserver/docker/config/janus.transport.websockets.jcfg.sample /usr/local/etc/janus/
+COPY videoserver/docker/entrypoint.sh /staging/entrypoint.sh
+RUN chmod +x /staging/entrypoint.sh
 
-RUN mkdir -p /usr/local/lib/janus/loggers
+# Stage 2: final image — TARGETPLATFORM, zero RUN steps, no QEMU needed.
+FROM --platform=$TARGETPLATFORM docker.io/library/ubuntu:jammy
 
-COPY videoserver/docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --from=installer /staging/ /
 
-EXPOSE 8088 7088 8188
+# WebSocket transport (port 8188) is not built into carbonio-videoserver-ce
+# (PKGBUILD passes --disable-websockets), so it is not exposed here.
+EXPOSE 8088 7088
 EXPOSE 20000-20200/udp
 
 ENTRYPOINT ["/entrypoint.sh"]

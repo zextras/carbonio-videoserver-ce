@@ -1,15 +1,12 @@
 {
-    "name": "Zextras Videoserver CE",
-    "description": "Carbonio Videoserver CE",
-    "buildDir": "/tmp/",
-    "output": "artifacts",
-    "projects": [
-        {
-            "name": "videoserver/videoserver-confs",
-            "install": true
-        },
-        {
-            "name": "videoserver/videoserver"
-        }
-    ]
+  "name": "Zextras Videoserver CE",
+  "description": "Carbonio Videoserver CE",
+  "buildDir": "/tmp/",
+  "output": "artifacts",
+  "skipDeps": ["carbonio-videoserver-confs-ce", "pending-setups", "service-discover"],
+  "projects": [
+    {
+      "name": "videoserver/videoserver"
+    }
+  ]
 }

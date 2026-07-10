@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 library(
-    identifier: 'jenkins-lib-common@dt3-pipeline',
+    identifier: 'jenkins-lib-common@v3.3.0',
     retriever: modernSCM([
         $class: 'GitSCMSource',
         credentialsId: 'jenkins-integration-with-github-account',
@@ -11,18 +11,89 @@ library(
     ])
 )
 
-dt3_pipeline(
-    repoName: 'carbonio-videoserver-ce',
-    packaging: [
-        addCarbonioRepos: true,
-        pkgbuildPaths: ['videoserver/videoserver/PKGBUILD', 'videoserver/videoserver-confs/PKGBUILD'],
-        prepare: true,
-    ],
-    docker: [[
-        dockerfile: 'videoserver/docker/Dockerfile',
-        imageName: 'carbonio-videoserver-ce',
-        title: 'Carbonio Videoserver CE',
-        description: 'Carbonio Videoserver CE Service',
-    ]],
-    reuse: [projectType: 'CE'],
-)
+properties(defaultPipelineProperties())
+
+pipeline {
+    agent {
+        node {
+            label 'base'
+        }
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '25'))
+        skipDefaultCheckout()
+        timeout(time: 2, unit: 'HOURS')
+    }
+
+    stages {
+        stage('Setup') {
+            steps {
+                checkout scm
+                script {
+                    gitMetadata()
+                }
+            }
+        }
+
+        stage('Build deb/rpm') {
+            steps {
+                echo 'Building deb/rpm packages'
+                buildStage(
+                    addCarbonioRepos: true,
+                    pkgbuildPaths: ['videoserver/videoserver/PKGBUILD'],
+                    prepare: true,
+                    rockySinglePkg: false,
+                    ubuntuSinglePkg: false,
+                )
+                buildStage(
+                    addCarbonioRepos: true,
+                    architecture: 'aarch64',
+                    pkgbuildPaths: ['videoserver/videoserver/PKGBUILD'],
+                    distros: ['ubuntu-jammy'],
+                    parallelBuilds: false,
+                    prepare: true,
+                )
+            }
+        }
+
+        stage('Upload artifacts') {
+            when {
+                expression { return uploadStage.shouldUpload() }
+            }
+            tools {
+                jfrog 'jfrog-cli'
+            }
+            steps {
+                uploadStage(
+                    packages: yapHelper.resolvePackageNames(),
+                    rockySinglePkg: false,
+                    ubuntuSinglePkg: false,
+                )
+                uploadStage(
+                    architecture: 'aarch64',
+                    distros: ['ubuntu-jammy'],
+                    packages: yapHelper.resolvePackageNames(),
+                )
+            }
+        }
+
+        stage('Publish docker images') {
+            steps {
+                unstash 'artifacts-ubuntu-jammy'
+                unstash 'artifacts-ubuntu-jammy-aarch64'
+                dockerStage(
+                    images: [[
+                        dockerfile: 'videoserver/docker/Dockerfile',
+                        imageName: 'carbonio-videoserver-ce',
+                        platforms: ['linux/amd64', 'linux/arm64'] as Set,
+                        ocLabels: [
+                            title: 'Carbonio Videoserver CE',
+                            description: 'Carbonio Videoserver CE Service',
+                        ],
+                    ]]
+                )
+            }
+        }
+    }
+}
