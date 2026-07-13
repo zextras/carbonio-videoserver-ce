@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-JANUS_CFG="/usr/local/etc/janus/janus.jcfg"
+JANUS_CFG="/etc/janus/janus.jcfg"
 
 if [ -n "$NAT_IP" ]; then
 	sed -i "s|#nat_1_1_mapping = .*|nat_1_1_mapping = \"$NAT_IP\"|" "$JANUS_CFG"
@@ -13,4 +13,4 @@ else
 	echo "Warning: NAT_IP is not set, nat_1_1_mapping will not be configured"
 fi
 
-exec /usr/local/bin/janus
+exec /opt/zextras/common/bin/janus
