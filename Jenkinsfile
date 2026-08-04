@@ -36,12 +36,19 @@ pipeline {
             }
         }
 
+        stage('Skip CI') {
+            steps {
+                script {
+                    semanticRelease.guard()
+                }
+            }
+        }
+
         stage('Build deb/rpm') {
             steps {
                 echo 'Building deb/rpm packages'
                 buildStage(
                     addCarbonioRepos: true,
-                    pkgbuildPaths: ['videoserver/videoserver/PKGBUILD'],
                     prepare: true,
                     rockySinglePkg: false,
                     ubuntuSinglePkg: false,
@@ -49,7 +56,6 @@ pipeline {
                 buildStage(
                     addCarbonioRepos: true,
                     architecture: 'aarch64',
-                    pkgbuildPaths: ['videoserver/videoserver/PKGBUILD'],
                     distros: ['ubuntu-jammy'],
                     parallelBuilds: false,
                     prepare: true,
@@ -66,14 +72,12 @@ pipeline {
             }
             steps {
                 uploadStage(
-                    packages: yapHelper.resolvePackageNames(),
                     rockySinglePkg: false,
                     ubuntuSinglePkg: false,
                 )
                 uploadStage(
                     architecture: 'aarch64',
                     distros: ['ubuntu-jammy'],
-                    packages: yapHelper.resolvePackageNames(),
                 )
             }
         }
@@ -93,6 +97,12 @@ pipeline {
                         ],
                     ]]
                 )
+            }
+        }
+
+        stage('Semantic Release') {
+            steps {
+                semanticRelease()
             }
         }
     }
