@@ -41,9 +41,17 @@ RUN apt-get update \
 
 COPY artifacts/ /tmp/artifacts/
 
+# The codename must be pinned: on default-branch builds the "Upload artifacts"
+# stage unstashes every distro into this same workspace before the docker build,
+# so artifacts/ also holds the noble (and rocky) packages. An unpinned
+# *_${TARGETARCH}.deb glob then matches two files and dpkg -x dies with exit 2.
+# This image is jammy-based, so it must unpack the jammy build.
 RUN set -e; \
-	pkg_ce=$(ls /tmp/artifacts/carbonio-videoserver-ce_*_${TARGETARCH}.deb); \
-	pkg_confs=$(ls /tmp/artifacts/carbonio-videoserver-confs-ce_*_${TARGETARCH}.deb); \
+	pkg_ce=$(ls /tmp/artifacts/carbonio-videoserver-ce_*jammy*_${TARGETARCH}.deb); \
+	pkg_confs=$(ls /tmp/artifacts/carbonio-videoserver-confs-ce_*jammy*_${TARGETARCH}.deb); \
+	for p in "$pkg_ce" "$pkg_confs"; do \
+		[ "$(printf '%s\n' "$p" | wc -l)" -eq 1 ] || { echo "ambiguous deb match: $p" >&2; exit 1; }; \
+	done; \
 	mkdir -p /staging /tmp/debs && cd /tmp/debs && \
 	apt-get download \
 		carbonio-curl:${TARGETARCH} \
