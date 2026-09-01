@@ -21,7 +21,7 @@
 # which this single-process container (entrypoint just execs janus)
 # ever invokes. cdebconf/debconf/dialog are postinst-only and are
 # skipped for the same reason dpkg -x is used at all.
-FROM --platform=$BUILDPLATFORM docker.io/library/ubuntu:jammy AS installer
+FROM --platform=$BUILDPLATFORM docker.io/library/ubuntu:resolute AS installer
 
 ARG TARGETARCH
 ARG BUILDARCH=amd64
@@ -93,7 +93,7 @@ COPY videoserver/docker/entrypoint.sh /staging/entrypoint.sh
 RUN chmod +x /staging/entrypoint.sh
 
 # Stage 2: final image — TARGETPLATFORM, zero RUN steps, no QEMU needed.
-FROM --platform=$TARGETPLATFORM docker.io/library/ubuntu:jammy
+FROM --platform=$TARGETPLATFORM docker.io/library/ubuntu:resolute
 
 COPY --from=installer /staging/ /
 
