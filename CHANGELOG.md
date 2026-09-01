@@ -1,3 +1,9 @@
+## [1.3.11](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.10...v1.3.11) (2026-09-01)
+
+### Bug Fixes
+
+* **ci:** point semantic-release at main ahead of devel->main rename ([#110](https://github.com/zextras/carbonio-videoserver-ce/issues/110)) ([27b1f75](https://github.com/zextras/carbonio-videoserver-ce/commit/27b1f757cb11d806a63df1ea00fd8dadb987d5bc))
+
 ## [1.3.10](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.9...v1.3.10) (2026-08-27)
 
 ## [1.3.9](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.8...v1.3.9) (2026-08-26)
