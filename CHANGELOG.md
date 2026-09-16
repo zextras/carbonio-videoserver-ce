@@ -1,3 +1,9 @@
+## [1.3.16](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.15...v1.3.16) (2026-09-16)
+
+### Bug Fixes
+
+* **docker:** pull Carbonio deps from Nexus instead of area51 ([#117](https://github.com/zextras/carbonio-videoserver-ce/issues/117)) ([4f4600a](https://github.com/zextras/carbonio-videoserver-ce/commit/4f4600a177fee2c00a7a36343835ab3669f372ea))
+
 ## [1.3.15](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.14...v1.3.15) (2026-09-11)
 
 ## [1.3.14](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.13...v1.3.14) (2026-09-08)
