@@ -78,6 +78,18 @@ RUN set -e; \
 # `install -d`), so create it ourselves.
 RUN mkdir -p /staging/opt/zextras/common/lib/janus/loggers
 
+# jammy is usrmerged (/bin, /sbin, /lib*  ->  /usr/...) but the packages still
+# ship real bin/ and lib*/ paths, and the final `COPY /staging/ /` cannot write
+# a real directory over those symlinks. Merge them the way the distro already
+# did, so the copied tree lands on the same paths either way.
+RUN set -e; \
+	for d in bin sbin lib lib32 lib64 libx32; do \
+		[ -d "/staging/${d}" ] || continue; \
+		mkdir -p "/staging/usr/${d}"; \
+		cp -a "/staging/${d}/." "/staging/usr/${d}/"; \
+		rm -rf "/staging/${d}"; \
+	done
+
 COPY videoserver/docker/config/janus.jcfg /staging/etc/janus/
 COPY videoserver/docker/config/janus.jcfg.sample /staging/etc/janus/
 COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg /staging/etc/janus/
