@@ -95,6 +95,14 @@ pipeline {
                             title: 'Carbonio Videoserver CE',
                             description: 'Carbonio Videoserver CE Service',
                         ],
+                    ], [
+                        dockerfile: 'videoserver/docker/videoserver-sidecar/Dockerfile',
+                        imageName: 'carbonio-videoserver-ce-sidecar',
+                        platforms: ['linux/amd64', 'linux/arm64'] as Set,
+                        ocLabels: [
+                            title: 'Carbonio Videoserver CE Sidecar',
+                            description: 'Carbonio Videoserver Community Edition Sidecar',
+                        ],
                     ]]
                 )
             }
