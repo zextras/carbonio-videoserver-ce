@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-FROM registry.dev.zextras.com/dev/carbonio-sidecar:devel
+ARG SIDECAR_IMAGE=registry.dev.zextras.com/dev/carbonio-sidecar:main
+FROM ${SIDECAR_IMAGE}
 
 # Service registration (registered by the base entrypoint)
 COPY videoserver/videoserver/carbonio-videoserver.hcl /consul/config/
