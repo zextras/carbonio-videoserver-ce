@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Zextras <https://www.zextras.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+set -e
+
+SD="/etc/carbonio/videoserver/service-discover"
+POLICY_NAME="carbonio-videoserver-policy"
+POLICY_DESCRIPTION="Carbonio videoserver service policy for service and sidecar proxy"
+
+: "${CONSUL_HTTP_TOKEN:=$(service-discover bootstrap-token --setup)}"
+export CONSUL_HTTP_TOKEN
+
+consul acl policy create -name "${POLICY_NAME}" -description "${POLICY_DESCRIPTION}" \
+  -rules @"${SD}/policies.json" >/dev/null 2>&1 ||
+  consul acl policy update -no-merge -name "${POLICY_NAME}" -description "${POLICY_DESCRIPTION}" \
+    -rules @"${SD}/policies.json" >/dev/null
+
+consul config write "${SD}/service-protocol.json"
+consul config write "${SD}/intentions.json"
+
+if [ ! -s "${SD}/token" ]; then
+  consul acl token create -format json -policy-name "${POLICY_NAME}" \
+    -description "Token for carbonio-videoserver/$(hostname)" |
+    jq -r '.SecretID' >"${SD}/token"
+  chmod 0600 "${SD}/token"
+fi
+
+# The app image's janus.jcfg has a fixed api_secret; ws-collaboration reads it from this key.
+if [ -z "$(consul kv get carbonio-videoserver/api-secret 2>/dev/null)" ]; then
+  consul kv put carbonio-videoserver/api-secret api-secret
+fi
