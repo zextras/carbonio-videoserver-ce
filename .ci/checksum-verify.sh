@@ -11,6 +11,8 @@ PKGBUILD_PATH="${1:?Usage: checksum-verify.sh <PKGBUILD> [true|false]}"
 AUTOFIX="${2:-true}"
 PKGDIR="$(dirname "$PKGBUILD_PATH")"
 
+# Subshell sourcing expands ${pkgver} like makepkg; no source/sha256sums locals here, or they'd shadow the PKGBUILD's own arrays.
+
 list_arrays() {
     (
         set +u +e
@@ -20,6 +22,7 @@ list_arrays() {
     ) || true
 }
 
+# Empty array must print nothing — a bare printf's blank line would look like a single "" element.
 read_array() {
     (
         set +u +e
@@ -29,6 +32,7 @@ read_array() {
     ) || true
 }
 
+# Always renders canonical multi-line, 2-space indent — both real PKGBUILDs already use it.
 render_block() {
     local name="$1"
     shift
@@ -40,6 +44,7 @@ render_block() {
     printf '%s' "$out"
 }
 
+# A same-line close (sha256sums=('x') or sha256sums=()) must still end the block, or the rewrite eats the next one.
 rewrite_block() {
     local name="$1" file="$2"
 
@@ -58,7 +63,9 @@ rewrite_block() {
     mv "${file}.tmp" "$file"
 }
 
-mapfile -t variants < <(list_arrays '^(sha256sums|source)_[A-Za-z0-9_]+$')
+# Neither repo uses variant-suffixed arrays; refuse rather than silently skip an unverified source.
+variants=()
+while IFS= read -r line; do variants+=("$line"); done < <(list_arrays '^(sha256sums|source)_[A-Za-z0-9_]+$')
 [ ${#variants[@]} -eq 0 ] || { echo "ERROR: variant-suffixed arrays not supported: ${variants[*]}"; exit 1; }
 
 has_source="$(list_arrays '^source$')"
@@ -71,8 +78,10 @@ fi
 [ -n "$has_source" ] || { echo "ERROR: sha256sums=() has no matching source=() array"; exit 1; }
 [ -n "$has_sums" ] || { echo "ERROR: source=() has no matching sha256sums=() array — its sources would go unverified"; exit 1; }
 
-mapfile -t sources < <(read_array source)
-mapfile -t sums < <(read_array sha256sums)
+sources=()
+while IFS= read -r line; do sources+=("$line"); done < <(read_array source)
+sums=()
+while IFS= read -r line; do sums+=("$line"); done < <(read_array sha256sums)
 
 if [ ${#sources[@]} -ne ${#sums[@]} ]; then
     echo "ERROR: source count (${#sources[@]}) != sha256sums count (${#sums[@]})"
@@ -97,6 +106,7 @@ for i in ${sources[@]+"${!sources[@]}"}; do
 
     filepath="$PKGDIR/$local_name"
 
+    # SKIP must survive either way — re-hashing a version-stamped source breaks the next release build.
     if [ -f "$filepath" ]; then
         if [ "$sum" = "SKIP" ]; then
             echo "  SKIP (preserved): $local_name"
