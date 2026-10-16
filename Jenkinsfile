@@ -11,107 +11,30 @@ library(
     ])
 )
 
-properties(defaultPipelineProperties())
-
-pipeline {
-    agent {
-        node {
-            label 'base'
-        }
-    }
-
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '25'))
-        skipDefaultCheckout()
-        timeout(time: 2, unit: 'HOURS')
-    }
-
-    stages {
-        stage('Setup') {
-            steps {
-                checkout scm
-                script {
-                    gitMetadata()
-                }
-            }
-        }
-
-        stage('Skip CI') {
-            steps {
-                script {
-                    semanticRelease.guard()
-                }
-            }
-        }
-
-        stage('Build deb/rpm') {
-            steps {
-                echo 'Building deb/rpm packages'
-                buildStage(
-                    addCarbonioRepos: true,
-                    prepare: true,
-                    rockySinglePkg: false,
-                    ubuntuSinglePkg: false,
-                )
-                buildStage(
-                    addCarbonioRepos: true,
-                    architecture: 'aarch64',
-                    distros: ['ubuntu-jammy'],
-                    parallelBuilds: false,
-                    prepare: true,
-                )
-            }
-        }
-
-        stage('Upload artifacts') {
-            when {
-                expression { return uploadStage.shouldUpload() }
-            }
-            tools {
-                jfrog 'jfrog-cli'
-            }
-            steps {
-                uploadStage(
-                    rockySinglePkg: false,
-                    ubuntuSinglePkg: false,
-                )
-                uploadStage(
-                    architecture: 'aarch64',
-                    distros: ['ubuntu-jammy'],
-                )
-            }
-        }
-
-        stage('Publish docker images') {
-            steps {
-                unstash 'artifacts-ubuntu-jammy'
-                unstash 'artifacts-ubuntu-jammy-aarch64'
-                dockerStage(
-                    images: [[
-                        dockerfile: 'videoserver/docker/Dockerfile',
-                        imageName: 'carbonio-videoserver-ce',
-                        platforms: ['linux/amd64', 'linux/arm64'] as Set,
-                        ocLabels: [
-                            title: 'Carbonio Videoserver CE',
-                            description: 'Carbonio Videoserver CE Service',
-                        ],
-                    ], [
-                        dockerfile: 'videoserver/docker/videoserver-sidecar/Dockerfile',
-                        imageName: 'carbonio-videoserver-ce-sidecar',
-                        platforms: ['linux/amd64', 'linux/arm64'] as Set,
-                        ocLabels: [
-                            title: 'Carbonio Videoserver CE Sidecar',
-                            description: 'Carbonio Videoserver Community Edition Sidecar',
-                        ],
-                    ]]
-                )
-            }
-        }
-
-        stage('Semantic Release') {
-            steps {
-                semanticRelease()
-            }
-        }
-    }
-}
+dt3_pipeline(
+    repoName: 'carbonio-videoserver-ce',
+    packaging: [
+        pkgbuildPaths: ['videoserver/videoserver/PKGBUILD'],
+        addCarbonioRepos: true,
+        prepare: true,
+        aarch64: true,
+        artifactsForDocker: true,
+    ],
+    docker: [
+        [
+            dockerfile: 'videoserver/docker/Dockerfile',
+            imageName: 'carbonio-videoserver-ce',
+            platforms: ['linux/amd64', 'linux/arm64'] as Set,
+            title: 'Carbonio Videoserver CE',
+            description: 'Carbonio Videoserver CE Service',
+        ],
+        [
+            dockerfile: 'videoserver/docker/videoserver-sidecar/Dockerfile',
+            imageName: 'carbonio-videoserver-ce-sidecar',
+            platforms: ['linux/amd64', 'linux/arm64'] as Set,
+            title: 'Carbonio Videoserver CE Sidecar',
+            description: 'Carbonio Videoserver Community Edition Sidecar',
+        ],
+    ],
+    reuse: [projectType: 'CE'],
+)
