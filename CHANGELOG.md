@@ -1,3 +1,9 @@
+## [1.3.29](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.28...v1.3.29) (2026-10-16)
+
+### Bug Fixes
+
+* **ci:** replace mapfile in checksum-verify for macOS bash 3.2 ([#129](https://github.com/zextras/carbonio-videoserver-ce/issues/129)) ([da176aa](https://github.com/zextras/carbonio-videoserver-ce/commit/da176aa5b775e23f65db5711dac376b202c5eae5)), closes [jenkins-lib-common#216](https://github.com/zextras/jenkins-lib-common/issues/216)
+
 ## [1.3.28](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.27...v1.3.28) (2026-10-15)
 
 ## [1.3.27](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.26...v1.3.27) (2026-10-13)
