@@ -21,8 +21,9 @@ fi
 # --setup check for SETUP_CONSUL_TOKEN env. variable and uses it
 # to avoid re-asking for the password
 echo -n "Insert the cluster credential password: "
-export CONSUL_HTTP_TOKEN=$(service-discover bootstrap-token --setup)
+CONSUL_HTTP_TOKEN=$(service-discover bootstrap-token --setup)
 EXIT_CODE="$?"
+export CONSUL_HTTP_TOKEN
 echo ""
 if [[ "${EXIT_CODE}" != "0" ]]; then
   echo "Cannot access to bootstrap token"
@@ -35,10 +36,8 @@ POLICY_NAME='carbonio-videoserver-policy'
 POLICY_DESCRIPTION='Carbonio videoserver service policy for service and sidecar proxy'
 
 # Create or update policy for the specific service (this will be shared across cluster)
-consul acl policy create -name "${POLICY_NAME}" -description "${POLICY_DESCRIPTION}" -rules  @/etc/carbonio/videoserver/service-discover/policies.json >/dev/null 2>&1
-if [[ "$?" != "0" ]]; then
-    consul acl policy update -no-merge -name "${POLICY_NAME}" -description "${POLICY_DESCRIPTION}" -rules @/etc/carbonio/videoserver/service-discover/policies.json
-    if [[ "$?" != "0" ]]; then
+if ! consul acl policy create -name "${POLICY_NAME}" -description "${POLICY_DESCRIPTION}" -rules  @/etc/carbonio/videoserver/service-discover/policies.json >/dev/null 2>&1; then
+    if ! consul acl policy update -no-merge -name "${POLICY_NAME}" -description "${POLICY_DESCRIPTION}" -rules @/etc/carbonio/videoserver/service-discover/policies.json; then
       echo "Setup failed: Cannot update policy for ${POLICY_NAME}"
       exit 1
     fi
