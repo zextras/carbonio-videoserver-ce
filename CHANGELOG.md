@@ -1,3 +1,9 @@
+## [1.3.32](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.31...v1.3.32) (2026-10-23)
+
+### Bug Fixes
+
+* **setup:** fail when the bootstrap token cannot be read ([#133](https://github.com/zextras/carbonio-videoserver-ce/issues/133)) ([663e4bb](https://github.com/zextras/carbonio-videoserver-ce/commit/663e4bb6f5d7fcf2f14fc8710d002bc286558636))
+
 ## [1.3.31](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.30...v1.3.31) (2026-10-23)
 
 ## [1.3.30](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.29...v1.3.30) (2026-10-21)
