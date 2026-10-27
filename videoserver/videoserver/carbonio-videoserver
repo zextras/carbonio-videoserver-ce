@@ -51,34 +51,30 @@ consul config write /etc/carbonio/videoserver/service-discover/service-protocol.
 # Allow other services to contact this service
 consul config write /etc/carbonio/videoserver/service-discover/intentions.json
 
-if [[ ! -f "/etc/carbonio/videoserver/service-discover/token" ]]; then
-    # Create the token
-    consul acl token create -format json -policy-name "${POLICY_NAME}" -description "Token for
-    carbonio-videoserver/$(hostname -A)" |
-      jq -r '.SecretID' > /etc/carbonio/videoserver/service-discover/token;
-    chown videoserver:videoserver /etc/carbonio/videoserver/service-discover/token
-    chmod 0600 /etc/carbonio/videoserver/service-discover/token
+service-discover service-token ensure --service carbonio-videoserver --policy "${POLICY_NAME}" \
+  --token-file /etc/carbonio/videoserver/service-discover/token --owner videoserver
 
-    # To pass the token to consul we need to inject it to a env. variable
-    # since it doesn't accept a file as an argument
-    mkdir -p /etc/systemd/system/carbonio-videoserver.service.d/
-    cat >/etc/systemd/system/carbonio-videoserver.service.d/override.conf <<EOF
+# To pass the token to consul we need to inject it to a env. variable
+# since it doesn't accept a file as an argument
+mkdir -p /etc/systemd/system/carbonio-videoserver.service.d/
+cat >/etc/systemd/system/carbonio-videoserver.service.d/override.conf <<EOF
 [Service]
 Environment="CONSUL_HTTP_TOKEN=$(cat /etc/carbonio/videoserver/service-discover/token)"
 EOF
-    chmod 0600 /etc/systemd/system/carbonio-videoserver.service.d/override.conf
-    systemctl daemon-reload
-fi
+chmod 0600 /etc/systemd/system/carbonio-videoserver.service.d/override.conf
+systemctl daemon-reload
 
 consul reload
 
 carbonio-videoserver-configs
 
-# Limit token visibility as much as possible
-export -n CONSUL_HTTP_TOKEN
-
 systemctl restart carbonio-videoserver-sidecar.service
 sleep 1
 systemctl restart carbonio-videoserver.service
+
+service-discover service-token prune-legacy --service carbonio-videoserver --policy "${POLICY_NAME}"
+
+# Limit token visibility as much as possible
+export -n CONSUL_HTTP_TOKEN
 
 trap - EXIT
