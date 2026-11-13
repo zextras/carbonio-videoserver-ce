@@ -4,35 +4,93 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-# This script add and set configuration values needed by videoserver
+# Renders the Janus configuration from the packaged templates on every setup
+
+set -e
 
 CONSUL_TOKEN_PATH="/etc/carbonio/videoserver/service-discover/token"
+JANUS_CONF_DIR="${JANUS_CONF_DIR:-/etc/janus}"
+JANUS_CFG="${JANUS_CONF_DIR}/janus.jcfg"
+RABBITMQ_EVH_CFG="${JANUS_CONF_DIR}/janus.eventhandler.rabbitmqevh.jcfg"
 
 get_consul_kv() {
-  KEY=$1
-  CONSUL_VALUE=$(consul kv get -token-file="$CONSUL_TOKEN_PATH" "${KEY}")
+  CONSUL_VALUE=$(consul kv get -token-file="$CONSUL_TOKEN_PATH" "$1" 2>/dev/null || true)
 }
 
-get_consul_kv "carbonio-videoserver/api-secret"; VIDEOSERVER_API_SECRET=$CONSUL_VALUE >/dev/null 2>&1
+escape_sed_replacement() {
+  printf '%s' "$1" | sed 's/[\\&|]/\\&/g'
+}
 
-if [[ "$VIDEOSERVER_API_SECRET" != "" ]]; then
-  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$VIDEOSERVER_API_SECRET\"#" /etc/janus/janus.jcfg
+escape_string() {
+  escape_sed_replacement "$(printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
+}
+
+stat_field() {
+  stat -c "$1" "$3" 2>/dev/null || stat -f "$2" "$3"
+}
+
+render() {
+  local target=$1
+  shift
+  if [[ ! -r "${target}.sample" ]]; then
+    echo "Janus configuration template not found: ${target}.sample"
+    exit 1
+  fi
+  TEMP_CFG=$(mktemp "${target}.tmp.XXXXXX")
+  trap 'rm -f "$TEMP_CFG"' EXIT
+  sed "$@" "${target}.sample" >"$TEMP_CFG"
+  if [[ -e "$target" ]]; then
+    chmod "$(stat_field '%a' '%Lp' "$target")" "$TEMP_CFG"
+    chown "$(stat_field '%u:%g' '%u:%g' "$target")" "$TEMP_CFG"
+  else
+    chmod 644 "$TEMP_CFG"
+  fi
+  mv -f "$TEMP_CFG" "$target"
+}
+
+PREVIOUS_JANUS_CFG="$JANUS_CFG"
+# rpm moves the config it no longer ships aside on upgrade
+[[ -e "$PREVIOUS_JANUS_CFG" ]] || PREVIOUS_JANUS_CFG="${JANUS_CFG}.rpmsave"
+
+previous_line() {
+  grep -m1 "^[[:space:]]*#*[[:space:]]*$1[[:space:]]*=" "$PREVIOUS_JANUS_CFG" 2>/dev/null
+}
+
+keep_previous_line() {
+  JANUS_EDITS+=(-e "s|^[[:space:]]*#*[[:space:]]*$1[[:space:]]*=.*|$(escape_sed_replacement "$2")|")
+}
+
+get_consul_kv "carbonio-videoserver/api-secret"
+API_SECRET=$CONSUL_VALUE
+if [[ -z "$API_SECRET" ]]; then
+  API_SECRET=$(openssl rand -base64 24)
+  consul kv put -token-file="${CONSUL_TOKEN_PATH}" "carbonio-videoserver/api-secret" "${API_SECRET}"
+fi
+JANUS_EDITS=(-e "s|\${API_SECRET}|$(escape_string "$API_SECRET")|")
+
+NAT_LINE=$(previous_line nat_1_1_mapping || true)
+if [[ -n "$NAT_LINE" && "$NAT_LINE" != *"\${PUBLIC_IP_ADDRESS}"* && "$NAT_LINE" != *'""'* ]]; then
+  keep_previous_line nat_1_1_mapping "$NAT_LINE"
 else
-  api_secret=$(openssl rand -base64 24)
-  sed -i "s#api_secret = \"\${API_SECRET}\"#api_secret = \"$api_secret\"#" /etc/janus/janus.jcfg
-  consul kv put -token-file="${CONSUL_TOKEN_PATH}" "carbonio-videoserver/api-secret" "${api_secret}"
+  PUBLIC_IP=$(curl -sf --max-time 10 ifconfig.me || true)
+  JANUS_EDITS+=(-e "s|\${PUBLIC_IP_ADDRESS}|$(escape_string "$PUBLIC_IP")|")
 fi
 
-get_consul_kv "carbonio-message-broker/default/username"; USERNAME=$CONSUL_VALUE >/dev/null 2>&1
-get_consul_kv "carbonio-message-broker/default/password"; PASSWORD=$CONSUL_VALUE >/dev/null 2>&1
-
-if [[ "$USERNAME" != "" && "$PASSWORD" != "" ]]; then
-  sed -i "s/<RABBITMQ_USERNAME>/$USERNAME/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
-  sed -i "s/<RABBITMQ_PASSWORD>/$PASSWORD/" /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
+if PRIVATE_HOST_LINE=$(previous_line keep_private_host); then
+  keep_previous_line keep_private_host "$PRIVATE_HOST_LINE"
 fi
 
-# add core to events list if not already present, otherwise rabbitmqevh won't be able to receive events from janus
-RABBITMQ_EVH_CFG="/etc/janus/janus.eventhandler.rabbitmqevh.jcfg"
-if ! grep -qE 'events[[:space:]]*=[[:space:]]*"[^"]*core' "$RABBITMQ_EVH_CFG"; then
-  sed -i -E 's/(events[[:space:]]*=[[:space:]]*"[^"]*)"(.*)/\1, core"\2/' "$RABBITMQ_EVH_CFG"
+render "$JANUS_CFG" "${JANUS_EDITS[@]}"
+
+get_consul_kv "carbonio-message-broker/default/username"
+RABBITMQ_USERNAME=$CONSUL_VALUE
+get_consul_kv "carbonio-message-broker/default/password"
+RABBITMQ_PASSWORD=$CONSUL_VALUE
+
+if [[ -n "$RABBITMQ_USERNAME" && -n "$RABBITMQ_PASSWORD" ]]; then
+  render "$RABBITMQ_EVH_CFG" \
+    -e "s|<RABBITMQ_USERNAME>|$(escape_string "$RABBITMQ_USERNAME")|" \
+    -e "s|<RABBITMQ_PASSWORD>|$(escape_string "$RABBITMQ_PASSWORD")|"
+else
+  echo "Message broker credentials not found in Consul, ${RABBITMQ_EVH_CFG} left unchanged"
 fi
