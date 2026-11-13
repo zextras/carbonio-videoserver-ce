@@ -62,3 +62,10 @@ repos:
         language: system
         pass_filenames: false
         files: ^videoserver/
+
+      - id: test-videoserver-configs
+        name: test-videoserver-configs
+        entry: bash .ci/test-videoserver-configs.sh
+        language: system
+        pass_filenames: false
+        files: ^(videoserver/videoserver/carbonio-videoserver-configs|\.ci/test-videoserver-configs\.sh)$
