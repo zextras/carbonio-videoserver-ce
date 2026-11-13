@@ -1,3 +1,9 @@
+## [1.3.34](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.33...v1.3.34) (2026-11-13)
+
+### Bug Fixes
+
+* **setup:** reuse a deterministic Consul token per node - CO-3612 ([#136](https://github.com/zextras/carbonio-videoserver-ce/issues/136)) ([c812e17](https://github.com/zextras/carbonio-videoserver-ce/commit/c812e17f0ad1c3c151768ee4a6e574a24ce74e64))
+
 ## [1.3.33](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.32...v1.3.33) (2026-11-01)
 
 ## [1.3.32](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.31...v1.3.32) (2026-10-23)
