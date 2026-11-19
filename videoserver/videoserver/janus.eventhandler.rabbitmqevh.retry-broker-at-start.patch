@@ -1,0 +1,45 @@
+--- a/src/events/janus_rabbitmqevh.c
++++ b/src/events/janus_rabbitmqevh.c
+@@ -292,10 +292,11 @@
+ 		JANUS_LOG(LOG_INFO, "RabbitMQEventHandler: enabled, %s:%d (%s) exch: (%s) exchange_type:%s\n", rmqhost, rmqport, route_key, exchange,exchange_type);
+ 	}
+ 
+-	/* Connect */
+-	int result = janus_rabbitmqevh_connect();
+-	if(result < 0) {
+-		goto error;
++	/* Connect: Janus ignores a failed init, so let the heartbeat thread retry instead */
++	if(janus_rabbitmqevh_connect() < 0) {
++		if(heartbeat <= 0)
++			goto error;
++		JANUS_LOG(LOG_WARN, "RabbitMQEventHandler: broker not reachable yet, retrying every 5 seconds\n");
+ 	}
+ 
+ 	/* Initialize the events queue */
+@@ -657,18 +658,20 @@
+ 
+ 			JANUS_LOG(LOG_VERB, "RabbitMQEventHandler: Error on amqp_simple_wait_frame_noblock: %d (%s)\n", res, amqp_error_string2(res));
+ 
++			janus_mutex_lock(&mutex);
+ 			if(rmq_conn) {
+ 				amqp_destroy_connection(rmq_conn);
++				rmq_conn = NULL;
+ 			}
++			int result = -1;
+ 			if(!g_atomic_int_get(&stopping)) {
+ 				JANUS_LOG(LOG_VERB, "RabbitMQEventHandler: Trying to reconnect\n");
+-				int result = janus_rabbitmqevh_connect();
+-				if(result < 0) {
+-					g_usleep(5000000);
+-				} else {
+-					g_usleep(waiting_usec);
+-				}
++				result = janus_rabbitmqevh_connect();
+ 			}
++			janus_mutex_unlock(&mutex);
++			if(!g_atomic_int_get(&stopping)) {
++				g_usleep(result < 0 ? 5000000 : waiting_usec);
++			}
+ 		} else {
+ 			/* Wait half of heartbeat before test again*/
+ 			g_usleep(waiting_usec);

@@ -104,6 +104,7 @@ section="comm"
 priority="important"
 source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${_pkgver}.tar.gz"
+  "janus.eventhandler.rabbitmqevh.retry-broker-at-start.patch"
   "621-carbonio-videoserver.sh"
   "carbonio-videoserver"
   "carbonio-videoserver.hcl"
@@ -124,6 +125,7 @@ source=(
 )
 sha256sums=(
   'ba0d588ad2500e98cdc82e3dc2051c37ba52fa4ff374d92cfcd1145eb4315596'
+  '360b1b3fad80e40d6d23c5ead08fd2082ee83c1434911386f649f99267669186'
   'c474d6228fa89a5ddb79a5fae444efd4fee8d7a24fc5e31c5a9d60022a6556c5'
   '1e59f5d36a9c1da8a2ef7dcec9c6bb40ba2b23d1d38085a141c7597ef367edce'
   '1b5e448ae50961cd3d2cb1cf542e43752036e4a0ccf664cc0ce13fca2e67f4cf'
@@ -223,6 +225,11 @@ _postinst_message() {
   echo "Carbonio videoserver installed successfully!"
   echo "You must run pending-setups to configure it correctly."
   echo "======================================================"
+}
+
+prepare() {
+  cd "${srcdir}/janus-gateway-${_pkgver}"
+  patch -p1 <"${srcdir}/janus.eventhandler.rabbitmqevh.retry-broker-at-start.patch"
 }
 
 build() {
