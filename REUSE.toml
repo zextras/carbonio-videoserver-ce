@@ -44,3 +44,9 @@ path = "videoserver/**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 Zextras s.r.l"
 SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "videoserver/videoserver/janus.*"
+precedence = "override"
+SPDX-FileCopyrightText = "Meetecho s.r.l."
+SPDX-License-Identifier = "GPL-3.0-only"

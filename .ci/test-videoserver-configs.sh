@@ -16,24 +16,8 @@ export JANUS_CONF_DIR="$TEST_DIR/janus"
 JANUS_CFG="$JANUS_CONF_DIR/janus.jcfg"
 EVH_CFG="$JANUS_CONF_DIR/janus.eventhandler.rabbitmqevh.jcfg"
 
-cat >"$JANUS_CFG.sample" <<'EOF'
-general: {
-	api_secret = "${API_SECRET}"	# String that all Janus requests must contain
-}
-media: {
-	rtp_port_range = "20000-40000"
-}
-nat: {
-	nat_1_1_mapping = "${PUBLIC_IP_ADDRESS}"
-	#keep_private_host = true
-}
-EOF
-cat >"$EVH_CFG.sample" <<'EOF'
-general: {
-	username = "<RABBITMQ_USERNAME>"				# Username to use to authenticate, if needed
-	password = "<RABBITMQ_PASSWORD>"				# Password to use to authenticate, if needed
-}
-EOF
+cp "$REPO_ROOT/videoserver/videoserver/janus.jcfg.sample" \
+  "$REPO_ROOT/videoserver/videoserver/janus.eventhandler.rabbitmqevh.jcfg.sample" "$JANUS_CONF_DIR/"
 
 cat >"$TEST_DIR/bin/consul" <<'EOF'
 #!/bin/sh

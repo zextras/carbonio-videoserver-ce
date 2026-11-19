@@ -90,16 +90,6 @@ RUN set -e; \
 		rm -rf "/staging/${d}"; \
 	done
 
-COPY videoserver/docker/config/janus.jcfg /staging/etc/janus/
-COPY videoserver/docker/config/janus.jcfg.sample /staging/etc/janus/
-COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg /staging/etc/janus/
-COPY videoserver/docker/config/janus.eventhandler.rabbitmqevh.jcfg.sample /staging/etc/janus/
-COPY videoserver/docker/config/janus.plugin.audiobridge.jcfg /staging/etc/janus/
-COPY videoserver/docker/config/janus.plugin.audiobridge.jcfg.sample /staging/etc/janus/
-COPY videoserver/docker/config/janus.plugin.videoroom.jcfg /staging/etc/janus/
-COPY videoserver/docker/config/janus.plugin.videoroom.jcfg.sample /staging/etc/janus/
-COPY videoserver/docker/config/janus.transport.http.jcfg /staging/etc/janus/
-COPY videoserver/docker/config/janus.transport.http.jcfg.sample /staging/etc/janus/
 
 COPY videoserver/docker/entrypoint.sh /staging/entrypoint.sh
 RUN chmod +x /staging/entrypoint.sh

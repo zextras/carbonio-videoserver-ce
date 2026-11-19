@@ -112,7 +112,12 @@ source=(
   "carbonio-videoserver-sidecar-legacy.service"
   "carbonio-videoserver-configs"
   "intentions.json"
-  "janus.jcfg.patch"
+  "janus.jcfg.sample"
+  "janus.eventhandler.rabbitmqevh.jcfg.sample"
+  "janus.plugin.audiobridge.jcfg"
+  "janus.plugin.videoroom.jcfg"
+  "janus.transport.http.jcfg"
+  "janus.transport.rabbitmq.jcfg"
   "policies.json"
   "service-protocol.json"
   "carbonio-message-broker-consul-check"
@@ -127,7 +132,12 @@ sha256sums=(
   'e9356df33318d350c0eec141b4bb2dc728efa44f031afb9349c5aaa806574379'
   'ca855cd481969c21a29b24bedd06b69e28a2451383182cb83382ef920f617299'
   'f93b86989d642c9879e86b7b24b7144fd300c7e40e77934a2c9cc4261fed9068'
-  '14fb24eb4a252e859ea2f752fed69060cf4882bde5e087bfe59007f37ab4bb93'
+  'ef033067a7fe5fb59b6286f6c23d2b27a9c13263a08497e2e4bf471d2db8d439'
+  '2039c8903202d0384443582218faa66a021d279b22a5a72a40c0b5cf427715fe'
+  'c33707f44368f3ff6bd0335eff484e0fcd3c56837b1a2a6f1be3902c9045ce6c'
+  '91ff9b22276484258f55e9b57bf4898e9c2121d720ff56587d014d9d5c965ede'
+  'f6a3cd01ca9d91bea54c6b8999cd2db156d2717a46024cd511be250613bf9353'
+  '172cd1cbe4e4cf029b567e73ccf1cfebe8fecda0d6b2cbe8195cc9a833e7f9c8'
   'cbe699652a2569ac1c5b9d9dd983d8d3788013c346a5c247425e460398771455'
   '53883f4fdfc51da84691ec7ac74378dc8337fb8514ef1de66dc1a24e9b290ba1'
   'f843bce1b2b436bf017f5c3f325c7e94787e123579d18d6c4670d3968b3ff7a7'
@@ -217,8 +227,6 @@ _postinst_message() {
 
 build() {
   cd "${srcdir}/janus-gateway-${_pkgver}"
-  patch -Np1 -i ../janus.jcfg.patch
-
   export CFLAGS="-I/opt/zextras/common/include -ffile-prefix-map=${srcdir}=."
   export LDFLAGS="-Wl,-rpath,/opt/zextras/common/lib \
     -Wl,-rpath,/opt/zextras/common/lib64 \
@@ -283,12 +291,13 @@ package_carbonio-videoserver-ce__ubuntu_jammy() {
 package_carbonio-videoserver-confs-ce() {
   pkgdesc="Janus WebRTC server configuration files for Carbonio CE"
   depends=()
-  cd "${srcdir}/janus-gateway-${_pkgver}"
-  make DESTDIR="${pkgdir}" configs
-  # carbonio-videoserver-configs renders these from the templates on every setup
-  mv "${pkgdir}/etc/janus/janus.jcfg" "${pkgdir}/etc/janus/janus.jcfg.sample"
-  mv "${pkgdir}/etc/janus/janus.eventhandler.rabbitmqevh.jcfg" \
-    "${pkgdir}/etc/janus/janus.eventhandler.rabbitmqevh.jcfg.sample"
+  cd "${srcdir}"
+  install -Dm644 "janus.jcfg.sample" "${pkgdir}/etc/janus/janus.jcfg.sample"
+  install -Dm644 "janus.eventhandler.rabbitmqevh.jcfg.sample" "${pkgdir}/etc/janus/janus.eventhandler.rabbitmqevh.jcfg.sample"
+  install -Dm644 "janus.plugin.audiobridge.jcfg" "${pkgdir}/etc/janus/janus.plugin.audiobridge.jcfg"
+  install -Dm644 "janus.plugin.videoroom.jcfg" "${pkgdir}/etc/janus/janus.plugin.videoroom.jcfg"
+  install -Dm644 "janus.transport.http.jcfg" "${pkgdir}/etc/janus/janus.transport.http.jcfg"
+  install -Dm644 "janus.transport.rabbitmq.jcfg" "${pkgdir}/etc/janus/janus.transport.rabbitmq.jcfg"
 }
 
 postinst__apt() {
