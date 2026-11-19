@@ -334,6 +334,7 @@ postrm__apt() {
 
 postrm__yum() {
   rm -f /etc/carbonio/videoserver/service-discover/token
+  rm -f /etc/janus/janus.jcfg /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
   fi
