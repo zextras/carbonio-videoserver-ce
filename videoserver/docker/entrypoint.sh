@@ -8,9 +8,8 @@ JANUS_CFG="/etc/janus/janus.jcfg"
 RABBITMQ_EVH_CFG="/etc/janus/janus.eventhandler.rabbitmqevh.jcfg"
 
 # api-secret: the value k3d stores in Consul for ws-collaboration
-sed "s|\${API_SECRET}|${API_SECRET:-api-secret}|" "$JANUS_CFG.sample" >"$JANUS_CFG"
-sed -e "s|<RABBITMQ_USERNAME>|${RABBITMQ_USERNAME:-guest}|" \
-	-e "s|<RABBITMQ_PASSWORD>|${RABBITMQ_PASSWORD:-guest}|" \
+sed "s|\${API_SECRET}|api-secret|" "$JANUS_CFG.sample" >"$JANUS_CFG"
+sed -e "s|<RABBITMQ_USERNAME>|guest|" -e "s|<RABBITMQ_PASSWORD>|guest|" \
 	"$RABBITMQ_EVH_CFG.sample" >"$RABBITMQ_EVH_CFG"
 sed -i 's|^\(\s*\(admin_\)\{0,1\}ip = \)"127.0.0.1"|\1"0.0.0.0"|' /etc/janus/janus.transport.http.jcfg
 
