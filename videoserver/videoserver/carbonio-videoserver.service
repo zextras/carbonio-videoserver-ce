@@ -5,7 +5,6 @@ PartOf=carbonio.target
 
 [Service]
 Type=simple
-ExecStartPre=/usr/bin/carbonio-message-broker-consul-check
 ExecStart=/opt/zextras/common/bin/janus
 User=videoserver
 Group=videoserver
