@@ -31,29 +31,6 @@ sed -i \
 	"$RABBITMQ_EVH_CFG"
 echo "rabbitmq event handler set to: ${RABBITMQ_HOST}:${RABBITMQ_PORT}"
 
-# janus keeps running without its event handler if the broker is unreachable at
-# startup, so nobody notices the missing events; through the mesh the upstream
-# also only exists once the sidecar's envoy is up. Same reason the packaged unit
-# has carbonio-message-broker-consul-check as ExecStartPre.
-#
-# A plain TCP connect is not enough: envoy accepts on the upstream port whether
-# or not the broker behind it is serving. Sending the AMQP header and waiting for
-# a reply is what tells the two apart. Subshell so a failed redirect can't take
-# the script down with it.
-broker_speaks_amqp() {
-	(
-		exec 3<>"/dev/tcp/${RABBITMQ_HOST}/${RABBITMQ_PORT}" &&
-			printf 'AMQP\x00\x00\x09\x01' >&3 &&
-			read -r -t 2 -N 1 _ <&3
-	) 2>/dev/null
-}
-
-for _ in $(seq 1 30); do
-	broker_speaks_amqp && break
-	echo "waiting for rabbitmq at ${RABBITMQ_HOST}:${RABBITMQ_PORT}..."
-	sleep 2
-done
-
 if [ -n "$NAT_IP" ]; then
 	sed -i "s|\${PUBLIC_IP_ADDRESS}|$NAT_IP|" "$JANUS_CFG"
 	echo "nat_1_1_mapping set to: $NAT_IP"
