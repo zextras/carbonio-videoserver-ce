@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.36...v1.4.0) (2026-11-19)
+
+### Features
+
+* **setup:** render the janus configs from templates on every setup ([#141](https://github.com/zextras/carbonio-videoserver-ce/issues/141)) ([c7440f1](https://github.com/zextras/carbonio-videoserver-ce/commit/c7440f10c9be7b8bedcae5559c104ac2b06a98fd))
+
 ## [1.3.36](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.35...v1.3.36) (2026-11-19)
 
 ## [1.3.35](https://github.com/zextras/carbonio-videoserver-ce/compare/v1.3.34...v1.3.35) (2026-11-18)
