@@ -30,14 +30,19 @@ case "$*" in
   *) exit 1 ;;
 esac
 EOF
+cat >"$TEST_DIR/bin/chown" <<'EOF'
+#!/bin/sh
+printf '%s\n' "$*" >>"$STUB_CHOWNS"
+EOF
 cat >"$TEST_DIR/bin/curl" <<'EOF'
 #!/bin/sh
 [ -n "$STUB_PUBLIC_IP" ] && printf '%s' "$STUB_PUBLIC_IP"
 EOF
-chmod +x "$TEST_DIR/bin/consul" "$TEST_DIR/bin/curl"
+chmod +x "$TEST_DIR/bin/consul" "$TEST_DIR/bin/curl" "$TEST_DIR/bin/chown"
 
 export PATH="$TEST_DIR/bin:$PATH"
 export STUB_CONSUL_PUTS="$TEST_DIR/consul-puts"
+export STUB_CHOWNS="$TEST_DIR/chowns"
 export STUB_API_SECRET='api/secret+=='
 export STUB_RABBITMQ_USERNAME='janus'
 export STUB_RABBITMQ_PASSWORD='pa/ss&w|o"rd\x'
@@ -71,7 +76,10 @@ assert_contains "$JANUS_CFG" 'nat_1_1_mapping = "203.0.113.7"'
 assert_matches "$JANUS_CFG" '^[[:space:]]*#keep_private_host = true'
 assert_contains "$EVH_CFG" 'username = "janus"'
 assert_contains "$EVH_CFG" 'password = "pa/ss&w|o\"rd\\x"'
-[[ "$(file_mode "$JANUS_CFG")" == 644 ]] || fail "fresh janus.jcfg has mode $(file_mode "$JANUS_CFG")"
+[[ "$(file_mode "$JANUS_CFG")" == 640 ]] || fail "fresh janus.jcfg has mode $(file_mode "$JANUS_CFG")"
+[[ "$(file_mode "$EVH_CFG")" == 640 ]] || fail "fresh event handler config has mode $(file_mode "$EVH_CFG")"
+grep -q "^root:videoserver .*/janus.jcfg.tmp" "$STUB_CHOWNS" || fail "janus.jcfg not given to root:videoserver"
+grep -q "^root:videoserver .*/janus.eventhandler.rabbitmqevh.jcfg.tmp" "$STUB_CHOWNS" || fail "event handler config not given to root:videoserver"
 
 # CO-4495: changed credentials reach the live files on the next setup.
 STUB_API_SECRET='rotated-secret' STUB_RABBITMQ_PASSWORD='rotated-password' "$CONFIGS"
@@ -119,10 +127,10 @@ assert_contains "$JANUS_CFG" "api_secret = \"$STORED_SECRET\""
 STUB_RABBITMQ_PASSWORD='' "$CONFIGS"
 assert_contains "$EVH_CFG" 'password = "pa/ss&w|o\"rd\\x"'
 
-# A mode the admin tightened on a file full of credentials is kept.
-chmod 600 "$JANUS_CFG"
+# Credentials stay readable by janus only, also when an older config was world-readable.
+chmod 644 "$JANUS_CFG"
 "$CONFIGS"
-[[ "$(file_mode "$JANUS_CFG")" == 600 ]] || fail "re-render reset janus.jcfg to mode $(file_mode "$JANUS_CFG")"
+[[ "$(file_mode "$JANUS_CFG")" == 640 ]] || fail "re-render left janus.jcfg with mode $(file_mode "$JANUS_CFG")"
 
 # A missing template fails without touching the config in place.
 mv "$JANUS_CFG.sample" "$TEST_DIR/template.away"
