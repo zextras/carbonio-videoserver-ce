@@ -20,6 +20,9 @@ cat >"$JANUS_CFG.sample" <<'EOF'
 general: {
 	api_secret = "${API_SECRET}"	# String that all Janus requests must contain
 }
+media: {
+	rtp_port_range = "20000-40000"
+}
 nat: {
 	nat_1_1_mapping = "${PUBLIC_IP_ADDRESS}"
 	#keep_private_host = true
@@ -93,10 +96,10 @@ assert_contains "$EVH_CFG" 'password = "rotated-password"'
 
 # Values the admin set by hand survive a re-render.
 edit "$JANUS_CFG" 's|nat_1_1_mapping = .*|nat_1_1_mapping = "198.51.100.1,10.0.0.1"|'
-edit "$JANUS_CFG" 's|#keep_private_host = true|keep_private_host = true|'
+edit "$JANUS_CFG" 's|rtp_port_range = .*|rtp_port_range = "30000-31000"|'
 STUB_PUBLIC_IP='192.0.2.99' "$CONFIGS"
 assert_contains "$JANUS_CFG" 'nat_1_1_mapping = "198.51.100.1,10.0.0.1"'
-assert_matches "$JANUS_CFG" '^[[:space:]]*keep_private_host = true'
+assert_contains "$JANUS_CFG" 'rtp_port_range = "30000-31000"'
 
 edit "$JANUS_CFG" 's|nat_1_1_mapping|#nat_1_1_mapping|'
 "$CONFIGS"

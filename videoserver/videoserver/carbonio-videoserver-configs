@@ -76,8 +76,8 @@ else
   JANUS_EDITS+=(-e "s|\${PUBLIC_IP_ADDRESS}|$(escape_string "$PUBLIC_IP")|")
 fi
 
-if PRIVATE_HOST_LINE=$(previous_line keep_private_host); then
-  keep_previous_line keep_private_host "$PRIVATE_HOST_LINE"
+if RTP_PORT_RANGE_LINE=$(previous_line rtp_port_range); then
+  keep_previous_line rtp_port_range "$RTP_PORT_RANGE_LINE"
 fi
 
 render "$JANUS_CFG" "${JANUS_EDITS[@]}"
