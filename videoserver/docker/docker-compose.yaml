@@ -21,23 +21,7 @@ services:
     develop:
       watch:
         - action: rebuild
-          path: config/janus.jcfg
-        - action: rebuild
-          path: config/janus.eventhandler.rabbitmqevh.jcfg
-        - action: rebuild
-          path: config/janus.eventhandler.rabbitmqevh.jcfg.sample
-        - action: rebuild
-          path: config/janus.plugin.audiobridge.jcfg
-        - action: rebuild
-          path: config/janus.plugin.audiobridge.jcfg.sample
-        - action: rebuild
-          path: config/janus.plugin.videoroom.jcfg
-        - action: rebuild
-          path: config/janus.plugin.videoroom.jcfg.sample
-        - action: rebuild
-          path: config/janus.transport.http.jcfg
-        - action: rebuild
-          path: config/janus.transport.http.jcfg.sample
+          path: entrypoint.sh
 networks:
   carbonio-network:
     name: carbonio-network
