@@ -104,7 +104,7 @@ section="comm"
 priority="important"
 source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${_pkgver}.tar.gz"
-  "janus.eventhandler.rabbitmqevh.retry-broker-at-start.patch"
+  "janus.eventhandler.rabbitmqevh.reconnect.patch"
   "621-carbonio-videoserver.sh"
   "carbonio-videoserver"
   "carbonio-videoserver.hcl"
@@ -225,7 +225,7 @@ _postinst_message() {
 
 prepare() {
   cd "${srcdir}/janus-gateway-${_pkgver}"
-  patch -p1 <"${srcdir}/janus.eventhandler.rabbitmqevh.retry-broker-at-start.patch"
+  patch -p1 <"${srcdir}/janus.eventhandler.rabbitmqevh.reconnect.patch"
 }
 
 build() {
