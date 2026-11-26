@@ -60,7 +60,23 @@
  			}
  			janus_mutex_unlock(&mutex);
  			free(event_text);
-@@ -657,18 +676,21 @@
+@@ -643,9 +662,12 @@
+ 
+ 	while(g_atomic_int_get(&initialized) && !g_atomic_int_get(&stopping)) {
+ 		janus_mutex_lock(&mutex);
+-		amqp_maybe_release_buffers(rmq_conn);
+-		/* Wait for a frame */
+-		int res = amqp_simple_wait_frame_noblock(rmq_conn, &frame, &timeout);
++		/* A connect refused after login leaves the socket open: don't wait on it to retry */
++		int res = AMQP_STATUS_CONNECTION_CLOSED;
++		if(!rmq_retrying) {
++			amqp_maybe_release_buffers(rmq_conn);
++			res = amqp_simple_wait_frame_noblock(rmq_conn, &frame, &timeout);
++		}
+ 		janus_mutex_unlock(&mutex);
+ 		if(res != AMQP_STATUS_OK) {
+ 			/* No data */
+@@ -657,18 +679,21 @@
  
  			JANUS_LOG(LOG_VERB, "RabbitMQEventHandler: Error on amqp_simple_wait_frame_noblock: %d (%s)\n", res, amqp_error_string2(res));
  
