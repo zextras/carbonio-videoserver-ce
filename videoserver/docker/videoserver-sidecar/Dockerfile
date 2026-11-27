@@ -3,10 +3,17 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 ARG SIDECAR_IMAGE=registry.dev.zextras.com/dev/carbonio-sidecar:main
+
+FROM --platform=$BUILDPLATFORM docker.io/library/alpine:3.20 AS hcl
+COPY videoserver/videoserver/carbonio-videoserver-template.hcl /carbonio-videoserver-template.hcl
+RUN sed -E 's/\{\{ or \(env "[A-Z0-9_]+"\) "([^"]*)" \}\}/\1/g' \
+    /carbonio-videoserver-template.hcl > /carbonio-videoserver.hcl \
+    && ! grep -q '{{' /carbonio-videoserver.hcl
+
 FROM ${SIDECAR_IMAGE}
 
 # Service registration (registered by the base entrypoint)
-COPY videoserver/videoserver/carbonio-videoserver.hcl /consul/config/
+COPY --from=hcl /carbonio-videoserver.hcl /consul/config/
 
 # Setup files
 COPY videoserver/videoserver/service-protocol.json /etc/carbonio/videoserver/service-discover/
