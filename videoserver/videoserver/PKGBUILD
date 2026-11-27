@@ -30,6 +30,7 @@ depends__apt=(
   "pending-setups"
   "service-discover"
   "service-discover-base"
+  "service-discover-template"
   "zlib1g"
 )
 depends__ubuntu_noble=(
@@ -55,6 +56,7 @@ depends__ubuntu_noble=(
   "pending-setups"
   "service-discover"
   "service-discover-base"
+  "service-discover-template"
   "zlib1g"
 )
 depends__yum=(
@@ -74,6 +76,7 @@ depends__yum=(
   "pending-setups"
   "service-discover"
   "service-discover-base"
+  "service-discover-template"
   "zlib"
 )
 makedepends__apt=(
@@ -106,7 +109,7 @@ source=(
   "https://github.com/meetecho/janus-gateway/archive/refs/tags/v${_pkgver}.tar.gz"
   "621-carbonio-videoserver.sh"
   "carbonio-videoserver"
-  "carbonio-videoserver.hcl"
+  "carbonio-videoserver-template.hcl"
   "carbonio-videoserver.service"
   "carbonio-videoserver-sidecar.service"
   "carbonio-videoserver-sidecar-legacy.service"
@@ -125,8 +128,8 @@ source=(
 sha256sums=(
   'ba0d588ad2500e98cdc82e3dc2051c37ba52fa4ff374d92cfcd1145eb4315596'
   'c474d6228fa89a5ddb79a5fae444efd4fee8d7a24fc5e31c5a9d60022a6556c5'
-  '1e59f5d36a9c1da8a2ef7dcec9c6bb40ba2b23d1d38085a141c7597ef367edce'
-  '1b5e448ae50961cd3d2cb1cf542e43752036e4a0ccf664cc0ce13fca2e67f4cf'
+  'dddc41d8903c29461969cf6776786ef6a540c2d0b92c3cec0fea8d1f187ad6e0'
+  '57a90f06a326714b3f7722a2e588a95a8140b3443d9fcfdb845b97c6039c2b51'
   '798368b51267b7be2ad7a756c4f8506dd0d3db1484ccd017e48d4e6dfeeace8f'
   'd6b6a4d72555d1931365dcfdad26c01453831dc9b1b1e9a17f4b71cdfd15cd48'
   'e9356df33318d350c0eec141b4bb2dc728efa44f031afb9349c5aaa806574379'
@@ -151,8 +154,8 @@ _package_common() {
     "${pkgdir}/usr/bin/carbonio-videoserver"
   install -Dm644 "${srcdir}/carbonio-videoserver.service" \
     "${pkgdir}/usr/lib/systemd/system/carbonio-videoserver.service"
-  install -Dm644 "${srcdir}/carbonio-videoserver.hcl" \
-    "${pkgdir}/etc/zextras/service-discover/carbonio-videoserver.hcl"
+  install -Dm644 "${srcdir}/carbonio-videoserver-template.hcl" \
+    "${pkgdir}/etc/zextras/service-discover/templates/carbonio-videoserver-template.hcl"
   install -Dm644 "${srcdir}/621-carbonio-videoserver.sh" \
     "${pkgdir}/etc/zextras/pending-setups.d/621-carbonio-videoserver.sh"
   install -Dm755 "${srcdir}/carbonio-videoserver-configs" \
@@ -312,6 +315,7 @@ postinst__yum() {
 }
 
 postrm__apt() {
+  rm -f /etc/zextras/service-discover/carbonio-videoserver.hcl
   if [ "$1" = "purge" ]; then
     if getent passwd videoserver >/dev/null; then
       if which deluser >/dev/null; then
@@ -326,6 +330,7 @@ postrm__apt() {
 
     rm -f /etc/carbonio/videoserver/service-discover/token
     rm -f /etc/janus/janus.jcfg /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
+    rm -f /etc/zextras/service-discover/carbonio-videoserver.env
     if [ -d /run/systemd/system ]; then
       systemctl daemon-reload >/dev/null 2>&1 || :
     fi
@@ -335,6 +340,7 @@ postrm__apt() {
 postrm__yum() {
   rm -f /etc/carbonio/videoserver/service-discover/token
   rm -f /etc/janus/janus.jcfg /etc/janus/janus.eventhandler.rabbitmqevh.jcfg
+  rm -f /etc/zextras/service-discover/carbonio-videoserver.hcl
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
   fi
